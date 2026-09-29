@@ -3,13 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>מערכת ניהול שעות ונוכחות</title>
-<link rel="manifest" href="manifest.webmanifest">
+<title>אברהם – שעות ונוכחות</title>
+<link rel="manifest" id="mf" href="manifest.webmanifest">
+<script>if (/[?&]mode=receipts/.test(location.search)) { document.getElementById("mf").href = "manifest-rcp.webmanifest"; document.title = "אברהם – קבלות"; document.documentElement.classList.add("mode-rcp"); }</script>
 <meta name="theme-color" content="#0f2542">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="icon.svg">
+<link rel="apple-touch-icon" id="ati" href="icon-180.png">
+<link rel="icon" type="image/png" href="icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="שעות עבודה">
+<meta name="apple-mobile-web-app-title" id="amt" content="אברהם">
+<script>if (document.documentElement.classList.contains("mode-rcp")) { document.getElementById("ati").href = "rcp-180.png"; document.getElementById("amt").content = "קבלות"; }</script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 <style>
@@ -249,6 +252,16 @@ tr.weekrow.active td{outline:2px solid var(--green);outline-offset:-2px}
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:10px}
 .kpis div{border:1px solid var(--line);border-radius:10px;padding:8px 10px}.kpis b{display:block;font-size:20px}
 .rcp-st{font-size:12px;border-radius:8px;padding:0 6px}.rcp-st.ok{background:#e6f6ea;color:#1f6b35}.rcp-st.no{background:#fde2e2;color:#9b1c1c}
+.mode-rcp #app>*:not(.rcpbar){display:none!important}
+.rcpbar{display:none}
+.mode-rcp .rcpbar{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;background:linear-gradient(135deg,#1f6b35,#2b8a4a);color:#fff;border-radius:12px;padding:12px 16px;margin-bottom:10px}
+.mode-rcp .rcpbar b{font-size:20px}
+.mode-rcp .rcpbar a,.mode-rcp .rcpbar button{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.35);border-radius:8px;padding:6px 12px;text-decoration:none;font-size:13px}
+.mode-rcp .modal-bg.rcpfull{position:static;background:none;padding:0;display:block}
+.mode-rcp .modal-bg.rcpfull .modal{max-width:1000px;width:auto;margin:0 auto;max-height:none;box-shadow:var(--shadow)}
+.mode-rcp .modal-bg.rcpfull .modal>h3 [data-close]{display:none}
+.install-card{margin-top:14px;padding-top:12px;border-top:1px dashed var(--line);text-align:center}
+.qrbox{display:flex;justify-content:center;margin:10px 0}.qrbox img,.qrbox canvas{background:#fff;padding:8px;border-radius:10px}
 .list-item{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 10px;border:1px solid var(--line);border-radius:8px;margin-bottom:6px}
 .fixed-grid{display:grid;grid-template-columns:70px 1fr 1fr;gap:6px 10px;align-items:center}
 #toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:10px 18px;border-radius:10px;z-index:9999;font-size:14px;opacity:0;transition:opacity .25s;pointer-events:none}
@@ -266,8 +279,8 @@ tr.weekrow.active td{outline:2px solid var(--green);outline-offset:-2px}
 <div id="login-screen" class="hidden">
   <div class="login-card">
     <div id="login-view">
-      <h2>מערכת ניהול שעות ונוכחות</h2>
-      <div class="sub">כניסה למערכת</div>
+      <h2 id="login-title">אברהם – שעות ונוכחות</h2>
+      <div class="sub" id="login-sub">כניסה למערכת – רק משתמשים שהמנהל רשם יכולים להיכנס</div>
       <input type="email" id="login-email" placeholder="שם משתמש (מייל)" autocomplete="username">
       <input type="password" id="login-password" placeholder="סיסמה" autocomplete="current-password">
       <button id="login-btn">כניסה</button>
@@ -275,6 +288,7 @@ tr.weekrow.active td{outline:2px solid var(--green);outline-offset:-2px}
       <button id="google-btn" class="gbtn"><svg viewBox="0 0 48 48" width="18" height="18" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg> כניסה עם חשבון Google (ג'ימייל)</button>
       <button class="linkbtn" id="forgot-link">שכחתי סיסמה</button>
       <div id="login-msg" class="msg"></div>
+      <div class="install-card"><button class="b-blue" id="login-install">📲 הורד את האפליקציה לטלפון</button></div>
     </div>
     <div id="forgot-view" class="hidden">
       <h2>שחזור סיסמה</h2>
@@ -299,6 +313,7 @@ tr.weekrow.active td{outline:2px solid var(--green);outline-offset:-2px}
 
 <!-- ===== המערכת ===== -->
 <div id="app" class="hidden">
+  <div class="rcpbar"><span>📸 <b>קבלות וחשבונות</b> <span id="rcpbar-name"></span></span><span style="display:flex;gap:6px;flex-wrap:wrap"><a href="./">🏠 לאפליקציה המלאה</a><button id="rcpbar-install">📲 התקן</button><button id="rcpbar-out">🚪 יציאה</button></span></div>
   <div class="hero">
     <div class="hero-clock" id="hero-clock">
       <svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="46" fill="rgba(255,255,255,.06)" stroke="rgba(255,255,255,.55)" stroke-width="3"/>
@@ -1846,6 +1861,7 @@ function barChart(existing, canvas, labels, data, hi, tipTitle){
   });
 }
 function renderCharts(){
+  if (typeof Chart === "undefined") { document.querySelectorAll(".chart-card").forEach(c => c.classList.add("hidden")); return; }
   const yd = MONTHS.map((_, i) => { const [f, t] = monthRange(cur.y, i); return +hoursInRange(f, t).toFixed(2); });
   $("year-title").textContent = `📈 גרף מעקב שנתי – ${cur.y}`;
   if (yearChart) yearChart.destroy();
@@ -1877,7 +1893,7 @@ function modal(html){
   bg.addEventListener("click", e => { if (e.target === bg || e.target.closest("[data-close]")) closeModal(); });
   return bg.querySelector(".modal");
 }
-function closeModal(){ $("modal-root").innerHTML = ""; }
+function closeModal(){ $("modal-root").innerHTML = ""; if (typeof RCP_MODE !== "undefined" && RCP_MODE && me && !$("app").classList.contains("hidden")) setTimeout(() => { if (!$("modal-root").firstChild) openReceiptsPage(); }, 0); }
 const closeX = `<button class="iconbtn mini" data-close>✕</button>`;
 
 // ---- שעות קבועות ----
@@ -1975,7 +1991,7 @@ function openMe(){
     <button class="b-blue" id="me-fixed">פתח הגדרת שעות קבועות לימים</button>
 
     <h4>📱 אפליקציה בטלפון</h4>
-    <button class="b-blue" id="me-install">📲 התקן את המערכת כאפליקציה</button>
+    <div class="frow"><button class="b-blue" id="me-install">📲 התקן את "אברהם" כאפליקציה</button><a class="btnlink b-green" href="receipts/">📸 אפליקציית הקבלות (קישור נפרד)</a></div>
 
     <h4>🎨 צבע המערכת</h4>
     <div class="swatches">${ACCENTS.map((a, i) => `<button data-acc="${i}" class="${i === acc ? "on" : ""}" style="background:${a[0]}" title="צבע ${i + 1}"></button>`).join("")}<button data-acc="-1" class="${acc < 0 ? "on" : ""}" style="background:linear-gradient(135deg,#2f6fdb 50%,#fff 50%)" title="ברירת מחדל"></button></div>
@@ -2656,6 +2672,15 @@ async function exportExcel(){
 }
 
 // ================== התחברות (Firebase) ==================
+// בדיקה אילו כתובות חסומות (למשל ע"י סינון אינטרנט כמו נטפרי)
+async function netBlockReport(){
+  const T = [["www.gstatic.com", "https://www.gstatic.com/firebasejs/" + FB_VER + "/firebase-app.js"], ["firestore.googleapis.com", "https://firestore.googleapis.com/"], ["identitytoolkit.googleapis.com", "https://identitytoolkit.googleapis.com/"], ["cdn.jsdelivr.net", "https://cdn.jsdelivr.net/npm/chart.js@4.4.3/package.json"], ["api.emailjs.com", "https://api.emailjs.com/"]];
+  const bad = [];
+  await Promise.all(T.map(async ([d, u]) => { try { await fetch(u, { mode: "no-cors", cache: "no-store" }); } catch (e) { bad.push(d); } }));
+  const el = $("login-msg"); el.className = "msg err";
+  el.innerHTML = bad.length ? `⛔ המערכת לא מצליחה להתחבר. נראה שסינון האינטרנט (למשל <b>נטפרי</b>) חוסם את הכתובות:<br><b dir="ltr">${bad.join("<br>")}</b><br>צריך לבקש מהסינון לפתוח אותן (יחד עם <b dir="ltr">mutzlach-il.github.io</b>).`
+    : "שגיאה בחיבור לשרת. בדוק את האינטרנט ורענן.";
+}
 async function initFirebase(){
   const base = `https://www.gstatic.com/firebasejs/${FB_VER}/`;
   const [app, a, f] = await Promise.all([import(base + "firebase-app.js"), import(base + "firebase-auth.js"), import(base + "firebase-firestore.js")]);
@@ -2665,7 +2690,7 @@ async function initFirebase(){
   a.onAuthStateChanged(fb.auth, onAuth);
 }
 async function onAuth(user){
-  if (!user) { me = null; show("login-screen"); return; }
+  if (!user) { me = null; $("modal-root").innerHTML = ""; show("login-screen"); return; }
   const { a, f } = fb, email = norm(user.email);
   try {
     if (email === CFG.admin && !user.emailVerified) {
@@ -2685,6 +2710,12 @@ async function onAuth(user){
     console.error(err); await a.signOut(fb.auth); setMsg("login-msg", "שגיאה בטעינה: " + (err.code || err.message), false);
   }
 }
+const RCP_MODE = document.documentElement.classList.contains("mode-rcp");
+async function openReceiptsPage(){
+  await openReceipts();
+  const bg = $("modal-root").firstChild; if (bg) bg.classList.add("rcpfull");
+  $("rcpbar-name").textContent = "· " + (isAdmin ? "מנהל – כל הדירות" : (settings.name || me));
+}
 async function openSystem(email, fallbackName){
   viewEmail = email;
   await DB.loadAll(email);
@@ -2693,11 +2724,12 @@ async function openSystem(email, fallbackName){
   $("settings-btn").classList.toggle("hidden", !isAdmin);
   $("msg-btn").classList.toggle("hidden", isAdmin);
   startNotify();
+  if (RCP_MODE) openReceiptsPage();
   if (isAdmin) { clearInterval(openSystem._iv); openSystem._iv = setInterval(adminScan, 5 * 60000); fillUserSwitcher(); setTimeout(maybeAutoBackup, 4000); setTimeout(maybeMonthlyReport, 9000); adminScan(); }
 }
 function updateHeader(){
   $("who-name").textContent = settings.name || viewEmail;
-  document.title = `${settings.name ? settings.name + " – " : ""}מערכת ניהול שעות ונוכחות`;
+  document.title = document.documentElement.classList.contains("mode-rcp") ? "קבלות – אברהם" : `${settings.name ? settings.name + " – " : ""}אברהם`;
 }
 async function fillUserSwitcher(){
   const sel = $("view-user");
@@ -2839,6 +2871,9 @@ function wire(){
   $("rcp-btn").onclick = () => openReceipts().catch(e => toast("שגיאה: " + e.message));
   $("rep-btn").onclick = () => openReports().catch(e => toast("שגיאה: " + e.message));
   $("help-btn").onclick = openHelp;
+  $("login-install").onclick = installApp; $("rcpbar-install").onclick = installApp;
+  $("rcpbar-out").onclick = () => $("logout-btn").click();
+  if (document.documentElement.classList.contains("mode-rcp")) { $("login-title").textContent = "📸 קבלות וחשבונות"; $("login-sub").textContent = "כניסה – רק משתמשים שהמנהל רשם יכולים להיכנס"; }
   $("apt-btn").onclick = openAptCard;
   $("stats-btn").onclick = openStats;
   $("cal-btn").onclick = openCal;
@@ -2867,13 +2902,19 @@ function markWeek(){ document.querySelectorAll("tr.weekrow").forEach(r => r.clas
 let installEvt = null;
 window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); installEvt = e; });
 if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(() => {});
+const APP_URL = "https://mutzlach-il.github.io/my-hours/", RCP_URL = "https://mutzlach-il.github.io/my-hours/receipts/";
 async function installApp(){
   if (installEvt) { installEvt.prompt(); const r = await installEvt.userChoice.catch(() => null); installEvt = null; if (r && r.outcome === "accepted") toast("האפליקציה הותקנה ✔"); return; }
-  const ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
-  modal(`<h3>📱 התקנה בטלפון ${closeX}</h3>${ios
-    ? `<ol style="line-height:1.9"><li>פתח את האתר ב-<b>Safari</b>.</li><li>לחץ על כפתור השיתוף <b>⬆️</b> בתחתית המסך.</li><li>בחר <b>"הוסף למסך הבית"</b> ואז <b>"הוסף"</b>.</li></ol>`
-    : `<ol style="line-height:1.9"><li>פתח את האתר ב-<b>Chrome</b> בטלפון.</li><li>לחץ על <b>⋮</b> (שלוש הנקודות למעלה).</li><li>בחר <b>"התקנת אפליקציה"</b> או <b>"הוספה למסך הבית"</b>.</li></ol>`}
-    <div class="muted">אחרי זה יופיע אייקון "שעות עבודה" במסך הבית, שנפתח ישר למערכת.</div>`);
+  const ios = /iphone|ipad|ipod/i.test(navigator.userAgent), rcp = document.documentElement.classList.contains("mode-rcp"), url = rcp ? RCP_URL : APP_URL;
+  const m = modal(`<h3>📲 הורדת האפליקציה "${rcp ? "קבלות" : "אברהם"}" לטלפון ${closeX}</h3>
+    <div class="muted" style="margin-bottom:8px">כל טלפון יכול להוריד. אחרי ההתקנה נכנסים עם שם משתמש (מייל) וסיסמה – מי שהמנהל לא רשם לא יוכל להיכנס.</div>
+    <div class="qrbox" id="qr"></div>
+    <div style="text-align:center;margin-bottom:10px"><b dir="ltr">${url}</b><br><button class="b-gray" id="in-copy" style="margin-top:6px">📋 העתק קישור</button> <a class="btnlink b-wa" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent((rcp ? "📸 אפליקציית הקבלות: " : "📱 אפליקציית השעות אברהם: ") + url)}">🟢 שלח בוואטסאפ</a></div>
+    <h4>🤖 אנדרואיד (Chrome)</h4><ol style="line-height:1.9"><li>פותחים את הקישור ב-<b>Chrome</b>.</li><li>לוחצים על <b>⋮</b> (שלוש הנקודות למעלה).</li><li>בוחרים <b>"התקנת אפליקציה"</b> או <b>"הוספה למסך הבית"</b>.</li></ol>
+    <h4>🍎 אייפון (Safari)</h4><ol style="line-height:1.9"><li>פותחים את הקישור ב-<b>Safari</b>.</li><li>לוחצים על כפתור השיתוף <b>⬆️</b> בתחתית המסך.</li><li>בוחרים <b>"הוסף למסך הבית"</b> ואז <b>"הוסף"</b>.</li></ol>
+    <div class="muted">אחרי זה יופיע במסך הבית האייקון "${rcp ? "קבלות" : "אברהם"}", שנפתח כמו אפליקציה רגילה.</div>`);
+  m.querySelector("#in-copy").onclick = () => { navigator.clipboard?.writeText(url).then(() => toast("הקישור הועתק ✔")).catch(() => toast(url)); };
+  try { await loadScript("https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"); const q = qrcode(0, "M"); q.addData(url); q.make(); m.querySelector("#qr").innerHTML = q.createImgTag(5, 8); } catch (e) {}
 }
 
 // ================== הפעלה ==================
@@ -2888,7 +2929,7 @@ async function installApp(){
   setInterval(() => { if (!$("app").classList.contains("hidden") && isAdmin) adminScan(); }, 600000);
   if (DEMO) { $("demo-flag").classList.remove("hidden"); me = viewEmail = "demo@example.com"; isAdmin = !new URLSearchParams(location.search).has("worker"); await openSystem(me); return; }
   try { await initFirebase(); }
-  catch (e) { show("login-screen"); setMsg("login-msg", "שגיאה בחיבור לשרת. בדוק את האינטרנט ורענן.", false); }
+  catch (e) { show("login-screen"); netBlockReport(); }
 })();
 </script>
 </body>
