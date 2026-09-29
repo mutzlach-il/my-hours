@@ -1,0 +1,2 @@
+[{"relation":["delegate_permission/common.handle_all_urls"],"target":{"namespace":"android_app","package_name":"io.github.mutzlachil.avraham","sha256_cert_fingerprints":["09:AA:97:10:FA:F1:78:CB:44:3C:A1:0D:E3:AE:68:81:4F:D5:E9:95:6C:75:71:66:8E:44:88:5E:43:D4:AC:4F"]}},
+ {"relation":["delegate_permission/common.handle_all_urls"],"target":{"namespace":"android_app","package_name":"io.github.mutzlachil.kabalot","sha256_cert_fingerprints":["09:AA:97:10:FA:F1:78:CB:44:3C:A1:0D:E3:AE:68:81:4F:D5:E9:95:6C:75:71:66:8E:44:88:5E:43:D4:AC:4F"]}}]
