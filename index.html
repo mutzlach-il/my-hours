@@ -2017,7 +2017,7 @@ function openMe(){
   const fz = d => { prefs.font = Math.max(-2, Math.min(4, (prefs.font || 0) + d)); savePrefs(); applyFont(); m.querySelector("#pf-fv").textContent = (100 + prefs.font * 8) + "%"; };
   m.querySelector("#pf-fm").onclick = () => fz(-1); m.querySelector("#pf-fp").onclick = () => fz(1);
   m.querySelector("#me-slip").onclick = () => { const v = m.querySelector("#me-slip-m").value; if (!v) return; const [y, mm] = v.split("-").map(Number); exportSlips([selfMember()], y, mm - 1); };
-  m.querySelector("#me-install").onclick = installApp;
+  m.querySelector("#me-install").onclick = installApp; if (IN_APP) m.querySelector("#me-install").classList.add("hidden");
   m.querySelectorAll("[data-acc]").forEach(b => b.onclick = () => {
     const i = +b.dataset.acc; try { localStorage.setItem("accent", i); } catch (e) {}
     applyAccent(i); renderCharts(); m.querySelectorAll("[data-acc]").forEach(x => x.classList.toggle("on", x === b));
@@ -2872,6 +2872,7 @@ function wire(){
   $("rep-btn").onclick = () => openReports().catch(e => toast("שגיאה: " + e.message));
   $("help-btn").onclick = openHelp;
   $("login-install").onclick = installApp; $("rcpbar-install").onclick = installApp;
+  if (IN_APP) { $("login-install").parentElement.classList.add("hidden"); $("rcpbar-install").classList.add("hidden"); }
   $("rcpbar-out").onclick = () => $("logout-btn").click();
   if (document.documentElement.classList.contains("mode-rcp")) { $("login-title").textContent = "📸 קבלות וחשבונות"; $("login-sub").textContent = "כניסה – רק משתמשים שהמנהל רשם יכולים להיכנס"; }
   $("apt-btn").onclick = openAptCard;
@@ -2903,7 +2904,24 @@ let installEvt = null;
 window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); installEvt = e; });
 if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(() => {});
 const APP_URL = "https://mutzlach-il.github.io/my-hours/", RCP_URL = "https://mutzlach-il.github.io/my-hours/receipts/";
+const DL_URL = "https://mutzlach-il.github.io/my-hours/download/";
+const IN_APP = (() => { try { if (/[?&]app=android/.test(location.search)) sessionStorage.setItem("inApp", "1"); return sessionStorage.getItem("inApp") === "1" || matchMedia("(display-mode: standalone)").matches || document.referrer.startsWith("android-app://"); } catch (e) { return false; } })();
 async function installApp(){
+  const isAndroid = /android/i.test(navigator.userAgent), rcpM = document.documentElement.classList.contains("mode-rcp");
+  if (isAndroid) {
+    const apk = DL_URL + (rcpM ? "kabalot.apk" : "avraham.apk");
+    const a = document.createElement("a"); a.href = apk; a.download = rcpM ? "kabalot.apk" : "avraham.apk"; document.body.appendChild(a); a.click(); a.remove();
+    modal(`<h3>⬇️ האפליקציה "${rcpM ? "קבלות" : "אברהם"}" יורדת לטלפון ${closeX}</h3>
+      <ol style="line-height:2">
+        <li>כשההורדה נגמרת לוחצים <b>"פתח"</b> (או פותחים את הקובץ מההורדות).</li>
+        <li>אם הטלפון שואל – מאשרים <b>"לאפשר התקנה ממקור זה"</b>.</li>
+        <li>לוחצים <b>"התקנה"</b>. אם מופיעה אזהרה של Play Protect – <b>"פרטים נוספים" ← "להתקין בכל זאת"</b>.</li>
+        <li>פותחים את האפליקציה ונכנסים עם שם המשתמש והסיסמה.</li>
+      </ol>
+      <div style="text-align:center"><a class="btnlink b-blue" href="${apk}" download>⬇️ ההורדה לא התחילה? לחץ כאן</a></div>
+      <div class="muted" style="margin-top:10px">מי שהמנהל לא רשם – לא יוכל להיכנס.</div>`);
+    return;
+  }
   if (installEvt) { installEvt.prompt(); const r = await installEvt.userChoice.catch(() => null); installEvt = null; if (r && r.outcome === "accepted") toast("האפליקציה הותקנה ✔"); return; }
   const ios = /iphone|ipad|ipod/i.test(navigator.userAgent), rcp = document.documentElement.classList.contains("mode-rcp"), url = rcp ? RCP_URL : APP_URL;
   const m = modal(`<h3>📲 הורדת האפליקציה "${rcp ? "קבלות" : "אברהם"}" לטלפון ${closeX}</h3>
@@ -2912,7 +2930,8 @@ async function installApp(){
     <div style="text-align:center;margin-bottom:10px"><b dir="ltr">${url}</b><br><button class="b-gray" id="in-copy" style="margin-top:6px">📋 העתק קישור</button> <a class="btnlink b-wa" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent((rcp ? "📸 אפליקציית הקבלות: " : "📱 אפליקציית השעות אברהם: ") + url)}">🟢 שלח בוואטסאפ</a></div>
     <h4>🤖 אנדרואיד (Chrome)</h4><ol style="line-height:1.9"><li>פותחים את הקישור ב-<b>Chrome</b>.</li><li>לוחצים על <b>⋮</b> (שלוש הנקודות למעלה).</li><li>בוחרים <b>"התקנת אפליקציה"</b> או <b>"הוספה למסך הבית"</b>.</li></ol>
     <h4>🍎 אייפון (Safari)</h4><ol style="line-height:1.9"><li>פותחים את הקישור ב-<b>Safari</b>.</li><li>לוחצים על כפתור השיתוף <b>⬆️</b> בתחתית המסך.</li><li>בוחרים <b>"הוסף למסך הבית"</b> ואז <b>"הוסף"</b>.</li></ol>
-    <div class="muted">אחרי זה יופיע במסך הבית האייקון "${rcp ? "קבלות" : "אברהם"}", שנפתח כמו אפליקציה רגילה.</div>`);
+    <div class="muted">אחרי זה יופיע במסך הבית האייקון "${rcp ? "קבלות" : "אברהם"}", שנפתח כמו אפליקציה רגילה.</div>
+    <div style="text-align:center;margin-top:10px"><a class="btnlink b-green" href="${DL_URL}" target="_blank" rel="noopener">🤖 דף ההורדה לאנדרואיד (קובץ אפליקציה)</a></div>`);
   m.querySelector("#in-copy").onclick = () => { navigator.clipboard?.writeText(url).then(() => toast("הקישור הועתק ✔")).catch(() => toast(url)); };
   try { await loadScript("https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"); const q = qrcode(0, "M"); q.addData(url); q.make(); m.querySelector("#qr").innerHTML = q.createImgTag(5, 8); } catch (e) {}
 }
