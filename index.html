@@ -59,6 +59,7 @@ input:focus,select:focus{outline:2px solid var(--accent);outline-offset:0}
 .hero-clock .t{font-size:30px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:1px}
 .hero-clock .d{font-size:12.5px;opacity:.9}
 @media(max-width:1250px){.hero-clock{position:static;transform:none;display:inline-flex;text-align:right;margin-bottom:8px}}
+.hero .view-wrap{margin-top:8px;position:relative;z-index:2}
 .wnote{display:inline-block;margin-inline-start:14px;color:var(--amber);font-weight:700}
 tr.monthrow .wnote{color:#ffd57a}
 .wnote-w{color:#1f7ae0}
@@ -116,7 +117,7 @@ html[data-theme="dark"] .announce{background:#3a3012;color:#f3dc92;border-color:
 .hero{position:relative;background:linear-gradient(135deg,#0f2542,#1d3b66);color:#fff;border-radius:12px;box-shadow:var(--shadow);padding:18px 16px;margin-bottom:12px;text-align:center}
 .hero .name{font-size:26px;font-weight:800;letter-spacing:.5px}
 .hero .sub{font-size:13px;opacity:.85;margin-top:2px}
-.hero-actions{position:absolute;left:14px;top:50%;transform:translateY(-50%);display:flex;gap:6px;flex-wrap:wrap;z-index:2;max-width:46%}
+.hero-actions{position:relative;display:flex;gap:6px;flex-wrap:wrap;z-index:2;justify-content:center;margin-top:10px}
 .hero .name,.hero .sub,.hero .greet{position:relative;z-index:1;pointer-events:none}
 .hero .sub span,.hero .greet span{pointer-events:auto}
 .hero-actions button,.hero-actions select{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.25);padding:6px 10px;font-size:13px}
@@ -125,7 +126,7 @@ html[data-theme="dark"] .announce{background:#3a3012;color:#f3dc92;border-color:
 .iconbtn{background:var(--soft);color:var(--ink);border:1px solid var(--line)}
 .top2{display:grid;grid-template-columns:1fr 1.6fr;gap:10px;margin-bottom:12px}
 @media(max-width:850px){.top2{grid-template-columns:1fr}}
-.sumcard{background:var(--card);border-radius:12px;box-shadow:var(--shadow);padding:14px 16px;text-align:center}
+.sumcard{background:var(--card);border-radius:12px;box-shadow:var(--shadow);padding:14px 16px;text-align:center;display:flex;flex-direction:column;justify-content:center}
 .sumcard .lbl{color:var(--muted);font-size:13px}
 .sumcard .big{font-size:30px;font-weight:800;color:var(--accent-2);margin:4px 0}
 .progress{height:9px;background:var(--line);border-radius:6px;overflow:hidden;margin:6px 0 4px}
@@ -206,9 +207,51 @@ tr.weekrow.active td{outline:2px solid var(--green);outline-offset:-2px}
 .rcp-full{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:zoom-out}
 .rcp-full img{max-width:95vw;max-height:88vh;border-radius:8px;background:#fff}
 .rcp-full-x{color:#fff;font-weight:700}
+.rejbadge{display:inline-block;font-size:11px;background:#fde2e2;color:#9b1c1c;border-radius:8px;padding:0 6px;margin-inline-start:4px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.chip{border:1px solid var(--line);border-radius:16px;padding:4px 10px;cursor:pointer;font-size:13px;display:inline-flex;gap:4px;align-items:center}
+.sigpad{width:100%;max-width:560px;height:180px;border:2px dashed var(--line);border-radius:10px;background:#fff;touch-action:none;cursor:crosshair}
+.signthumb{height:26px;vertical-align:middle;background:#fff;border-radius:4px;margin-inline-start:4px}
+.helpsec{border:1px solid var(--line);border-radius:8px;margin-bottom:6px;padding:6px 10px}
+.helpsec summary{cursor:pointer;font-weight:700}
+.helpsec div{margin-top:6px;line-height:1.6}
+.rcp-over{color:#c62828;font-weight:700}
+.rcp-chart{height:220px;margin:6px 0 12px}
+.launcher{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:8px;margin-bottom:12px}
+.launcher button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:74px;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);font-size:13px;font-weight:700;padding:8px 6px;position:relative;transition:transform .12s}
+.launcher button:hover{transform:translateY(-2px);border-color:var(--accent)}
+.launcher button .ic{font-size:24px;line-height:1}
+.launcher button .badge-n{position:absolute;top:6px;left:6px;margin:0}
+.launcher .lx-admin{background:linear-gradient(135deg,#0f2542,#1d3b66);color:#fff}
+.dash{margin-bottom:12px}
+.dash>summary{cursor:pointer;font-weight:800;padding:8px 12px;background:var(--card);border:1px solid var(--line);border-radius:10px;margin-bottom:10px;list-style:none}
+.dash>summary::-webkit-details-marker{display:none}
+.dash:not([open])>summary::after{content:" ▼ לחץ לפתיחה";font-weight:400;color:var(--muted);font-size:12.5px}
+.actions button.on{outline:2px solid var(--accent)}
+.undo-btn{margin-inline-start:10px;background:#fff;color:#111;border-radius:8px;padding:2px 10px;font-weight:700}
+.offline-bar{position:sticky;top:0;z-index:50;background:#b42318;color:#fff;text-align:center;padding:6px;font-weight:700}
+.otbadge{display:inline-block;font-size:11px;background:#e8f0ff;color:#1f4fa8;border-radius:8px;padding:0 6px;margin-inline-start:4px}
+.latebadge{display:inline-block;font-size:11px;background:#fff1d6;color:#8a5a00;border-radius:8px;padding:0 6px;margin-inline-start:4px}
+.kindbadge{display:inline-block;font-size:12px;background:#eef7ee;color:#1f6b35;border-radius:8px;padding:1px 8px}
+.badges{display:flex;flex-wrap:wrap;gap:6px}
+.bdg{border:1px solid var(--line);border-radius:16px;padding:4px 10px;font-size:13px;opacity:.38;filter:grayscale(1)}
+.bdg.on{opacity:1;filter:none;border-color:#e0a020;background:rgba(224,160,32,.1)}
+.heatmap{display:grid;grid-template-rows:repeat(7,11px);grid-auto-flow:column;grid-auto-columns:11px;gap:2px;overflow-x:auto;padding-bottom:4px;direction:ltr}
+.heatmap i{width:11px;height:11px;border-radius:2px;display:block}
+.hm0{background:var(--line)}.hm1{background:#b7d3ff}.hm2{background:#6fa3f5}.hm3{background:#2f6fdb}.hm4{background:#173f8a}
+.btnlink{display:inline-flex;align-items:center;gap:4px;padding:8px 14px;border-radius:8px;color:#fff;text-decoration:none;font-weight:700;font-size:14px}
+.b-wa{background:#1f9d55}
+.task{display:flex;gap:8px;align-items:center;padding:8px 10px;border:1px solid var(--line);border-radius:8px;margin-bottom:6px;cursor:pointer}
+.task.done{text-decoration:line-through;opacity:.6}
+.al-acts{display:inline-flex;gap:4px;margin-inline-start:8px}
+.teamweek td{min-width:90px;font-size:12.5px}.tw-cell{background:rgba(47,111,219,.1);border-radius:6px;padding:2px 4px;margin-bottom:2px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:10px}
+.kpis div{border:1px solid var(--line);border-radius:10px;padding:8px 10px}.kpis b{display:block;font-size:20px}
+.rcp-st{font-size:12px;border-radius:8px;padding:0 6px}.rcp-st.ok{background:#e6f6ea;color:#1f6b35}.rcp-st.no{background:#fde2e2;color:#9b1c1c}
 .list-item{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 10px;border:1px solid var(--line);border-radius:8px;margin-bottom:6px}
 .fixed-grid{display:grid;grid-template-columns:70px 1fr 1fr;gap:6px 10px;align-items:center}
-#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:10px 18px;border-radius:10px;z-index:99;font-size:14px;opacity:0;transition:opacity .25s;pointer-events:none}
+#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:10px 18px;border-radius:10px;z-index:9999;font-size:14px;opacity:0;transition:opacity .25s;pointer-events:none}
+#toast.show .undo-btn{pointer-events:auto}
 #toast.show{opacity:1}
 #loading{text-align:center;margin-top:120px;color:var(--muted)}
 .demo-flag{background:var(--amber);color:#000;font-size:12px;padding:2px 8px;border-radius:8px}
@@ -256,13 +299,6 @@ tr.weekrow.active td{outline:2px solid var(--green);outline-offset:-2px}
 <!-- ===== המערכת ===== -->
 <div id="app" class="hidden">
   <div class="hero">
-    <div class="hero-actions">
-      <button id="theme-btn" title="מצב יום / לילה">🌙/☀️ מצב תצוגה</button>
-      <button id="me-btn">👤 האזור האישי</button>
-      <button id="settings-btn" class="hidden">⚙️ הגדרות מנהל</button>
-      <select id="view-user" class="hidden" title="צפייה במערכת של עובד"></select>
-      <button id="logout-btn">🚪 יציאה</button>
-    </div>
     <div class="hero-clock" id="hero-clock">
       <svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="46" fill="rgba(255,255,255,.06)" stroke="rgba(255,255,255,.55)" stroke-width="3"/>
         <g id="hc-ticks"></g>
@@ -275,14 +311,32 @@ tr.weekrow.active td{outline:2px solid var(--green);outline-offset:-2px}
     <div class="name" id="who-name"></div>
     <div class="sub">מערכת ניהול שעות נוכחות ודאשבורד מעקב מתקדם <span id="demo-flag" class="demo-flag hidden">מצב הדגמה</span></div>
     <div class="greet" id="greet"></div>
+    <div class="view-wrap"><select id="view-user" class="hidden" title="צפייה במערכת של עובד"></select></div>
+  </div>
+
+  <div class="launcher" id="launcher">
+    <button id="add-date-btn"><span class="ic">➕</span>הוסף משמרת</button>
+    <button id="fixed-btn"><span class="ic">⏱</span>שעות קבועות</button>
+    <button id="rcp-btn"><span class="ic">📸</span>קבלות קניות</button>
+    <button id="apt-btn"><span class="ic">🏠</span>הדירה שלי</button>
+    <button id="rep-btn"><span class="ic">🛠️</span>דיווח לדירה</button>
+    <button id="msg-btn"><span class="ic">✉️</span>הודעה למנהל</button>
+    <button id="stats-btn"><span class="ic">📊</span>הנתונים שלי</button>
+    <button id="cal-btn"><span class="ic">📅</span>חגים ולוח</button>
+    <button id="me-btn"><span class="ic">👤</span>אזור אישי והגדרות</button>
+    <button id="help-btn"><span class="ic">📖</span>הוראות</button>
+    <button id="settings-btn" class="hidden lx-admin"><span class="ic">⚙️</span>הגדרות מנהל</button>
+    <button id="theme-btn"><span class="ic">🌓</span>מצב תצוגה</button>
+    <button id="logout-btn"><span class="ic">🚪</span>יציאה</button>
   </div>
 
   <div id="announce" class="announce hidden"></div>
 
+  <div class="notices" id="notices"></div>
+  <details class="dash" id="dash" open><summary>📈 גרפים ונתונים</summary>
   <div class="top3">
     <div class="sumcard" id="sumcard-wrap">
       <div id="sumcard"></div>
-      <div class="punch" id="punch"></div>
     </div>
     <div class="chart-card">
       <div class="chart-head" style="justify-content:center"><div class="t">📈 גרף מעקב שנתי (לחץ על נקודה/חודש לפרטים)</div><span id="year-title" class="hidden"></span></div>
@@ -297,8 +351,8 @@ tr.weekrow.active td{outline:2px solid var(--green);outline-offset:-2px}
     </div>
   </div>
 
-  <div class="notices" id="notices"></div>
   <div class="tiles" id="tiles"></div>
+  </details>
 
   <div class="toolbar card" style="padding:10px 12px">
     <div class="monthnav" style="box-shadow:none;padding:0">
@@ -308,13 +362,8 @@ tr.weekrow.active td{outline:2px solid var(--green);outline-offset:-2px}
       <span class="hidden"><button id="prev-month"></button><button id="next-month"></button><button id="today-btn"></button></span>
     </div>
     <div class="actions">
-      <button class="b-green" id="add-date-btn">+ הוסף משמרת לפי תאריך</button>
-      <button class="b-blue" id="fixed-btn">⚙️ שעות קבועות לימים</button>
-      <button class="b-gray" id="locs-btn">🏠 הדירות שלי</button>
-      <button class="b-gray" id="slip-btn">🧾 תלוש שכר</button>
-      <button class="b-gray" id="rcp-btn">📸 קבלות קניות</button>
-      <button class="b-gray" id="msg-btn">✉️ הודעה למנהל</button>
-      <button class="b-purple hidden" id="report-btn">📧 גיבוי ענן למייל</button>
+      <button class="b-gray" id="money-btn">👁 הצג סכומים</button>
+      <button class="b-gray" id="only-btn">✅ רק ימים עם משמרות</button>
       <button class="b-excel" id="excel-btn">📊 ייצוא לאקסל</button>
       <button class="b-red" id="pdf-btn">🖨️ הדפסה / הפקת קובץ</button>
     </div>
@@ -369,7 +418,8 @@ let globalCfg = defaultGlobal();   // config/global – תעריפים כללי�
 let userRates = {};                // תעריף אישי של העובד המוצג (users/{email}.rates)
 let userAdj = [];                  // תוספות / בונוסים של העובד המוצג (users/{email}.adjustments)
 let userLocks = {};                // חודשים נעולים של העובד המוצג (users/{email}.locks)
-let userPlan = [];                 // משמרות מתוכננות (users/{email}.plan)
+let userPlan = [];
+let userApt = "";                  // הדירה הקבועה של העובד (users/{email}.apt)                 // משמרות מתוכננות (users/{email}.plan)
 const today = new Date();
 let cur = { y: today.getFullYear(), m: today.getMonth() };
 let weekStart = startOfWeek(today);
@@ -404,8 +454,8 @@ function shiftHours(s){ const a = toMin(s.in), b = toMin(s.out); if (a == null |
 function fmtHM(h){ const t = Math.round(h*60); return `${Math.floor(t/60)}:${pad(t%60)}`; }
 const money = n => "₪" + (Math.round(n*100)/100).toLocaleString("he-IL", {maximumFractionDigits:2});
 function defaultSettings(){ return { name: "", locations: [], fixed: {} }; }
-function defaultGlobal(){ return { rates: { day: 35.41, nightFlat: 124.25, nightStart: "00:00", nightEnd: "06:30", partial: "prop", restPct: 150, restStart: "18:00", restEnd: "20:00", restNight: false }, announce: "", backup: { auto: true, last: 0 }, monthly: { auto: true, lastSent: "" }, apartments: [], approval: true }; }
-function mergeGlobal(g){ const d = defaultGlobal(); g = g || {}; return { ...d, ...g, rates: { ...d.rates, ...(g.rates || {}) }, backup: { ...d.backup, ...(g.backup || {}) }, monthly: { ...d.monthly, ...(g.monthly || {}) }, apartments: g.apartments || [] }; }
+function defaultGlobal(){ return { rates: { day: 35.41, nightFlat: 124.25, nightStart: "00:00", nightEnd: "06:30", partial: "prop", restPct: 150, restStart: "18:00", restEnd: "20:00", restNight: false }, announce: "", backup: { auto: true, last: 0 }, monthly: { auto: true, lastSent: "" }, apartments: [], approvalAll: false, planCheck: true, planTol: 15, autoLock: { on: true, days: 5 }, aptAnnounce: {} }; }
+function mergeGlobal(g){ const d = defaultGlobal(); g = g || {}; return { ...d, ...g, rates: { ...d.rates, ...(g.rates || {}) }, backup: { ...d.backup, ...(g.backup || {}) }, monthly: { ...d.monthly, ...(g.monthly || {}) }, apartments: g.apartments || [], autoLock: { ...d.autoLock, ...(g.autoLock || {}) }, aptAnnounce: g.aptAnnounce || {} }; }
 function ratesFor(personal){
   const r = { ...globalCfg.rates };
   if (personal && +personal.day > 0) r.day = +personal.day;
@@ -450,6 +500,7 @@ function calcPay(list, R = effRates()){
   const pct = Math.max(100, +R.restPct || 100);
   let dayMin = 0, premMin = 0; const nights = new Map(), restNights = new Set();
   for (const s of list) {
+    if (s.rejected || (s.approved === false && s.offPlan)) continue;
     const a = toMin(s.in), b = toMin(s.out); if (a == null || b == null) continue;
     const base = dayIdx(s.date), S = base * 1440 + a; let E = base * 1440 + b; if (b < a) E += 1440; if (E === S) continue;
     const rw = pct > 100 ? restWindows(base - 1, base + 2, R) : [];
@@ -471,7 +522,7 @@ function calcPay(list, R = effRates()){
   const dayPay = dayMin / 60 * R.day + premPay;
   return { dayH: dayMin / 60, nightH: nightMins / 60, nights: nights.size, premH: premMin / 60, premPay, pct, dayPay, nightPay, total: dayPay + nightPay, R };
 }
-function isNightShift(s){ return calcPay([s]).nights > 0; }
+function isNightShift(s){ return calcPay([{ ...s, approved: true, rejected: false }]).nights > 0; }
 function shiftsInRange(from, to){ return [...shifts.values()].filter(s => s.date >= from && s.date <= to); }
 function toast(t){ const el = $("toast"); el.textContent = t; el.classList.add("show"); clearTimeout(toast._t); toast._t = setTimeout(() => el.classList.remove("show"), 2600); }
 function setMsg(id, text, ok){ const el = $(id); el.className = "msg " + (ok ? "ok" : "err"); el.textContent = text; }
@@ -481,13 +532,13 @@ function loadScript(src){ return new Promise((res, rej) => { if (document.queryS
 function locationFor(dateStr){
   let loc = "";
   [...settings.locations].sort((a,b) => a.from.localeCompare(b.from)).forEach(l => { if (l.from <= dateStr) loc = l.address; });
-  return loc;
+  return loc || userApt || "";
 }
 function shiftsOn(dateStr){ return [...shifts.values()].filter(s => s.date === dateStr).sort((a,b) => (toMin(a.in) ?? 9999) - (toMin(b.in) ?? 9999)); }
 function hoursOnDate(dateStr){ return shiftsOn(dateStr).reduce((t,s) => t + shiftHours(s), 0); }
-function hoursInRange(from, to){ let t = 0; for (const s of shifts.values()) if (s.date >= from && s.date <= to) t += shiftHours(s); return t; }
+function hoursInRange(from, to){ let t = 0; for (const s of shifts.values()) if (s.date >= from && s.date <= to && !s.rejected) t += shiftHours(s); return t; }
 function monthRange(y, m){ return [ymd(new Date(y, m, 1)), ymd(new Date(y, m+1, 0))]; }
-function workDays(from, to){ return new Set([...shifts.values()].filter(s => s.date >= from && s.date <= to && shiftHours(s) > 0).map(s => s.date)).size; }
+function workDays(from, to){ return new Set([...shifts.values()].filter(s => s.date >= from && s.date <= to && shiftHours(s) > 0 && !s.rejected).map(s => s.date)).size; }
 
 // ================== תאריך עברי וחגים ==================
 async function loadHebcal(){
@@ -533,10 +584,10 @@ function nextHoliday(){
 // ================== שכבת נתונים ==================
 const DB = {
   async loadAll(email){
-    settings = defaultSettings(); shifts = new Map(); userRates = {}; userAdj = []; userLocks = {}; userPlan = [];
+    settings = defaultSettings(); shifts = new Map(); userRates = {}; userAdj = []; userLocks = {}; userPlan = []; userApt = "";
     if (DEMO) {
       const d = JSON.parse(localStorage.getItem("demo_data") || "null");
-      if (d) { settings = Object.assign(defaultSettings(), d.settings); (d.shifts || []).forEach(s => shifts.set(s.id, s)); userRates = d.rates || {}; userAdj = d.adj || []; userLocks = d.locks || {}; userPlan = d.plan || []; globalCfg = mergeGlobal(d.global); }
+      if (d) { settings = Object.assign(defaultSettings(), d.settings); (d.shifts || []).forEach(s => shifts.set(s.id, s)); userRates = d.rates || {}; userAdj = d.adj || []; userLocks = d.locks || {}; userPlan = d.plan || []; userApt = d.apt || ""; globalCfg = mergeGlobal(d.global); }
       else seedDemo();
       return;
     }
@@ -554,31 +605,36 @@ const DB = {
     userAdj = (u && u.exists() && u.data().adjustments) || [];
     userLocks = (u && u.exists() && u.data().locks) || {};
     userPlan = (u && u.exists() && u.data().plan) || [];
+    userApt = (u && u.exists() && u.data().apt) || "";
   },
-  demoSave(){ localStorage.setItem("demo_data", JSON.stringify({ settings, shifts: [...shifts.values()], rates: userRates, adj: userAdj, locks: userLocks, plan: userPlan, global: globalCfg })); },
+  demoSave(){ localStorage.setItem("demo_data", JSON.stringify({ settings, shifts: [...shifts.values()], rates: userRates, adj: userAdj, locks: userLocks, plan: userPlan, apt: userApt, global: globalCfg })); },
   async putGlobal(){
     if (DEMO) return this.demoSave();
     await fb.f.setDoc(fb.f.doc(fb.db, "config", "global"), globalCfg);
   },
   async putUser(email, data){
-    if (DEMO) { if (data.rates) userRates = data.rates; if (data.adjustments) userAdj = data.adjustments; if (data.locks) userLocks = data.locks; if (data.plan) userPlan = data.plan; if (data.name != null && email === viewEmail) settings.name = data.name; return this.demoSave(); }
+    if (DEMO) { if (data.rates) userRates = data.rates; if (data.adjustments) userAdj = data.adjustments; if (data.locks) userLocks = data.locks; if (data.plan) userPlan = data.plan; if (data.apt != null) userApt = data.apt; if (data.name != null && email === viewEmail) settings.name = data.name; return this.demoSave(); }
     await fb.f.setDoc(fb.f.doc(fb.db, "users", email), data, { merge: true });
     if (email === viewEmail && data.rates) userRates = data.rates;
     if (email === viewEmail && data.adjustments) userAdj = data.adjustments;
     if (email === viewEmail && data.locks) userLocks = data.locks;
     if (email === viewEmail && data.plan) userPlan = data.plan;
+    if (email === viewEmail && data.apt != null) userApt = data.apt;
   },
   async putShift(s){
     if (!isAdmin && isLocked(s.date)) throw new Error("החודש נעול על ידי המנהל – אי אפשר לשנות");
-    s = { ...s, approved: isAdmin || !globalCfg.approval };
+    const old = shifts.get(s.id);
+    s = shiftStatus(s);
     shifts.set(s.id, s);
+    logShiftChange(old, s);
+    if (isAdmin) { clearTimeout(adminScan._t); adminScan._t = setTimeout(adminScan, 1200); }
     if (DEMO) return this.demoSave();
     const { id, ...data } = s;
     await fb.f.setDoc(fb.f.doc(fb.db, "shifts", viewEmail, "items", id), data);
   },
   async delShift(id){
     const old = shifts.get(id); if (old && !isAdmin && isLocked(old.date)) throw new Error("החודש נעול על ידי המנהל – אי אפשר לשנות");
-    shifts.delete(id);
+    shifts.delete(id); if (old) logShiftChange(old, null);
     if (DEMO) return this.demoSave();
     await fb.f.deleteDoc(fb.f.doc(fb.db, "shifts", viewEmail, "items", id));
   },
@@ -587,7 +643,7 @@ const DB = {
     await fb.f.setDoc(fb.f.doc(fb.db, "settings", viewEmail), settings);
   },
   async putMany(list){
-    list = list.filter(s => isAdmin || !isLocked(s.date)).map(s => ({ ...s, approved: s.approved === true && isAdmin ? true : (isAdmin || !globalCfg.approval) }));
+    list = list.filter(s => isAdmin || !isLocked(s.date)).map(s => s.approved === true && isAdmin ? s : shiftStatus(s));
     list.forEach(s => shifts.set(s.id, s));
     if (DEMO) return this.demoSave();
     const { writeBatch, doc } = fb.f;
@@ -644,6 +700,10 @@ const RCP = {
   async remove(id){
     if (DEMO) { this.demoSet(this.demo().filter(x => x.id !== id)); return; }
     await fb.f.deleteDoc(fb.f.doc(fb.db, "receipts", id));
+  },
+  async setStatus(id, data){
+    if (DEMO) { this.demoSet(this.demo().map(x => x.id === id ? { ...x, ...data } : x)); return; }
+    await fb.f.updateDoc(fb.f.doc(fb.db, "receipts", id), data);
   }
 };
 function shrinkImage(file){
@@ -672,7 +732,7 @@ function shrinkImage(file){
 }
 function rcpApts(){
   const names = (globalCfg.apartments || []).map(a => a.name).filter(Boolean);
-  const mine = (settings.locations || []).map(l => { const a = aptFor(l.address); return a ? a.name : l.address; }).filter(Boolean);
+  const mine = [myApt(), userApt, ...(settings.locations || []).map(l => { const a = aptFor(l.address); return a ? a.name : l.address; })].filter(Boolean);
   return { list: [...new Set([...(isAdmin ? names : []), ...mine, ...(isAdmin ? [] : names)])], mine: [...new Set(mine)] };
 }
 function openReceiptImg(src){
@@ -683,8 +743,8 @@ async function openReceipts(){
   const A = rcpApts(), mk = monthKey(cur.y, cur.m);
   const m = modal(`<h3>📸 קבלות קניות לדירה ${closeX}</h3>
     <div class="rcp-form">
-      <div class="frow"><label>דירה</label><select id="rc-apt" style="flex:1">${A.list.map(a => `<option ${A.mine[0] === a ? "selected" : ""}>${esc(a)}</option>`).join("")}<option value="__other">אחר…</option></select><input id="rc-apt-o" class="hidden" placeholder="שם הדירה" style="flex:1"></div>
-      <div class="frow"><label>תאריך</label><input type="date" id="rc-date" value="${ymd(today)}"><label style="min-width:auto">סכום (₪)</label><input type="number" id="rc-amount" step="0.01" min="0" style="width:120px" placeholder="למשל 85.90"></div>
+      <div class="frow"><label>דירה</label><select id="rc-apt" style="flex:1">${A.list.map(a => `<option ${(myApt() || A.mine[0]) === a ? "selected" : ""}>${esc(a)}</option>`).join("")}<option value="__other">אחר…</option></select><input id="rc-apt-o" class="hidden" placeholder="שם הדירה" style="flex:1"></div>
+      <div class="frow"><label>תאריך</label><input type="date" id="rc-date" value="${ymd(today)}"><label style="min-width:auto">סכום (₪)</label><input type="number" id="rc-amount" step="0.01" min="0" style="width:120px" placeholder="למשל 85.90"><span id="rc-ocr" class="muted" style="font-size:12.5px"></span></div>
       <div class="frow"><label>מה קנו</label><input id="rc-note" style="flex:1" placeholder="למשל: מוצרי ניקיון, מצעים"></div>
       <div class="frow"><label>תמונת הקבלה</label>
         <label class="b-blue rcp-cam">📷 צלם / בחר תמונה<input type="file" id="rc-file" accept="image/*" capture="environment" hidden></label>
@@ -693,14 +753,23 @@ async function openReceipts(){
     </div>
     <hr style="margin:14px 0;border:0;border-top:1px solid var(--line)">
     <div class="frow"><label>הצג</label><select id="rc-month"></select>${isAdmin ? `<select id="rc-fapt"><option value="">כל הדירות</option></select>` : ""}</div>
-    <div id="rc-sum"></div><div id="rc-list">טוען...</div>`);
-  let img = "", all = [];
+    <div id="rc-sum"></div>
+    <div class="rcp-chart"><canvas id="rc-chart"></canvas></div>
+    <div class="frow"><button class="b-excel" id="rc-xlsx">📊 ייצוא לאקסל</button><button class="b-red" id="rc-pdf">📄 PDF עם תמונות</button></div>
+    <div id="rc-list">טוען...</div>`);
+  let img = "", all = [], cur_list = [], cur_label = "";
   const aptSel = m.querySelector("#rc-apt"), other = m.querySelector("#rc-apt-o");
   aptSel.onchange = () => other.classList.toggle("hidden", aptSel.value !== "__other");
   m.querySelector("#rc-file").onchange = async e => {
     const f = e.target.files[0]; if (!f) return;
     try { toast("מעבד את התמונה..."); img = await shrinkImage(f); const p = m.querySelector("#rc-prev"); p.src = img; p.classList.remove("hidden"); }
-    catch (err) { toast(err.message); }
+    catch (err) { toast(err.message); return; }
+    const amt = m.querySelector("#rc-amount"), st = m.querySelector("#rc-ocr");
+    if (!amt.value) {
+      st.textContent = "🔍 מזהה את הסכום מהקבלה...";
+      try { const v = await ocrAmount(img); if (v && !amt.value) { amt.value = v.toFixed(2); st.innerHTML = `<span class="up">✔ זוהה ${money(v)} – בדוק שזה נכון</span>`; } else if (!v) st.textContent = "לא הצלחתי לזהות סכום – כתוב אותו ידנית"; }
+      catch (e) { st.textContent = "זיהוי אוטומטי לא זמין – כתוב את הסכום ידנית"; }
+    }
   };
   m.querySelector("#rc-save").onclick = async () => {
     const apt = aptSel.value === "__other" ? other.value.trim() : aptSel.value;
@@ -713,7 +782,7 @@ async function openReceipts(){
     try {
       await RCP.add({ apt, date, month: date.slice(0, 7), amount: Math.round(amount * 100) / 100, note: m.querySelector("#rc-note").value.trim(), img });
       toast("הקבלה נשמרה ✔");
-      img = ""; m.querySelector("#rc-prev").classList.add("hidden"); m.querySelector("#rc-amount").value = ""; m.querySelector("#rc-note").value = ""; m.querySelector("#rc-file").value = "";
+      img = ""; m.querySelector("#rc-ocr").textContent = ""; m.querySelector("#rc-prev").classList.add("hidden"); m.querySelector("#rc-amount").value = ""; m.querySelector("#rc-note").value = ""; m.querySelector("#rc-file").value = "";
       await load(date.slice(0, 7));
     } catch (e) { toast("שגיאה בשמירה: " + (e.code || e.message)); }
     btn.disabled = false; btn.textContent = "💾 שמור קבלה";
@@ -738,22 +807,649 @@ async function openReceipts(){
     m.querySelector("#rc-sum").innerHTML = `
       <div class="rcp-cards"><div class="rcp-card"><div class="muted">סה״כ ${esc(mLabel)}</div><b>${money(tot(list))}</b><div class="muted">${list.length} קבלות</div></div>
       <div class="rcp-card"><div class="muted">סה״כ כל החודשים</div><b>${money(tot(all.filter(r => !fv || r.apt === fv)))}</b><div class="muted">${all.filter(r => !fv || r.apt === fv).length} קבלות</div></div></div>
-      ${rows.length ? `<table class="rcp-table"><thead><tr><th>דירה</th><th>${esc(mLabel)}</th><th>סה״כ כל החודשים</th></tr></thead><tbody>${rows.map(([a, o]) => `<tr><td>🏠 ${esc(a)}</td><td>${money(o.month)} <span class="muted">(${o.n})</span></td><td>${money(o.all)}</td></tr>`).join("")}</tbody></table>` : ""}`;
+      ${rows.length ? `<table class="rcp-table"><thead><tr><th>דירה</th><th>${esc(mLabel)}</th>${isAdmin && mv !== "all" ? "<th>תקציב חודשי</th>" : ""}<th>סה״כ כל החודשים</th></tr></thead><tbody>${rows.map(([a, o]) => { const b = +((globalCfg.apartments || []).find(x => x.name === a)?.budget) || 0;
+        return `<tr><td>🏠 ${esc(a)}</td><td>${money(o.month)} <span class="muted">(${o.n})</span></td>${isAdmin && mv !== "all" ? `<td>${b ? `${money(b)} · ${o.month > b ? `<span class="rcp-over">⚠️ חריגה של ${money(o.month - b)}</span>` : `<span class="up">נשאר ${money(b - o.month)}</span>`}` : `<span class="muted">לא הוגדר</span>`}</td>` : ""}<td>${money(o.all)}</td></tr>`; }).join("")}</tbody></table>` : ""}`;
+    drawRcpChart(m.querySelector("#rc-chart"), all.filter(r => !fv || r.apt === fv));
+    cur_list = list; cur_label = `${mLabel}${fv ? " - " + fv : ""}`;
     m.querySelector("#rc-list").innerHTML = list.length ? list.map(r => `<div class="list-item rcp-item">
       <img class="rcp-thumb" src="${r.img}" data-full="${r.id}" alt="קבלה" title="לחץ להגדלה">
       <div style="flex:1;min-width:0"><b>${money(+r.amount || 0)}</b> · 🏠 ${esc(r.apt)}<div class="muted">${r.date.split("-").reverse().join("/")}${r.note ? " · " + esc(r.note) : ""}${isAdmin ? ` · צולם ע״י ${esc(r.fromName || r.from)}` : ""}</div></div>
+      ${r.status === "ok" ? `<span class="rcp-st ok">✔ אושר להחזר</span>` : r.status === "no" ? `<span class="rcp-st no" title="${esc(r.reason || "")}">✖ לא אושר${r.reason ? ": " + esc(r.reason) : ""}</span>` : ""}
+      ${isAdmin && !r.status && r.from !== me ? `<button class="mini add" data-rok="${r.id}" title="אשר והוסף החזר לשכר העובד">✔ החזר</button><button class="mini del" data-rno="${r.id}">✖</button>` : ""}
       ${isAdmin || r.from === me ? `<button class="iconbtn mini" data-rdel="${r.id}" title="מחק">🗑️</button>` : ""}</div>`).join("") : `<div class="muted">אין קבלות ב${esc(mLabel)}</div>`;
   };
   msel.onchange = draw; if (fsel) fsel.onchange = draw;
+  m.querySelector("#rc-xlsx").onclick = () => exportReceipts(cur_list, cur_label, "xlsx").catch(e => toast("שגיאה: " + e.message));
+  m.querySelector("#rc-pdf").onclick = () => exportReceipts(cur_list, cur_label, "pdf").catch(e => toast("שגיאה: " + e.message));
   m.querySelector("#rc-list").onclick = async e => {
     const t = e.target.closest("[data-full]"); if (t) return openReceiptImg(t.src);
+    const ok = e.target.closest("[data-rok]"), no = e.target.closest("[data-rno]");
+    if (ok || no) {
+      const r = all.find(x => x.id === (ok || no).dataset[ok ? "rok" : "rno"]); if (!r) return;
+      try {
+        if (ok) {
+          const us = await listUsers(), u = us.find(x => x.email === r.from), adj = [...((r.from === viewEmail ? userAdj : u?.adjustments) || []), { id: newId(), month: r.month, amount: +r.amount, reason: `החזר קבלה: ${r.note || ""} (${r.apt}, ${r.date.split("-").reverse().join("/")})`, label: "החזר קנייה", at: Date.now() }];
+          await DB.putUser(r.from, { adjustments: adj }); await RCP.setStatus(r.id, { status: "ok" }); LOG.add(r.from, `אישר החזר קבלה ${money(+r.amount)} (${r.apt})`); toast("אושר – ההחזר נוסף לשכר של העובד ✔");
+        } else { const why = prompt("למה לא לאשר? (העובד יראה)", ""); if (why == null) return; await RCP.setStatus(r.id, { status: "no", reason: why.trim() }); toast("סומן כלא מאושר"); }
+        renderAll(); await load();
+      } catch (er) { toast("שגיאה: " + (er.code || er.message)); }
+      return;
+    }
     const d = e.target.closest("[data-rdel]"); if (!d) return;
     if (!confirm("למחוק את הקבלה?")) return;
     try { await RCP.remove(d.dataset.rdel); toast("נמחק"); await load(); } catch (err) { toast("שגיאה: " + (err.code || err.message)); }
   };
   load(mk);
 }
-const isLocked = ds => !!userLocks[String(ds).slice(0, 7)];
+// ================== נעילה (כולל נעילה אוטומטית) ==================
+function lockState(locks, mk){
+  locks = locks || {};
+  if (locks[mk] === true) return true;
+  if (locks[mk] === false) return false;
+  const a = globalCfg.autoLock; if (!a || !a.on) return false;
+  const [y, m] = mk.split("-").map(Number); const end = new Date(y, m, 0, 23, 59, 59); end.setDate(end.getDate() + (+a.days || 0));
+  return Date.now() > end.getTime();
+}
+const isLocked = ds => lockState(userLocks, String(ds).slice(0, 7));
+const waNum = ph => { let d = String(ph || "").replace(/\D/g, ""); if (d.startsWith("0")) d = "972" + d.slice(1); return d; };
+
+// ================== סטטוס משמרת: לפי לוח המשמרות / ממתין / נדחה ==================
+const isPending = s => !!s && s.approved === false && !s.rejected && !!s.in && !!s.out;
+function planMatch(s, plan){
+  const tol = +(globalCfg.planTol ?? 15);
+  const d = (a, b) => { const x = toMin(a), y = toMin(b); if (x == null || y == null) return 9999; const v = Math.abs(x - y); return Math.min(v, 1440 - v); };
+  return (plan || []).some(p => p.date === s.date && d(p.in, s.in) <= tol && d(p.out, s.out) <= tol);
+}
+function shiftStatus(s){
+  const out = { ...s }; delete out.rejected; delete out.offPlan;
+  if (isAdmin) { out.approved = true; return out; }
+  if (!s.in || !s.out) { out.approved = true; return out; }
+  if (globalCfg.approvalAll) { out.approved = false; out.offPlan = "all"; return out; }
+  if (globalCfg.planCheck !== false && !planMatch(s, userPlan)) { out.approved = false; out.offPlan = planOn(s.date).length ? "diff" : "none"; return out; }
+  out.approved = true; return out;
+}
+function statusBadge(s){
+  if (!s || !shiftHours(s)) return "";
+  if (s.rejected) return `<span class="rejbadge" title="המנהל לא אישר – לא ישולם">❌ לא אושר</span>`;
+  if (s.approved !== false) return "";
+  const why = s.offPlan === "diff" ? "שעות שונות מהמתוכנן" : s.offPlan === "none" ? "לא בלוח המשמרות" : "ממתין לאישור";
+  if (!s.offPlan && !isAdmin) return `<span class="pendbadge">⏳ ממתין לאישור</span>`;
+  return isAdmin ? `<button class="mini apv" data-act="approve" title="${why} – אשר">✔</button><button class="mini delx" data-act="reject" title="לא לאשר">✖</button><span class="pendbadge">${why}</span>`
+    : `<span class="pendbadge" title="המשמרת תשולם אחרי אישור המנהל">⏳ ${why} – ממתין לאישור</span>`;
+}
+// עדכון דגלים של משמרת (גם של עובד אחר) בלי חישוב סטטוס מחדש
+async function setShiftFlags(email, s, flags){
+  const ns = { ...s, ...flags }; if (!flags.rejected) delete ns.rejected;
+  if (email === viewEmail) shifts.set(ns.id, ns);
+  if (DEMO) return DB.demoSave();
+  const { id, ...data } = ns;
+  await fb.f.setDoc(fb.f.doc(fb.db, "shifts", email, "items", id), data);
+}
+
+// ================== יומן שינויים ==================
+const LOG = {
+  demo(){ try { return JSON.parse(localStorage.getItem("demo_log") || "[]"); } catch (e) { return []; } },
+  add(target, text){
+    if (!me) return;
+    const e = { at: Date.now(), by: me, byName: isAdmin ? "המנהל" : (settings.name || me), target: target || viewEmail, text };
+    if (DEMO) { try { const l = this.demo(); l.push(e); localStorage.setItem("demo_log", JSON.stringify(l.slice(-500))); } catch (x) {} return; }
+    fb.f.addDoc(fb.f.collection(fb.db, "log"), e).catch(() => {});
+  },
+  async list(){
+    if (DEMO) return this.demo().sort((a, b) => b.at - a.at);
+    const q = await fb.f.getDocs(fb.f.collection(fb.db, "log"));
+    return q.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => b.at - a.at);
+  }
+};
+const shiftTxt = s => s ? `${dm(parseYmd(s.date))} ${s.in || "--:--"}–${s.out || "--:--"}${s.location ? " · " + s.location : ""}` : "";
+function logShiftChange(old, nw){
+  if (!old && nw && !nw.in && !nw.out) return;
+  if (old && nw && old.in === nw.in && old.out === nw.out && (old.location || "") === (nw.location || "")) return;
+  LOG.add(viewEmail, !old ? `הוסיף משמרת ${shiftTxt(nw)}` : !nw ? `מחק משמרת ${shiftTxt(old)}` : `שינה משמרת ${shiftTxt(old)} ← ${nw.in || "--:--"}–${nw.out || "--:--"}${nw.location && nw.location !== old.location ? " · " + nw.location : ""}`);
+}
+
+// ================== דיווחים: תקלה / חסר ציוד / החלפת משמרת ==================
+const REP = {
+  demo(){ try { return JSON.parse(localStorage.getItem("demo_rep") || "[]"); } catch (e) { return []; } },
+  demoSet(l){ try { localStorage.setItem("demo_rep", JSON.stringify(l)); } catch (e) { toast("אין מקום לשמור במצב הדגמה"); } },
+  async add(r){
+    const d = { from: me, fromName: isAdmin ? "המנהל" : (settings.name || me), at: Date.now(), status: "open", reply: "", ...r };
+    if (DEMO) { const l = this.demo(); l.push({ id: newId(), ...d }); this.demoSet(l); return; }
+    await fb.f.addDoc(fb.f.collection(fb.db, "reports"), d);
+  },
+  async list(){
+    if (DEMO) { const l = this.demo(); return (isAdmin ? l : l.filter(x => x.from === me)).sort((a, b) => b.at - a.at); }
+    const col = fb.f.collection(fb.db, "reports");
+    const q = await fb.f.getDocs(isAdmin ? col : fb.f.query(col, fb.f.where("from", "==", me)));
+    return q.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => b.at - a.at);
+  },
+  async update(id, data){
+    if (DEMO) { this.demoSet(this.demo().map(x => x.id === id ? { ...x, ...data } : x)); return; }
+    await fb.f.updateDoc(fb.f.doc(fb.db, "reports", id), data);
+  },
+  async remove(id){
+    if (DEMO) { this.demoSet(this.demo().filter(x => x.id !== id)); return; }
+    await fb.f.deleteDoc(fb.f.doc(fb.db, "reports", id));
+  }
+};
+const DEF_SUPPLIES = ["נייר טואלט", "מגבות נייר", "סבון כלים", "סבון ידיים", "שקיות אשפה", "חומרי ניקוי", "אקונומיקה", "ספוגים", "מצעים נקיים", "מגבות", "נורות", "סוללות"];
+const suppliesOf = name => { const a = (globalCfg.apartments || []).find(x => x.name === name); const l = (a?.supplies || "").split(/[,\n]/).map(x => x.trim()).filter(Boolean); return l.length ? l : DEF_SUPPLIES; };
+const myApt = () => { const a = aptFor(locationFor(ymd(today))); return a ? a.name : (locationFor(ymd(today)) || userApt || ""); };
+const REP_T = { fault: "🔧 תקלה", supply: "🧴 חסר ציוד", swap: "🔄 החלפת משמרת" };
+const REP_S = { open: "⏳ פתוח", done: "✔ טופל", approved: "✔ אושר", rejected: "✖ לא אושר" };
+
+async function openReports(tab = "fault"){
+  const A = rcpApts(), def = myApt();
+  const aptOpts = sel => [...new Set([...(def ? [def] : []), ...A.list])].map(a => `<option ${a === sel ? "selected" : ""}>${esc(a)}</option>`).join("");
+  const futurePlan = userPlan.filter(p => p.date >= ymd(today)).sort((a, b) => (a.date + a.in).localeCompare(b.date + b.in));
+  const T = [["fault", "🔧 דיווח תקלה"], ["supply", "🧴 חסר ציוד"], ["swap", "🔄 החלפת משמרת"]];
+  const m = modal(`<h3>🛠️ דיווח לדירה ${closeX}</h3>
+    <div class="tabs">${T.map(([k, n]) => `<button data-rt="${k}" class="${k === tab ? "on" : ""}">${n}</button>`).join("")}</div>
+    <div id="rp-body"></div><h4>הדיווחים שלי</h4><div id="rp-list">טוען...</div>`);
+  m.querySelectorAll("[data-rt]").forEach(b => b.onclick = () => openReports(b.dataset.rt));
+  const body = m.querySelector("#rp-body");
+  let img = "";
+  if (tab === "fault") {
+    body.innerHTML = `<div class="muted" style="margin-bottom:8px">משהו התקלקל או נשבר בדירה? תאר מה קרה, ואם אפשר צרף תמונה. המנהל יקבל התראה.</div>
+      <div class="frow"><label>דירה</label><select id="rp-apt" style="flex:1">${aptOpts(def)}</select></div>
+      <div class="frow"><label>מה קרה</label><textarea id="rp-text" rows="3" style="flex:1" placeholder="למשל: יש נזילה מתחת לכיור במטבח"></textarea></div>
+      <div class="frow"><label>תמונה</label><label class="rcp-cam">📷 צלם / בחר תמונה<input type="file" id="rp-file" accept="image/*" capture="environment" hidden></label><img id="rp-prev" class="rcp-thumb hidden" alt=""></div>
+      <div class="frow"><label style="min-width:auto"><input type="checkbox" id="rp-urgent"> 🚨 דחוף</label></div>
+      <button class="b-green" id="rp-send">שלח דיווח</button>`;
+    body.querySelector("#rp-file").onchange = async e => { const f = e.target.files[0]; if (!f) return; try { img = await shrinkImage(f); const p = body.querySelector("#rp-prev"); p.src = img; p.classList.remove("hidden"); } catch (er) { toast(er.message); } };
+    body.querySelector("#rp-send").onclick = async () => {
+      const text = body.querySelector("#rp-text").value.trim(); if (!text) return toast("כתוב מה קרה");
+      try { await REP.add({ type: "fault", apt: body.querySelector("#rp-apt").value, text, img, urgent: body.querySelector("#rp-urgent").checked }); toast("הדיווח נשלח למנהל ✔"); openReports("fault"); } catch (e) { toast("שגיאה: " + (e.code || e.message)); }
+    };
+  } else if (tab === "supply") {
+    const drawItems = () => { const apt = body.querySelector("#rp-apt").value; body.querySelector("#rp-items").innerHTML = suppliesOf(apt).map(x => `<label class="chip"><input type="checkbox" value="${esc(x)}"> ${esc(x)}</label>`).join(""); };
+    body.innerHTML = `<div class="muted" style="margin-bottom:8px">סמן מה נגמר או חסר בדירה. המנהל יקבל רשימת קניות מסודרת לכל דירה.</div>
+      <div class="frow"><label>דירה</label><select id="rp-apt" style="flex:1">${aptOpts(def)}</select></div>
+      <div id="rp-items" class="chips"></div>
+      <div class="frow"><label>עוד משהו</label><input id="rp-text" style="flex:1" placeholder="למשל: שמן זית, אבקת כביסה"></div>
+      <button class="b-green" id="rp-send">שלח רשימה</button>`;
+    body.querySelector("#rp-apt").onchange = drawItems; drawItems();
+    body.querySelector("#rp-send").onclick = async () => {
+      const items = [...body.querySelectorAll("#rp-items input:checked")].map(i => i.value), text = body.querySelector("#rp-text").value.trim();
+      if (!items.length && !text) return toast("סמן לפחות פריט אחד");
+      try { await REP.add({ type: "supply", apt: body.querySelector("#rp-apt").value, items, text }); toast("הרשימה נשלחה למנהל ✔"); openReports("supply"); } catch (e) { toast("שגיאה: " + (e.code || e.message)); }
+    };
+  } else {
+    body.innerHTML = futurePlan.length ? `<div class="muted" style="margin-bottom:8px">לא יכול להגיע למשמרת? בחר את המשמרת, וכתוב מי יכול להחליף אותך. המנהל יאשר ויעביר את המשמרת.</div>
+      <div class="frow"><label>המשמרת</label><select id="rp-plan" style="flex:1">${futurePlan.map(p => `<option value="${esc(p.id)}">${DAYS[parseYmd(p.date).getDay()]} ${dmy(parseYmd(p.date))} · ${p.in}–${p.out}${p.location ? " · " + esc(p.location) : ""}</option>`).join("")}</select></div>
+      <div class="frow"><label>מי יחליף</label><input id="rp-who" style="flex:1" placeholder="שם העובד שמוכן להחליף (לא חובה)"></div>
+      <div class="frow"><label>סיבה</label><input id="rp-text" style="flex:1" placeholder="לא חובה"></div>
+      <button class="b-green" id="rp-send">שלח בקשה</button>`
+      : `<div class="muted">אין לך משמרות מתוכננות בלוח המשמרות, אז אין מה להחליף.</div>`;
+    const sb = body.querySelector("#rp-send");
+    if (sb) sb.onclick = async () => {
+      const p = futurePlan.find(x => x.id === body.querySelector("#rp-plan").value); if (!p) return;
+      try { await REP.add({ type: "swap", apt: p.location || "", plan: p, who: body.querySelector("#rp-who").value.trim(), text: body.querySelector("#rp-text").value.trim() }); toast("הבקשה נשלחה למנהל ✔"); openReports("swap"); } catch (e) { toast("שגיאה: " + (e.code || e.message)); }
+    };
+  }
+  const list = await REP.list().catch(() => []);
+  const lb = m.querySelector("#rp-list"); if (!lb) return;
+  lb.innerHTML = list.length ? list.map(r => `<div class="list-item" style="flex-direction:column;align-items:stretch">
+    <div><b>${REP_T[r.type] || ""}</b> ${r.apt ? "· 🏠 " + esc(r.apt) : ""} <span class="muted">· ${new Date(r.at).toLocaleDateString("he-IL")}</span> · <span class="${r.status === "open" ? "" : r.status === "rejected" ? "down" : "up"}">${REP_S[r.status] || ""}</span></div>
+    <div>${repText(r)}</div>${r.reply ? `<div class="up">↩ המנהל: ${esc(r.reply)}</div>` : ""}</div>`).join("") : `<div class="muted">עדיין לא שלחת דיווחים</div>`;
+}
+function repText(r){
+  if (r.type === "supply") return `${(r.items || []).map(esc).join(", ")}${r.text ? (r.items?.length ? ", " : "") + esc(r.text) : ""}`;
+  if (r.type === "swap") return `${DAYS[parseYmd(r.plan.date).getDay()]} ${dmy(parseYmd(r.plan.date))} · ${rng(r.plan.in, r.plan.out)}${r.who ? ` · מחליף: ${esc(r.who)}` : ""}${r.text ? ` · ${esc(r.text)}` : ""}`;
+  return `${r.urgent ? "🚨 " : ""}${esc(r.text)}${r.img ? ` <img class="rcp-thumb" src="${r.img}" data-zoom style="width:44px;height:44px;vertical-align:middle">` : ""}`;
+}
+
+// ---- מנהל: דיווחים ----
+async function tabReports(body){
+  body.innerHTML = `<div class="muted" style="margin-bottom:10px">תקלות ורשימות ציוד שהעובדים שלחו. כשמשהו טופל או נקנה – סמן ✔. (בקשות להחלפת משמרת נמצאות בלשונית "✅ אישורים".)</div><div id="rpa">טוען...</div>`;
+  const all = (await REP.list()).filter(r => r.type !== "swap");
+  const open = all.filter(r => r.status === "open"), done = all.filter(r => r.status !== "open").slice(0, 30);
+  const byApt = {}; open.filter(r => r.type === "supply").forEach(r => { const o = byApt[r.apt || "—"] || (byApt[r.apt || "—"] = new Set()); (r.items || []).forEach(i => o.add(i)); if (r.text) o.add(r.text); });
+  const row = r => `<div class="list-item" style="flex-direction:column;align-items:stretch" data-rp="${r.id}">
+      <div><b>${REP_T[r.type]}</b> · 🏠 ${esc(r.apt || "—")} · ${esc(r.fromName || r.from)} <span class="muted">· ${new Date(r.at).toLocaleString("he-IL")}</span> ${r.status !== "open" ? `· <span class="up">${REP_S[r.status]}</span>` : ""}</div>
+      <div>${repText(r)}</div>${r.reply ? `<div class="muted">↩ ${esc(r.reply)}</div>` : ""}
+      <div class="frow" style="margin:6px 0 0">${r.status === "open" ? `<input class="rp-reply" placeholder="תשובה לעובד (לא חובה)" style="flex:1"><button class="mini add rp-done">✔ ${r.type === "supply" ? "נקנה" : "טופל"}</button>` : ""}<button class="mini del rp-del">מחק</button></div></div>`;
+  body.querySelector("#rpa").innerHTML = `
+    ${Object.keys(byApt).length ? `<h4>🛒 רשימת קניות לפי דירה</h4>${Object.entries(byApt).map(([a, s]) => `<div class="list-item"><span>🏠 <b>${esc(a)}</b>: ${[...s].map(esc).join(", ")}</span></div>`).join("")}` : ""}
+    <h4>פתוחים (${open.length})</h4>${open.length ? open.map(row).join("") : `<div class="muted">אין דיווחים פתוחים 👍</div>`}
+    ${done.length ? `<h4>טופלו לאחרונה</h4>${done.map(row).join("")}` : ""}`;
+  body.querySelectorAll("[data-rp]").forEach(el => {
+    const id = el.dataset.rp, d = el.querySelector(".rp-done");
+    if (d) d.onclick = async () => { await REP.update(id, { status: "done", reply: el.querySelector(".rp-reply").value.trim(), doneAt: Date.now() }); toast("סומן ✔"); tabReports(body); adminScan(); };
+    el.querySelector(".rp-del").onclick = async () => { if (!confirm("למחוק את הדיווח?")) return; await REP.remove(id); tabReports(body); adminScan(); };
+  });
+  body.querySelectorAll("[data-zoom]").forEach(i => i.onclick = () => openReceiptImg(i.src));
+}
+
+// ---- מנהל: אישורים (משמרות מחוץ ללוח + החלפות) ----
+async function tabApprove(body){
+  body.innerHTML = `<div class="muted" style="margin-bottom:10px">משמרות שעובדים רשמו ולא מתאימות ללוח המשמרות (או ששעותיהן שונות מהמתוכנן). ✔ = המשמרת תשולם · ✖ = לא תשולם.</div><div id="apv">טוען...</div>`;
+  const [team, reps] = await Promise.all([loadTeam(), REP.list().catch(() => [])]);
+  const items = [];
+  team.forEach(mem => mem.shifts.filter(isPending).forEach(s => items.push({ mem, s })));
+  items.sort((a, b) => (a.s.date + a.s.in).localeCompare(b.s.date + b.s.in));
+  const swaps = reps.filter(r => r.type === "swap" && r.status === "open");
+  const users = team.map(x => x.u);
+  const al = computeAlerts(team, cur.y, cur.m).filter(a => a.s);
+  body.querySelector("#apv").innerHTML = `
+    ${al.length ? `<h4>⚠️ התראות על משמרות (${al.length})</h4>${al.map(a => `<div class="list-item" style="flex-wrap:wrap"><span>${esc(a.text)}</span>${alertActions(a)}</div>`).join("")}` : ""}
+    <h4>🕒 משמרות לאישור (${items.length})</h4>
+    ${items.length ? `<div class="frow"><button class="b-green" id="apv-all">✔ אשר את כולן</button></div>` + items.map(({ mem, s }, i) => {
+      const pl = (mem.u.plan || []).filter(p => p.date === s.date);
+      return `<div class="list-item" data-i="${i}"><span><b>${esc(mem.u.name || mem.u.email)}</b> · ${DAYS[parseYmd(s.date).getDay()]} ${dmy(parseYmd(s.date))} · ${rng(s.in, s.out)} (${fmtHM(shiftHours(s))})${(s.location || locForSettings(mem.settings, s.date) || mem.u.apt) ? " · 🏠 " + esc(s.location || locForSettings(mem.settings, s.date) || mem.u.apt) : ""}
+        <div class="muted" style="font-size:12px">${pl.length ? `מתוכנן: ${pl.map(p => rng(p.in, p.out)).join(", ")}` : "לא היה בלוח המשמרות"}${s.notes ? " · " + esc(s.notes) : ""}</div></span>
+        <span style="white-space:nowrap"><button class="mini add ap-ok">✔ אשר</button> <button class="mini del ap-no">✖ לא</button></span></div>`; }).join("") : `<div class="muted">אין משמרות שממתינות לאישור 👍</div>`}
+    <h4>🔄 בקשות להחלפת משמרת (${swaps.length})</h4>
+    ${swaps.length ? swaps.map(r => `<div class="list-item" style="flex-wrap:wrap" data-sw="${r.id}"><span><b>${esc(r.fromName || r.from)}</b>: ${repText(r)}</span>
+      <span class="frow" style="margin:0"><select class="sw-to"><option value="">— למי להעביר —</option>${users.filter(u => u.email !== r.from).map(u => `<option value="${esc(u.email)}" ${r.who && (u.name || "").includes(r.who) ? "selected" : ""}>${esc(u.name || u.email)}</option>`).join("")}</select>
+      <button class="mini add sw-ok">✔ אשר והעבר</button><button class="mini del sw-no">✖ לא</button></span></div>`).join("") : `<div class="muted">אין בקשות פתוחות</div>`}`;
+  wireAlertActions(body, team, () => tabApprove(body));
+  const act = async (i, ok) => {
+    const { mem, s } = items[i];
+    await setShiftFlags(mem.u.email, s, ok ? { approved: true, rejected: false } : { approved: false, rejected: true });
+    LOG.add(mem.u.email, `${ok ? "אישר" : "לא אישר"} משמרת ${shiftTxt(s)}`);
+  };
+  body.querySelectorAll("[data-i]").forEach(el => {
+    el.querySelector(".ap-ok").onclick = async () => { await act(+el.dataset.i, true); toast("אושר ✔"); renderAll(); tabApprove(body); adminScan(); };
+    el.querySelector(".ap-no").onclick = async () => { await act(+el.dataset.i, false); toast("סומן כלא מאושר – לא ישולם"); renderAll(); tabApprove(body); adminScan(); };
+  });
+  const all = body.querySelector("#apv-all");
+  if (all) all.onclick = async () => { for (let i = 0; i < items.length; i++) await act(i, true); toast(`אושרו ${items.length} משמרות ✔`); renderAll(); tabApprove(body); adminScan(); };
+  body.querySelectorAll("[data-sw]").forEach(el => {
+    const r = swaps.find(x => x.id === el.dataset.sw);
+    el.querySelector(".sw-ok").onclick = async () => {
+      const to = el.querySelector(".sw-to").value; if (!to) return toast("בחר למי להעביר את המשמרת");
+      const src = users.find(u => u.email === r.from), dst = users.find(u => u.email === to);
+      try {
+        const srcPlan = (r.from === viewEmail ? userPlan : (src?.plan || [])).filter(p => p.id !== r.plan.id);
+        const dstPlan = [...(to === viewEmail ? userPlan : (dst?.plan || [])), { ...r.plan, id: newId(), note: `החלפה במקום ${r.fromName || r.from}` }];
+        if (src) await DB.putUser(r.from, { plan: srcPlan });
+        await DB.putUser(to, { plan: dstPlan });
+        await REP.update(r.id, { status: "approved", reply: `המשמרת הועברה ל${dst?.name || to}` });
+        LOG.add(r.from, `אישר החלפת משמרת ${dm(parseYmd(r.plan.date))} ${r.plan.in}–${r.plan.out} → ${dst?.name || to}`);
+        toast("ההחלפה אושרה והמשמרת הועברה ✔"); renderAll(); tabApprove(body); adminScan();
+      } catch (e) { toast("שגיאה: " + (e.code || e.message)); }
+    };
+    el.querySelector(".sw-no").onclick = async () => { await REP.update(r.id, { status: "rejected", reply: "הבקשה לא אושרה" }); toast("הבקשה נדחתה"); tabApprove(body); adminScan(); };
+  });
+}
+
+// ---- מנהל: יומן שינויים ----
+async function tabLog(body){
+  body.innerHTML = `<div class="muted" style="margin-bottom:10px">כל שינוי במשמרות, אישורים, נעילות והחלפות – מי עשה, מה ומתי.</div>
+    <div class="frow"><select id="lg-user"><option value="">כל העובדים</option></select><input id="lg-q" placeholder="חיפוש" style="flex:1"></div><div id="lg-list">טוען...</div>`;
+  const [list, users] = await Promise.all([LOG.list(), listUsers()]);
+  const nm = e => users.find(u => u.email === e)?.name || e;
+  body.querySelector("#lg-user").innerHTML += users.map(u => `<option value="${esc(u.email)}">${esc(u.name || u.email)}</option>`).join("");
+  const draw = () => {
+    const u = body.querySelector("#lg-user").value, q = body.querySelector("#lg-q").value.trim();
+    const l = list.filter(x => (!u || x.target === u || x.by === u) && (!q || (x.text + x.byName).includes(q))).slice(0, 300);
+    body.querySelector("#lg-list").innerHTML = l.length ? `<table class="rcp-table"><thead><tr><th>מתי</th><th>מי</th><th>עובד</th><th>מה</th></tr></thead><tbody>${l.map(x => `<tr><td style="white-space:nowrap">${new Date(x.at).toLocaleString("he-IL")}</td><td>${esc(x.byName || x.by)}</td><td>${esc(nm(x.target))}</td><td>${esc(x.text)}</td></tr>`).join("")}</tbody></table>` : `<div class="muted">אין רשומות</div>`;
+  };
+  body.querySelector("#lg-user").onchange = draw; body.querySelector("#lg-q").oninput = draw; draw();
+}
+
+// ================== חתימה דיגיטלית על החודש ==================
+function openSign(){
+  const mk = monthKey(cur.y, cur.m), [f, t] = monthRange(cur.y, cur.m), h = hoursInRange(f, t);
+  const m = modal(`<h3>✍️ חתימה על ${MONTHS[cur.m]} ${cur.y} ${closeX}</h3>
+    <div style="margin-bottom:8px">אני, <b>${esc(settings.name || me)}</b>, מאשר/ת שהשעות שרשמתי בחודש ${MONTHS[cur.m]} ${cur.y} נכונות: <b>${fmtHM(h)}</b> שעות, ${workDays(f, t)} ימי עבודה.</div>
+    <div class="muted" style="margin-bottom:6px">חתום עם האצבע או העכבר בתוך המסגרת:</div>
+    <canvas id="sg-pad" width="560" height="180" class="sigpad"></canvas>
+    <div class="frow" style="margin-top:8px"><button class="b-green" id="sg-save">✔ אני מאשר וחותם</button><button class="b-gray" id="sg-clr">נקה</button></div>`);
+  const c = m.querySelector("#sg-pad"), g = c.getContext("2d"); let drawing = false, any = false;
+  g.lineWidth = 2.6; g.lineCap = "round"; g.strokeStyle = "#1b2a4a";
+  const pos = e => { const r = c.getBoundingClientRect(); return [(e.clientX - r.left) * c.width / r.width, (e.clientY - r.top) * c.height / r.height]; };
+  c.onpointerdown = e => { drawing = true; any = true; c.setPointerCapture(e.pointerId); const [x, y] = pos(e); g.beginPath(); g.moveTo(x, y); };
+  c.onpointermove = e => { if (!drawing) return; const [x, y] = pos(e); g.lineTo(x, y); g.stroke(); };
+  c.onpointerup = () => drawing = false;
+  m.querySelector("#sg-clr").onclick = () => { g.clearRect(0, 0, c.width, c.height); any = false; };
+  m.querySelector("#sg-save").onclick = async () => {
+    if (!any) return toast("חתום בתוך המסגרת");
+    settings.signs = { ...(settings.signs || {}), [mk]: { at: Date.now(), hours: +h.toFixed(2), img: c.toDataURL("image/png") } };
+    try { await DB.putSettings(); LOG.add(viewEmail, `חתם על ${MONTHS[cur.m]} ${cur.y} (${fmtHM(h)} שעות)`); closeModal(); refreshMonthRow(); toast("החתימה נשמרה ✔"); } catch (e) { toast("שגיאה: " + (e.code || e.message)); }
+  };
+}
+function signHtml(){
+  const sg = (settings.signs || {})[monthKey(cur.y, cur.m)];
+  if (sg) return ` &nbsp;|&nbsp; <span class="up" title="נחתם ב-${new Date(sg.at).toLocaleString("he-IL")}">✍️ ${isAdmin ? "העובד חתם" : "חתמת"} (${dm(new Date(sg.at))})</span> <img src="${sg.img}" class="signthumb" alt="חתימה">`;
+  if (!isAdmin && viewEmail === me) return ` <button class="mbtn" data-mact="sign">✍️ חתום על החודש</button>`;
+  return isAdmin ? ` &nbsp;|&nbsp; <span class="muted">✍️ עדיין לא נחתם</span>` : "";
+}
+
+// ================== זיהוי סכום מקבלה ==================
+async function ocrAmount(img){
+  await loadScript("https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js");
+  const { data } = await Tesseract.recognize(img, "eng");
+  const txt = (data.text || "").replace(/(\d)\s*[,.]\s*(\d{2})(?!\d)/g, "$1.$2");
+  const nums = (txt.match(/\d{1,5}\.\d{2}(?!\d)/g) || []).map(Number).filter(n => n > 0 && n < 50000);
+  if (!nums.length) return null;
+  const lines = txt.split("\n"), key = /total|tota|sum|סה|לתשלום|כ"ה|pay/i;
+  for (const l of lines) if (key.test(l)) { const n = (l.match(/\d{1,5}\.\d{2}(?!\d)/g) || []).map(Number); if (n.length) return Math.max(...n); }
+  return Math.max(...nums);
+}
+
+// ================== גרף הוצאות וייצוא קבלות ==================
+let rcpChart = null;
+function drawRcpChart(canvas, list){
+  if (!canvas || typeof Chart === "undefined") return;
+  const now = new Date(), keys = [];
+  for (let i = 11; i >= 0; i--) keys.push(monthKey(now.getFullYear(), now.getMonth() - i));
+  const apts = [...new Set(list.map(r => r.apt))].slice(0, 8);
+  const colors = ["#2f6fdb", "#1f9d55", "#d9730d", "#7c4ddb", "#c2417a", "#0f8b8d", "#8a6d00", "#555"];
+  if (rcpChart) { try { rcpChart.destroy(); } catch (e) {} }
+  rcpChart = new Chart(canvas, { type: "bar", data: { labels: keys.map(k => MONTHS[+k.slice(5) - 1].slice(0, 3) + " " + k.slice(2, 4)),
+    datasets: apts.map((a, i) => ({ label: a, backgroundColor: colors[i % 8], data: keys.map(k => list.filter(r => r.apt === a && r.month === k).reduce((s, r) => s + (+r.amount || 0), 0)) })) },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "bottom" } }, scales: { x: { stacked: true }, y: { stacked: true, ticks: { callback: v => "₪" + v } } } } });
+}
+async function exportReceipts(list, label, kind){
+  if (!list.length) return toast("אין קבלות לייצוא");
+  if (kind === "xlsx") {
+    try { await loadScript("https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"); } catch (e) { return toast("לא ניתן לטעון את רכיב האקסל"); }
+    const aoa = [["תאריך", "דירה", "סכום", "מה קנו", "צולם ע״י"], ...list.map(r => [r.date.split("-").reverse().join("/"), r.apt, +r.amount || 0, r.note || "", r.fromName || r.from])];
+    aoa.push([], ["סה״כ", "", list.reduce((s, r) => s + (+r.amount || 0), 0)]);
+    const byA = {}; list.forEach(r => byA[r.apt] = (byA[r.apt] || 0) + (+r.amount || 0));
+    const ws = XLSX.utils.aoa_to_sheet(aoa), ws2 = XLSX.utils.aoa_to_sheet([["דירה", "סה״כ"], ...Object.entries(byA)]);
+    ws["!cols"] = [{ wch: 12 }, { wch: 22 }, { wch: 10 }, { wch: 30 }, { wch: 18 }];
+    const wb = XLSX.utils.book_new(); wb.Workbook = { Views: [{ RTL: true }] };
+    XLSX.utils.book_append_sheet(wb, ws, "קבלות"); XLSX.utils.book_append_sheet(wb, ws2, "לפי דירה");
+    XLSX.writeFile(wb, `קבלות-${label}.xlsx`); return;
+  }
+  try { await loadScript("https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.2/dist/html2pdf.bundle.min.js"); } catch (e) { return toast("לא ניתן לטעון את רכיב ה-PDF"); }
+  const td = "border:1px solid #ccc;padding:6px;font-size:12px;vertical-align:top";
+  const el = document.createElement("div");
+  el.innerHTML = `<div dir="rtl" style="font-family:Arial;color:#111;background:#fff;padding:10px"><h2 style="margin:0 0 8px">קבלות קניות – ${esc(label)}</h2>
+    <div style="margin-bottom:8px">סה״כ: <b>${money(list.reduce((s, r) => s + (+r.amount || 0), 0))}</b> · ${list.length} קבלות</div>
+    <table style="border-collapse:collapse;width:100%">${list.map(r => `<tr style="page-break-inside:avoid"><td style="${td};width:150px"><img src="${r.img}" style="width:140px"></td><td style="${td}"><b>${money(+r.amount || 0)}</b><br>🏠 ${esc(r.apt)}<br>${r.date.split("-").reverse().join("/")}<br>${esc(r.note || "")}<br><span style="color:#666">צולם ע״י ${esc(r.fromName || r.from)}</span></td></tr>`).join("")}</table></div>`;
+  toast("מכין PDF...");
+  await html2pdf().set({ margin: 8, filename: `קבלות-${label}.pdf`, image: { type: "jpeg", quality: 0.9 }, html2canvas: { scale: 1.5, backgroundColor: "#ffffff" }, jsPDF: { unit: "mm", format: "a4" }, pagebreak: { mode: ["css", "legacy"] } }).from(el.firstElementChild).save();
+}
+
+// ================== הוראות שימוש ==================
+function openHelp(){
+  const W = [
+    ["🧭 המסך הראשי", `למעלה יש <b>קוביות</b> – כל קובייה פותחת מסך: הוספת משמרת, שעות קבועות, קבלות, הדירה שלי, דיווח לדירה, הודעה למנהל, הנתונים שלי, חגים ולוח, אזור אישי והגדרות, הוראות. מתחת: הודעות, "📈 גרפים ונתונים" (אפשר לסגור ולפתוח בלחיצה), ואז טבלת החודש.`],
+    ["👁 פרטיות – הסתרת סכומים", `במסך הראשי הסכומים מוסתרים (₪ •••), כך שאפשר להראות את המסך לחבר – הוא יראה רק שעות. לחץ "👁 הצג סכומים" מעל הטבלה כדי לראות אותם. אפשר לקבוע את זה גם באזור האישי.`],
+    ["🕒 רישום שעות", `בטבלה למטה יש שורה לכל יום בחודש. כתוב שעת כניסה ושעת יציאה (למשל 08:00 ו-16:30) – השעות נשמרות לבד. כפתור <b>⚡ שעות</b> ממלא את השעות הקבועות של אותו יום, <b>+</b> מוסיף עוד משמרת באותו יום, <b>✕ איפוס</b> מנקה את השורה ו-<b>X</b> מוחק.`],
+    ["➕ הוסף משמרת / ⏱ שעות קבועות", `בכפתורים למעלה: "הוסף משמרת" לתאריך מסוים, ו"שעות קבועות לימים" – קובעים פעם אחת שעות לכל יום בשבוע, ואפשר למלא איתן את כל החודש בלחיצה.`],
+    ["🗓️ לוח המשמרות ואישור מנהל", `המשמרות שהמנהל תכנן לך מופיעות בטבלה כ"🗓️ מתוכנן". משמרת שרשמת ושלא מתאימה ללוח (או בשעות אחרות) תסומן <b>⏳ ממתין לאישור</b> – היא תשולם רק אחרי שהמנהל יאשר. ❌ = המנהל לא אישר, והמשמרת לא תשולם.`],
+    ["🏠 הדירה שלך", `הדירה שבה אתה עובד נרשמת אוטומטית בכל משמרת. אם יש לדירה הוראות קבועות – הן מופיעות בראש המסך. אפשר לשנות דירה למשמרת בודדת ישר בטבלה, או לעדכן דירה חדשה באזור האישי.`],
+    ["📸 קבלות קניות", `קנית משהו לדירה? לחץ "📸 קבלות קניות", בחר דירה, צלם את הקבלה – המערכת מנסה לזהות את הסכום לבד (תמיד בדוק שהוא נכון) – ושמור. אתה רואה רק את הקבלות שלך, עם סיכום חודשי, גרף וייצוא לאקסל/PDF.`],
+    ["🛠️ דיווח לדירה", `"🔧 תקלה" – משהו התקלקל (אפשר לצרף תמונה ולסמן דחוף). "🧴 חסר ציוד" – סמן מה נגמר, והמנהל מקבל רשימת קניות. "🔄 החלפת משמרת" – לא יכול להגיע? בקש להעביר משמרת מהלוח, והמנהל יאשר.`],
+    ["✍️ חתימה על החודש", `בסוף החודש, בשורת "סיכום חודש" בתחתית הטבלה, לחץ "✍️ חתום על החודש" וחתום באצבע – זה אישור שהשעות נכונות.`],
+    ["🔒 נעילת חודש", `כמה ימים אחרי סוף החודש הוא ננעל אוטומטית, ואי אפשר לשנות בו שעות. צריך תיקון? שלח "✉️ הודעה למנהל".`],
+    ["👤 האזור האישי", `שם נמצאים: 🧾 תלוש שכר (PDF), הדירות שלך, שינוי סיסמה, צבע המערכת והתקנה כאפליקציה בטלפון.`],
+    ["✉️ הודעה למנהל", `לכל בקשה או שאלה – המנהל יענה לך באותו חלון.`],
+    ["🏖️ חופש / מחלה / מילואים", `ב"➕ הוסף משמרת" בוחרים "סוג" – חופש, מחלה, מילואים או היעדרות. היום יסומן בטבלה ויספר בנתונים.`],
+    ["🗓️ לפי הלוח / 📋 העתקת שבוע", `ביום שיש בו משמרת מתוכננת מופיע כפתור "🗓️ לפי הלוח" שממלא את השעות בדיוק כמו בלוח. ב"➕ הוסף משמרת" אפשר להעתיק את כל השבוע שעבר לשבוע הזה בלחיצה.`],
+    ["↩ מחקת בטעות?", `אחרי מחיקת משמרת מופיע כפתור "↩ בטל" למשך כמה שניות.`],
+    ["🏠 הדירה שלי", `כתובת עם כפתור ניווט, טלפון, מידע חשוב (קוד כניסה, וויפי), הוראות, הודעות לדירה ו<b>רשימת משימות להיום</b> שמסמנים ✔ – המנהל רואה כמה הושלמו.`],
+    ["📊 הנתונים שלי", `שעת כניסה ויציאה ממוצעת, רצף ימי עבודה, הדירה העיקרית, המשמרת הארוכה, 🏅 הישגים, מפת חום של כל השנה, שיתוף בוואטסאפ (בלי סכומים), הוספת המשמרות ליומן בטלפון והורדת כל הנתונים שלך.`],
+    ["📅 חגים ולוח", `90 הימים הקרובים: חגים, שבתות, המשמרות המתוכננות שלך וימי חופש.`],
+    ["⚙️ ההגדרות שלי", `באזור האישי: הצגת סכומים, רק ימים עם משמרות, גרפים בפתיחה, 🔔 תזכורת לפני משמרת, גודל טקסט, צבע, סיסמה ותלוש שכר.`],
+    ["⏫ ⏰ סימונים בטבלה", `"⏫ ארוכה" = משמרת של יותר מ-9 שעות. "⏰ איחור" = נכנסת מאוחר מהשעה שבלוח. "📡 אין חיבור" = אין אינטרנט, והשינויים לא יישמרו עד שיחזור.`],
+    ["⌨️ קיצורי מקלדת (מחשב)", `Alt+N משמרת חדשה · Alt+R קבלות · Alt+S הנתונים שלי · Alt+D הדירה שלי · Alt+C חגים ולוח · Alt+H הוראות.`],
+    ["📊 אקסל / 🖨️ הדפסה", `מייצאים את החודש המוצג לקובץ אקסל או PDF.`]
+  ];
+  const A = [
+    ["⚙️ הגדרות מנהל – סקירה", `כל ניהול המערכת נמצא בכפתור "⚙️ הגדרות מנהל". מספר אדום על הכפתור = דברים שמחכים לך (אישורים, דיווחים, הודעות, התראות).`],
+    ["⚠️ התראות – אשר או לא לאשר", `כל התראה על משמרת (משמרת ארוכה, חסרה יציאה, חפיפה בדירה, פחות מ-8 שעות מנוחה בין משמרות) מגיעה עם כפתורים: <b>✔ אשר</b> – המשמרת תקינה, תשולם וההתראה נסגרת; <b>✖ לא לאשר</b> – המשמרת לא תשולם; <b>✏️ פתח</b> – פותח את המערכת של העובד באותו חודש כדי לתקן. יש גם התראה על יותר מ-60 שעות בשבוע ועל חריגה מתקציב דירה.`],
+    ["✅ אישורים", `משמרות שעובד רשם ולא מתאימות ללוח המשמרות (או שעותיהן שונות ביותר מ-${+(globalCfg.planTol ?? 15)} דקות) מחכות כאן. ✔ = תשולם, ✖ = לא תשולם. כאן גם בקשות להחלפת משמרת: בוחרים למי להעביר ומאשרים – המשמרת עוברת אוטומטית בלוח.`],
+    ["📋 לוח עובדים", `למעלה: שעות הצוות, שכר כולל, קניות החודש, ממתינים לאישור ומי חתם. יש 🏆 דירוג שעות, 📞 טלפון ו-💬 וואטסאפ לכל עובד, כמה משימות הושלמו היום, ואקסל שכר לכל העובדים ודוח שנתי. כל העובדים בחודש הנבחר: שעות, מתוכנן מול בוצע, לילות, שכר, חתימה, התראות (חפיפות, יציאה חסרה, משמרת ארוכה). משם: תלושים לכולם, נעילת חודש, שליחת סיכום במייל.`],
+    ["👥 עובדים ותעריפים", `הוספת/מחיקת עובד, תעריף אישי, ו<b>הדירה של כל עובד</b> – המשמרות והקבלות שלו משויכות אליה אוטומטית.`],
+    ["🗓️ לוח משמרות", `קובעים מי עובד מתי ובאיזו דירה (גם חוזר כל שבוע). משמרת שהעובד רושם לפי הלוח מאושרת לבד. למטה: טבלת כל הצוות לשבוע, 📋 העתקת שבוע שלם לשבוע הבא, ו🧩 כיסוי דירות – אילו דירות בלי משמרת ב-7 הימים הקרובים.`],
+    ["🧾 החזר על קבלות", `בקבלות של עובד יש ✔ החזר – הסכום נכנס אוטומטית כתוספת לשכר שלו באותו חודש – או ✖ עם סיבה שהעובד רואה.`],
+    ["🗒️ הערה פרטית", `ב"עובדים ותעריפים" לכל עובד יש הערה פרטית שרק אתה רואה, וגם שדה טלפון.`],
+    ["🏠 דירות", `שם, כתובת, טלפון, מידע (קוד/וויפי), הוראות קבועות, <b>משימות יומיות</b> לעובד, <b>תקציב חודשי</b> (התראה כשעוברים אותו) ו<b>רשימת ציוד</b> שהעובדים מסמנים כשחסר.`],
+    ["🛠️ דיווחים", `תקלות ורשימות "חסר ציוד" מהעובדים, כולל רשימת קניות מרוכזת לכל דירה. מסמנים ✔ כשטופל/נקנה, ואפשר לכתוב תשובה.`],
+    ["📸 קבלות", `בכפתור "📸 קבלות קניות" אתה רואה את כל הקבלות של כולם: לפי חודש ודירה, מי צילם, סה״כ לחודש ולכל החודשים, תקציב מול הוצאה, גרף 12 חודשים וייצוא לאקסל/PDF עם התמונות (לרואה החשבון).`],
+    ["🎁 תוספות ובונוסים / 💰 תעריפים", `תוספת או ניכוי לעובד לחודש מסוים. בתעריפים: שעת יום, לילה, שבת/חג, בדיקת לוח משמרות ו<b>נעילה אוטומטית</b> של חודש אחרי X ימים.`],
+    ["📢 הודעות", `הודעה לכל העובדים, או <b>הודעה לדירה מסוימת</b> – רק מי שעובד בה יראה אותה.`],
+    ["📜 יומן שינויים", `כל שינוי שעות, אישור, נעילה, חתימה והחלפה – מי, מה ומתי.`],
+    ["☁️ גיבוי ודוחות", `גיבוי מלא למייל (ידני או אוטומטי כל שבוע), הורדה למחשב, שחזור, וסיכום חודשי אוטומטי במייל לכל העובדים.`],
+    ["👀 צפייה בעובד", `ברשימה הנפתחת למעלה בוחרים עובד ורואים את המערכת שלו בדיוק כמו שהוא רואה – ואפשר לתקן לו.`]
+  ];
+  const sec = l => l.map(([h, t]) => `<details class="helpsec"><summary>${h}</summary><div>${t}</div></details>`).join("");
+  const m = modal(`<h3>📖 הוראות שימוש ${closeX}</h3>
+    <div class="muted" style="margin-bottom:10px">לחץ על נושא כדי לפתוח אותו.</div>
+    ${isAdmin ? `<h4>👑 למנהל</h4>${sec(A)}<h4>👷 מה העובדים רואים</h4>` : ""}${sec(W)}`);
+  m.classList.add("wide");
+}
+
+
+// ================== העדפות אישיות (נשמרות במכשיר) ==================
+const prefs = (() => { let p = {}; try { p = JSON.parse(localStorage.getItem("prefs") || "{}"); } catch (e) {} return { money: false, font: 0, onlyWork: false, notify: false, dash: true, ...p }; })();
+function savePrefs(){ try { localStorage.setItem("prefs", JSON.stringify(prefs)); } catch (e) {} }
+const pm = n => prefs.money ? money(n) : "₪ •••";
+function applyFont(){ document.documentElement.style.fontSize = (100 + (prefs.font || 0) * 8) + "%"; }
+function setMoneyBtn(){ const b = $("money-btn"); if (b) b.innerHTML = prefs.money ? "🙈 הסתר סכומים" : "👁 הצג סכומים"; }
+function setOnlyBtn(){ const b = $("only-btn"); if (b) { b.innerHTML = prefs.onlyWork ? "📅 הצג את כל הימים" : "✅ רק ימים עם משמרות"; b.classList.toggle("on", !!prefs.onlyWork); } }
+const KIND = { vac: "🏖️ חופש", sick: "🤒 מחלה", army: "🎖️ מילואים", off: "🚫 היעדרות" };
+
+// ---- ביטול מחיקה ----
+function toastUndo(text, undo){
+  const el = $("toast"); el.innerHTML = `${esc(text)} <button class="undo-btn">↩ בטל</button>`; el.classList.add("show");
+  el.querySelector(".undo-btn").onclick = async () => { el.classList.remove("show"); try { await undo(); toast("שוחזר ✔"); } catch (e) { toast("שגיאה: " + e.message); } };
+  clearTimeout(toast._t); toast._t = setTimeout(() => el.classList.remove("show"), 7000);
+}
+
+// ---- חיבור לאינטרנט ----
+function watchOnline(){
+  const upd = () => { let b = $("offline-bar"); if (!b) { b = document.createElement("div"); b.id = "offline-bar"; b.className = "offline-bar"; document.body.prepend(b); } b.textContent = "📡 אין חיבור לאינטרנט – שינויים לא יישמרו עד שהחיבור יחזור"; b.classList.toggle("hidden", navigator.onLine); };
+  addEventListener("online", upd); addEventListener("offline", upd); upd();
+}
+
+// ---- תזכורת בדפדפן לפני משמרת ----
+let notifyTimer = null;
+function startNotify(){
+  clearInterval(notifyTimer);
+  if (!prefs.notify || typeof Notification === "undefined" || Notification.permission !== "granted") return;
+  const tick = () => {
+    const now = Date.now();
+    userPlan.forEach(p => {
+      const d = parseYmd(p.date), m = toMin(p.in); if (m == null) return; d.setHours(0, m, 0, 0);
+      const diff = (d - now) / 60000, key = "ntf_" + p.id;
+      if (diff > 0 && diff <= 30) { try { if (sessionStorage.getItem(key)) return; sessionStorage.setItem(key, 1); } catch (e) {} new Notification("⏰ משמרת בעוד " + Math.round(diff) + " דקות", { body: `${p.in}–${p.out}${p.location ? " · " + p.location : ""}`, icon: "icon.svg" }); }
+    });
+  };
+  tick(); notifyTimer = setInterval(tick, 60000);
+}
+
+// ---- יצוא ללוח שנה (ICS) ----
+function exportIcs(){
+  const list = userPlan.filter(p => p.date >= ymd(addDays(today, -1)));
+  if (!list.length) return toast("אין משמרות מתוכננות לייצוא");
+  const f = (ds, hm, add = 0) => { const d = parseYmd(ds); d.setDate(d.getDate() + add); const [h, m] = hm.split(":"); return `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}T${h}${m}00`; };
+  const ev = list.map(p => { const over = toMin(p.out) <= toMin(p.in) ? 1 : 0;
+    return `BEGIN:VEVENT\r\nUID:${p.id}@my-hours\r\nDTSTAMP:${f(ymd(today), "00:00")}\r\nDTSTART;TZID=Asia/Jerusalem:${f(p.date, p.in)}\r\nDTEND;TZID=Asia/Jerusalem:${f(p.date, p.out, over)}\r\nSUMMARY:משמרת${p.location ? " – " + p.location : ""}\r\nLOCATION:${p.location || ""}\r\nDESCRIPTION:${p.note || ""}\r\nEND:VEVENT`; }).join("\r\n");
+  const ics = `BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//my-hours//HE\r\n${ev}\r\nEND:VCALENDAR`;
+  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([ics], { type: "text/calendar" })); a.download = "המשמרות-שלי.ics"; a.click();
+  toast("הקובץ ירד – פתח אותו כדי להוסיף את המשמרות ליומן");
+}
+function downloadMyData(){
+  const data = { name: settings.name, email: viewEmail, exportedAt: new Date().toISOString(), settings, shifts: [...shifts.values()], plan: userPlan };
+  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" })); a.download = `הנתונים-שלי-${ymd(today)}.json`; a.click();
+}
+
+// ================== הנתונים שלי: סטטיסטיקה, הישגים ומפת חום ==================
+function myStats(y, m){
+  const [f, t] = monthRange(y, m), list = shiftsInRange(f, t).filter(s => shiftHours(s) > 0 && !s.rejected);
+  const avg = k => { const v = list.map(s => toMin(s[k])).filter(x => x != null); if (!v.length) return "—"; const a = Math.round(v.reduce((x, y) => x + y, 0) / v.length); return `${pad(Math.floor(a / 60))}:${pad(a % 60)}`; };
+  const apts = {}; list.forEach(s => { const a = s.location || locationFor(s.date) || "—"; apts[a] = (apts[a] || 0) + shiftHours(s); });
+  const topApt = Object.entries(apts).sort((a, b) => b[1] - a[1])[0];
+  const longest = list.reduce((a, s) => shiftHours(s) > (a ? shiftHours(a) : 0) ? s : a, null);
+  const rest = list.filter(s => isRestYmd(s.date)).length, nights = list.filter(isNightShift).length;
+  const absent = shiftsInRange(f, t).filter(s => s.kind);
+  return { n: list.length, avgIn: avg("in"), avgOut: avg("out"), topApt, longest, rest, nights, absent, h: list.reduce((a, s) => a + shiftHours(s), 0) };
+}
+function streakNow(){
+  let n = 0; for (let i = 0; i < 400; i++) { const ds = ymd(addDays(today, -i)); if (hoursOnDate(ds) > 0) n++; else if (i > 0) break; } return n;
+}
+function badgesFor(){
+  const all = [...shifts.values()].filter(s => shiftHours(s) > 0 && !s.rejected), tot = all.reduce((a, s) => a + shiftHours(s), 0);
+  const [f, t] = monthRange(cur.y, cur.m), mh = hoursInRange(f, t), nights = all.filter(isNightShift).length, st = streakNow();
+  const B = [["🥉", "100 שעות", tot >= 100], ["🥈", "500 שעות", tot >= 500], ["🥇", "1000 שעות", tot >= 1000], ["💎", "2000 שעות", tot >= 2000],
+    ["🌙", "10 לילות", nights >= 10], ["🦉", "50 לילות", nights >= 50], ["🔥", "רצף 5 ימים", st >= 5], ["⚡", "רצף 10 ימים", st >= 10],
+    ["📅", "150 שעות בחודש", mh >= 150], ["🏆", "200 שעות בחודש", mh >= 200], ["✍️", "חתמת על החודש", !!(settings.signs || {})[monthKey(cur.y, cur.m)]], ["🎯", "עמדת ביעד", !!settings.monthlyTarget && mh >= settings.monthlyTarget]];
+  return { B, tot, st };
+}
+function heatmapHtml(year){
+  const start = new Date(year, 0, 1), cells = [];
+  const off = start.getDay();
+  for (let i = 0; i < off; i++) cells.push(`<i class="hm0" style="visibility:hidden"></i>`);
+  for (let d = new Date(start); d.getFullYear() === year; d.setDate(d.getDate() + 1)) {
+    const h = hoursOnDate(ymd(d)), lv = h <= 0 ? 0 : h < 4 ? 1 : h < 8 ? 2 : h < 12 ? 3 : 4;
+    cells.push(`<i class="hm${lv}" title="${dmy(d)} · ${h ? fmtHM(h) + " שעות" : "אין"}"></i>`);
+  }
+  return `<div class="heatmap">${cells.join("")}</div><div class="muted" style="font-size:12px;margin-top:4px">כל ריבוע = יום. ככל שהצבע כהה יותר – יותר שעות.</div>`;
+}
+function openStats(){
+  const s = myStats(cur.y, cur.m), { B, tot, st } = badgesFor();
+  const txt = `📊 ${settings.name || ""} – ${MONTHS[cur.m]} ${cur.y}: ${fmtHM(s.h)} שעות · ${s.n} משמרות${s.nights ? ` · ${s.nights} לילות` : ""}`;
+  const m = modal(`<h3>📊 הנתונים שלי – ${MONTHS[cur.m]} ${cur.y} ${closeX}</h3>
+    <div class="rcp-cards">
+      <div class="rcp-card"><div class="muted">שעות החודש</div><b>${fmtHM(s.h)}</b><div class="muted">${s.n} משמרות</div></div>
+      <div class="rcp-card"><div class="muted">שעת כניסה ממוצעת</div><b>${s.avgIn}</b><div class="muted">יציאה ממוצעת ${s.avgOut}</div></div>
+      <div class="rcp-card"><div class="muted">🔥 רצף ימי עבודה</div><b>${st}</b><div class="muted">ימים ברצף עד היום</div></div>
+      <div class="rcp-card"><div class="muted">סה״כ שעות אי פעם</div><b>${fmtHM(tot)}</b><div class="muted">בכל החודשים</div></div>
+    </div>
+    <div class="list-item"><span>🏠 הדירה שעבדת בה הכי הרבה: <b>${s.topApt ? esc(s.topApt[0]) + " (" + fmtHM(s.topApt[1]) + ")" : "—"}</b></span></div>
+    <div class="list-item"><span>⏱ המשמרת הארוכה ביותר: <b>${s.longest ? `${dm(parseYmd(s.longest.date))} · ${rng(s.longest.in, s.longest.out)} (${fmtHM(shiftHours(s.longest))})` : "—"}</b></span></div>
+    <div class="list-item"><span>🌙 משמרות לילה: <b>${s.nights}</b> · ✡️ משמרות בשבת/חג: <b>${s.rest}</b>${s.absent.length ? ` · ימי היעדרות: <b>${s.absent.map(x => KIND[x.kind] || "").join(", ")}</b>` : ""}</span></div>
+    <h4>🏅 הישגים</h4><div class="badges">${B.map(([i, t, ok]) => `<span class="bdg ${ok ? "on" : ""}" title="${ok ? "הושג!" : "עוד לא"}">${i} ${t}</span>`).join("")}</div>
+    <h4>🗓️ מפת חום – ${cur.y}</h4>${heatmapHtml(cur.y)}
+    <h4>📤 שיתוף וייצוא</h4>
+    <div class="frow"><a class="btnlink b-wa" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(txt)}">🟢 שתף שעות בוואטסאפ (בלי סכומים)</a>
+      <button class="b-blue" id="st-ics">📆 הוסף את המשמרות שלי ליומן בטלפון</button><button class="b-gray" id="st-data">💾 הורד את כל הנתונים שלי</button></div>`);
+  m.classList.add("wide");
+  m.querySelector("#st-ics").onclick = exportIcs;
+  m.querySelector("#st-data").onclick = downloadMyData;
+}
+
+// ================== חגים, שבתות ולוח המשמרות שלי ==================
+function openCal(){
+  const rows = [];
+  for (let i = 0; i <= 90; i++) {
+    const d = addDays(today, i), ds = ymd(d), hol = (holidaysOf(d.getFullYear())[ds] || []).map(x => x.text), pl = planOn(ds), sh = shiftsOn(ds).filter(s => s.kind);
+    if (hol.length || pl.length || sh.length || (i < 14 && d.getDay() === 6))
+      rows.push(`<div class="list-item"><span><b>${DAYS[d.getDay()]} ${dmy(d)}</b> <span class="muted">${esc(hebDate(d))}</span>${hol.length ? ` · <span class="holtxt">${esc(hol.join(" · "))}</span>` : d.getDay() === 6 ? ` · <span class="holtxt">שבת</span>` : ""}
+        ${pl.map(p => `<div>🗓️ משמרת ${rng(p.in, p.out)}${p.location ? " · 🏠 " + esc(p.location) : ""}</div>`).join("")}${sh.map(s => `<div>${KIND[s.kind]}</div>`).join("")}</span></div>`);
+  }
+  const m = modal(`<h3>📅 חגים, שבתות והמשמרות שלי – 90 יום קדימה ${closeX}</h3>
+    <div class="frow"><button class="b-blue" id="cl-ics">📆 הוסף את המשמרות ליומן בטלפון</button></div>
+    ${rows.join("") || `<div class="muted">אין אירועים</div>`}`);
+  m.querySelector("#cl-ics").onclick = exportIcs;
+}
+
+// ================== הדירה שלי ==================
+function aptObj(name){ return (globalCfg.apartments || []).find(a => a.name === name) || null; }
+function openAptCard(){
+  const name = myApt(), a = aptObj(name), ds = ymd(today);
+  if (!name) return toast("עדיין לא שויכת לדירה – פנה למנהל");
+  const tasks = (a?.tasks || "").split("\n").map(x => x.trim()).filter(Boolean);
+  const done = ((settings.tasks || {})[ds] || {})[name] || [];
+  const addr = a?.address || name;
+  const m = modal(`<h3>🏠 ${esc(name)} ${closeX}</h3>
+    ${addr ? `<div class="list-item"><span>📍 ${esc(addr)}</span><a class="btnlink b-blue" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addr)}">🗺️ ניווט</a></div>` : ""}
+    ${a?.phone ? `<div class="list-item"><span>📞 ${esc(a.phone)}</span><a class="btnlink b-green" href="tel:${esc(a.phone)}">התקשר</a></div>` : ""}
+    ${a?.info ? `<div class="list-item" style="white-space:pre-wrap"><span>ℹ️ ${esc(a.info)}</span></div>` : ""}
+    ${a?.instructions ? `<div class="notice info" style="margin:8px 0">📝 הוראות קבועות: ${esc(a.instructions)}</div>` : ""}
+    ${(globalCfg.aptAnnounce || {})[name] ? `<div class="notice warn" style="margin:8px 0">📢 ${esc(globalCfg.aptAnnounce[name])}</div>` : ""}
+    <h4>✅ משימות להיום (${dmy(today)})</h4>
+    ${tasks.length ? `<div id="tk-list">${tasks.map((t, i) => `<label class="task ${done.includes(i) ? "done" : ""}"><input type="checkbox" data-tk="${i}" ${done.includes(i) ? "checked" : ""}> ${esc(t)}</label>`).join("")}</div>
+      <div class="progress" style="margin-top:8px"><div id="tk-bar" style="width:${Math.round(done.length / tasks.length * 100)}%"></div></div>` : `<div class="muted">המנהל עוד לא הגדיר משימות לדירה הזאת</div>`}
+    <div class="frow" style="margin-top:12px"><button class="b-gray" id="ac-rep">🛠️ דווח על תקלה / חסר ציוד</button><button class="b-gray" id="ac-rcp">📸 קבלה על קנייה</button></div>`);
+  m.querySelectorAll("[data-tk]").forEach(cb => cb.onchange = async () => {
+    const l = [...m.querySelectorAll("[data-tk]:checked")].map(x => +x.dataset.tk);
+    settings.tasks = { ...(settings.tasks || {}) }; settings.tasks[ds] = { ...(settings.tasks[ds] || {}), [name]: l };
+    Object.keys(settings.tasks).filter(k => k < ymd(addDays(today, -40))).forEach(k => delete settings.tasks[k]);
+    cb.closest(".task").classList.toggle("done", cb.checked); m.querySelector("#tk-bar").style.width = Math.round(l.length / tasks.length * 100) + "%";
+    try { await DB.putSettings(); if (l.length === tasks.length) toast("🎉 כל המשימות של היום הושלמו!"); } catch (e) { toast("שגיאה: " + (e.code || e.message)); }
+  });
+  m.querySelector("#ac-rep").onclick = () => openReports();
+  m.querySelector("#ac-rcp").onclick = () => openReceipts();
+}
+
+// ================== תזכורת: לא נרשמו שעות ==================
+function missingDaysNotice(){
+  if (viewEmail !== me || isAdmin) return "";
+  const miss = [];
+  for (let i = 1; i <= 3; i++) { const d = addDays(today, -i), ds = ymd(d); const exp = planOn(ds).length || (settings.fixed?.[d.getDay()]?.in); if (exp && !shiftsOn(ds).length) miss.push(dm(d)); }
+  return miss.length ? `<div class="notice warn">📝 לא נרשמו שעות בימים: ${miss.join(", ")} – אל תשכח למלא</div>` : "";
+}
+
+// ================== מנהל: התראות עם אישור / דחייה ==================
+function alertActions(a){
+  if (!a.email || !a.s) return "";
+  return `<span class="al-acts" data-al-email="${esc(a.email)}" data-al-id="${esc(a.s.id)}"><button class="mini add" data-al="ok" title="המשמרת תקינה – אשר">✔ אשר</button><button class="mini del" data-al="no" title="לא לאשר – לא תשולם">✖ לא לאשר</button><button class="mini fix" data-al="open" title="פתח את המערכת של העובד">✏️ פתח</button></span>`;
+}
+function wireAlertActions(root, team, redraw){
+  root.querySelectorAll("[data-al]").forEach(b => b.onclick = async () => {
+    const box = b.closest("[data-al-email]"), email = box.dataset.alEmail, id = box.dataset.alId;
+    const mem = team.find(x => x.u.email === email), s = mem?.shifts.find(x => x.id === id); if (!s) return;
+    if (b.dataset.al === "open") { closeModal(); const d = parseYmd(s.date); if (!DEMO && email !== viewEmail) { await openSystem(email); $("view-user").value = email; } setMonth(d.getFullYear(), d.getMonth()); return; }
+    const ok = b.dataset.al === "ok";
+    await setShiftFlags(email, s, ok ? { approved: true, rejected: false, alertOk: true } : { approved: false, rejected: true, alertOk: true });
+    LOG.add(email, `${ok ? "אישר" : "לא אישר"} (מהתראה) משמרת ${shiftTxt(s)}`);
+    toast(ok ? "אושר ✔ – ההתראה נסגרה" : "סומן כלא מאושר – לא ישולם"); renderAll(); adminScan(); redraw();
+  });
+}
+
+// ================== מנהל: דוחות אקסל ==================
+async function exportPayroll(team, y, m){
+  try { await loadScript("https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"); } catch (e) { return toast("לא ניתן לטעון את רכיב האקסל"); }
+  const aoa = [["עובד", "מייל", "דירה", "ימים", "שעות", "שעות יום", "לילות", "שעות שבת/חג", "שכר שעות", "שכר לילות", "תוספות", "סה״כ לתשלום", "ממתין לאישור", "חתם"]];
+  team.forEach(mem => { const r = memberMonth(mem, y, m);
+    aoa.push([mem.u.name || "", mem.u.email, mem.u.apt || "", r.days, +r.h.toFixed(2), +r.p.dayH.toFixed(2), r.p.nights, +r.p.premH.toFixed(2), +r.p.dayPay.toFixed(2), +r.p.nightPay.toFixed(2), +r.extra.toFixed(2), +r.total.toFixed(2), r.pending, r.signed ? "כן" : "לא"]); });
+  const ws = XLSX.utils.aoa_to_sheet(aoa); ws["!cols"] = aoa[0].map(() => ({ wch: 13 }));
+  const wb = XLSX.utils.book_new(); wb.Workbook = { Views: [{ RTL: true }] }; XLSX.utils.book_append_sheet(wb, ws, "שכר");
+  XLSX.writeFile(wb, `שכר-${MONTHS[m]}-${y}.xlsx`);
+}
+async function exportYear(team, y){
+  try { await loadScript("https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"); } catch (e) { return toast("לא ניתן לטעון את רכיב האקסל"); }
+  const aoa = [["עובד", ...MONTHS, "סה״כ שעות", "סה״כ לתשלום"]];
+  team.forEach(mem => { let th = 0, tp = 0; const row = [mem.u.name || mem.u.email]; for (let m = 0; m < 12; m++) { const r = memberMonth(mem, y, m); row.push(+r.h.toFixed(2)); th += r.h; tp += r.total; } row.push(+th.toFixed(2), +tp.toFixed(2)); aoa.push(row); });
+  const ws = XLSX.utils.aoa_to_sheet(aoa); const wb = XLSX.utils.book_new(); wb.Workbook = { Views: [{ RTL: true }] }; XLSX.utils.book_append_sheet(wb, ws, `שנת ${y}`);
+  XLSX.writeFile(wb, `דוח-שנתי-${y}.xlsx`);
+}
+
+// ================== מנהל: לוח משמרות שבועי לכל הצוות ==================
+function teamWeekHtml(users, ws){
+  const days = [...Array(7)].map((_, i) => addDays(ws, i));
+  return `<div style="overflow-x:auto"><table class="rcp-table teamweek"><thead><tr><th>עובד</th>${days.map(d => `<th>${DAYS[d.getDay()]}<div class="muted" style="font-weight:400">${dm(d)}</div></th>`).join("")}</tr></thead><tbody>
+    ${users.map(u => `<tr><td><b>${esc(u.name || u.email)}</b></td>${days.map(d => { const l = (u.plan || []).filter(p => p.date === ymd(d)); return `<td>${l.map(p => `<div class="tw-cell">${p.in}–${p.out}${p.location ? `<div class="muted">${esc(p.location)}</div>` : ""}</div>`).join("") || `<span class="muted">—</span>`}</td>`; }).join("")}</tr>`).join("")}</tbody></table></div>`;
+}
+function coverageHtml(users){
+  const apts = (globalCfg.apartments || []).map(a => a.name); if (!apts.length) return "";
+  const out = [];
+  for (let i = 0; i < 7; i++) { const ds = ymd(addDays(today, i)); const miss = apts.filter(a => !users.some(u => (u.plan || []).some(p => p.date === ds && p.location === a))); if (miss.length) out.push(`<div class="list-item"><span><b>${DAYS[parseYmd(ds).getDay()]} ${dm(parseYmd(ds))}</b> – אין משמרת מתוכננת ב: ${miss.map(esc).join(", ")}</span></div>`); }
+  return `<h4>🧩 כיסוי דירות – 7 הימים הקרובים</h4>${out.join("") || `<div class="muted">✔ לכל הדירות יש משמרת מתוכננת בכל יום</div>`}`;
+}
+
+// ================== מנהל: הערות פרטיות על עובד ==================
+const ANOTE = {
+  async get(email){ if (DEMO) { try { return JSON.parse(localStorage.getItem("demo_anote") || "{}")[email] || ""; } catch (e) { return ""; } } const d = await fb.f.getDoc(fb.f.doc(fb.db, "settings", CFG.admin)); return (d.exists() && (d.data().workerNotes || {})[email]) || ""; },
+  async set(email, text){ if (DEMO) { let o = {}; try { o = JSON.parse(localStorage.getItem("demo_anote") || "{}"); } catch (e) {} o[email] = text; localStorage.setItem("demo_anote", JSON.stringify(o)); return; }
+    await fb.f.setDoc(fb.f.doc(fb.db, "settings", CFG.admin), { workerNotes: { [email]: text } }, { merge: true });
+    if (viewEmail === CFG.admin) settings.workerNotes = { ...(settings.workerNotes || {}), [email]: text }; }
+};
+
+// ================== קיצורי מקלדת ==================
+function wireKeys(){
+  addEventListener("keydown", e => {
+    if (!e.altKey || $("app").classList.contains("hidden")) return;
+    const k = e.key.toLowerCase(), map = { n: openAddDate, h: openHelp, r: () => openReceipts(), s: openStats, d: openAptCard, c: openCal };
+    const hk = { "ן": "n", "י": "h", "ר": "r", "ד": "s", "ג": "d", "ב": "c" }[k] || k;
+    if (map[hk]) { e.preventDefault(); map[hk](); }
+  });
+}
+
+// ================== הודעה לדירה ==================
+function aptAnnounceFor(){
+  const map = globalCfg.aptAnnounce || {}; if (isAdmin) return "";
+  const a = myApt(); return a && map[a] ? `🏠 ${a}: ${map[a]}` : "";
+}
+
 
 function seedDemo(){
   settings = { name: "אברהם יונג", locations: [{ address: "ז'בוטינסקי 107", from: "2020-01-01" }], fixed: { 0:{in:"03:00",out:"07:00"}, 2:{in:"15:00",out:"19:00"} } };
@@ -790,6 +1486,7 @@ function renderTable(){
   for (let day = 1; day <= last; day++) {
     const d = new Date(cur.y, cur.m, day), ds = ymd(d);
     const list = shiftsOn(ds);
+    if (prefs.onlyWork && !list.length && !planOn(ds).length && d.getDay() !== 6 && day !== last) continue;
     const rows = list.length ? list : [null];
     const notes = dayNotes(d);
     const isHol = notes.some(n => n.hol);
@@ -808,7 +1505,7 @@ function renderTable(){
       html += `<td><input class="loc" list="loc-list" data-f="location" value="${esc(s && s.location ? s.location : defLoc)}" placeholder="דירה / מיקום"${dis}></td>`;
       html += `<td><div class="notecell">${i === 0 && plan.length ? `<span class="planbadge" title="${esc(plan.map(p => p.note).filter(Boolean).join(" · "))}">🗓️ מתוכנן ${plan.map(p => `${rng(p.in, p.out)}${p.location ? " · " + esc(p.location) : ""}`).join(", ")}</span>` : ""}${i === 0 && notes.length ? `<span class="holtxt">${esc(notes.map(x => x.text).join(" · "))}</span>` : ""}<input class="note" data-f="notes" value="${s ? esc(s.notes) : ""}" placeholder=""${dis}></div></td>`;
       html += lk ? `<td><span class="muted">🔒 נעול</span></td></tr>` : `<td><div class="rowacts">
-        <button class="mini fixb" data-act="fixed" title="מלא שעות קבועות ליום ${DAYS[d.getDay()]}">⚡ שעות</button>
+        ${plan.length ? `<button class="mini apv" data-act="plan" title="מלא לפי לוח המשמרות">🗓️ לפי הלוח</button>` : `<button class="mini fixb" data-act="fixed" title="מלא שעות קבועות ליום ${DAYS[d.getDay()]}">⚡ שעות</button>`}
         <button class="mini clr" data-act="clear" title="איפוס השורה">✕ איפוס</button>
         <button class="mini add" data-act="add" title="הוסף משמרת לאותו יום">+</button>
         <button class="mini delx" data-act="del" title="מחק משמרת">X</button>
@@ -826,10 +1523,13 @@ function renderTable(){
 }
 
 function hoursCell(s){
+  if (s && s.kind) return `<span class="kindbadge">${KIND[s.kind] || ""}</span>`;
   if (s && s.live && !s.out) return `<span class="up">⏱ במשמרת</span>`;
   if (!s || !shiftHours(s)) return "";
   return fmtHM(shiftHours(s)) + (isNightShift(s) ? `<span class="nightbadge" title="כולל שעות לילה">🌙 לילה</span>` : "")
-    + (s.approved === false ? (isAdmin ? `<button class="mini apv" data-act="approve" title="אשר את המשמרת">✔ אשר</button>` : `<span class="pendbadge" title="ממתין לאישור המנהל">⏳ ממתין</span>`) : "");
+    + (shiftHours(s) > 9 ? `<span class="otbadge" title="יותר מ-9 שעות במשמרת">⏫ ארוכה</span>` : "")
+    + (() => { const pl = planOn(s.date)[0]; if (!pl || !s.in) return ""; const d = toMin(s.in) - toMin(pl.in); return d > 5 && d < 240 ? `<span class="latebadge" title="לפי הלוח: ${pl.in}">⏰ איחור ${d}′</span>` : ""; })()
+    + statusBadge(s);
 }
 const noteOf = (k, f = "notes") => (settings[f] || {})[k] || "";
 // הוראות: המנהל כותב ב-notes, העובד כותב ב-wnotes. כל אחד עורך רק את שלו, ושניהם רואים את שתיהן.
@@ -859,22 +1559,24 @@ function openNote(k, f = "notes"){
 }
 const planOn = ds => userPlan.filter(p => p.date === ds).sort((a, b) => a.in.localeCompare(b.in));
 async function monthAction(act){
+  if (act === "sign") return openSign();
   if (!isAdmin) return;
   const [f, t] = monthRange(cur.y, cur.m), mk = monthKey(cur.y, cur.m);
   try {
     if (act === "lock") {
-      const locks = { ...userLocks }; if (locks[mk]) delete locks[mk]; else locks[mk] = true;
-      await DB.putUser(viewEmail, { locks }); userLocks = locks; renderAll();
+      const locks = { ...userLocks }; locks[mk] = !isLocked(f);
+      await DB.putUser(viewEmail, { locks }); userLocks = locks; renderAll(); LOG.add(viewEmail, `${locks[mk] ? "נעל" : "פתח"} את ${MONTHS[cur.m]} ${cur.y}`);
       toast(locks[mk] ? `🔒 ${MONTHS[cur.m]} ננעל – העובד לא יכול לשנות שעות` : "🔓 הנעילה הוסרה");
     } else if (act === "approveall") {
-      const list = shiftsInRange(f, t).filter(x => x.approved === false).map(x => ({ ...x, approved: true }));
-      await DB.putMany(list); renderAll(); toast(`אושרו ${list.length} משמרות ✔`);
+      const list = shiftsInRange(f, t).filter(isPending);
+      for (const x of list) { await setShiftFlags(viewEmail, x, { approved: true, rejected: false }); LOG.add(viewEmail, `אישר משמרת ${shiftTxt(x)}`); }
+      renderAll(); adminScan(); toast(`אושרו ${list.length} משמרות ✔`);
     }
   } catch (e) { toast("שגיאה: " + (e.code || e.message)); }
 }
 // ---- תזכורות, הוראות הדירה והתראות מנהל ----
 function aptFor(loc){ const n = norm(loc); if (!n) return null; return (globalCfg.apartments || []).find(a => norm(a.name) === n || (a.address && norm(a.address) === n)) || null; }
-let adminAlerts = { alerts: [], pending: 0, unread: 0 };
+let adminAlerts = { alerts: [], pending: 0, unread: 0, reports: 0, swaps: 0 };
 function renderNotices(){
   const box = $("notices"); if (!box) return;
   const out = [], now = new Date(), ds = ymd(now), nowM = now.getHours() * 60 + now.getMinutes();
@@ -883,44 +1585,48 @@ function renderNotices(){
     const expIn = pl?.in || fx?.in, expOut = pl?.out || fx?.out;
     const todayShifts = shiftsOn(ds), live = openLive();
     if (expIn && !todayShifts.some(x => x.in) && !live && nowM > toMin(expIn) + 10 && (!expOut || nowM < toMin(expOut) || toMin(expOut) < toMin(expIn)))
-      out.push(`<div class="notice warn">⏰ עדיין לא נרשמה כניסה היום (השעה המתוכננת ${esc(expIn)}). <button class="b-green" data-nact="in">▶ כניסה עכשיו</button></div>`);
+      out.push(`<div class="notice warn">⏰ עדיין לא נרשמו שעות היום (השעה המתוכננת ${esc(expIn)}).</div>`);
     if (live && expOut) { const o = toMin(expOut), st = toMin(live.in); const end = o > st ? o : o + 1440, curM = live.date === ds ? nowM : nowM + 1440; if (curM > end + 30) out.push(`<div class="notice warn">⏰ אתה עדיין במשמרת מאז ${esc(live.in)} – לא שכחת ללחוץ יציאה? <button class="b-red" data-nact="out">⏹ יציאה עכשיו</button></div>`); }
   }
+  const md = missingDaysNotice(); if (md) out.push(md);
   const apt = aptFor(locationFor(ds));
   if (apt && apt.instructions) out.push(`<div class="notice info">🏠 הוראות הדירה – ${esc(apt.name)}${apt.address && apt.address !== apt.name ? ` (${esc(apt.address)})` : ""}: <span style="font-weight:500">${esc(apt.instructions)}</span></div>`);
-  if (isAdmin && (adminAlerts.alerts.length || adminAlerts.pending || adminAlerts.unread)) {
+  if (isAdmin && (adminAlerts.alerts.length || adminAlerts.pending || adminAlerts.unread || adminAlerts.reports || adminAlerts.swaps)) {
     const parts = [];
-    if (adminAlerts.alerts.length) parts.push(`⚠️ ${adminAlerts.alerts.length} התראות`);
-    if (adminAlerts.pending) parts.push(`⏳ ${adminAlerts.pending} משמרות ממתינות לאישור`);
+    if (adminAlerts.alerts.length) parts.push(`⚠️ ${adminAlerts.alerts.length} התראות (אפשר לאשר או לא לאשר)`);
+    if (adminAlerts.pending) parts.push(`⏳ ${adminAlerts.pending} משמרות מחוץ ללוח ממתינות לאישור`);
+    if (adminAlerts.swaps) parts.push(`🔄 ${adminAlerts.swaps} בקשות החלפה`);
+    if (adminAlerts.reports) parts.push(`🛠️ ${adminAlerts.reports} דיווחים מהדירות`);
     if (adminAlerts.unread) parts.push(`✉️ ${adminAlerts.unread} הודעות חדשות`);
-    out.push(`<div class="notice admin">${parts.join(" &nbsp;·&nbsp; ")} <button class="b-gray" data-nact="alerts">פתח</button>${adminAlerts.unread ? `<button class="b-gray" data-nact="inbox">הודעות</button>` : ""}</div>`);
+    out.push(`<div class="notice admin">${parts.join(" &nbsp;·&nbsp; ")} ${adminAlerts.pending || adminAlerts.swaps || adminAlerts.alerts.length ? `<button class="b-green" data-nact="approve">✅ אשר / דחה</button>` : ""}${adminAlerts.reports ? `<button class="b-gray" data-nact="reports">🛠️ דיווחים</button>` : ""}<button class="b-gray" data-nact="alerts">📋 לוח</button>${adminAlerts.unread ? `<button class="b-gray" data-nact="inbox">הודעות</button>` : ""}</div>`);
   }
   box.innerHTML = out.join("");
   box.querySelectorAll("[data-nact]").forEach(b => b.onclick = () => {
     const a = b.dataset.nact;
     if (a === "in") $("punch-in")?.click(); else if (a === "out") $("punch-out")?.click();
-    else if (a === "alerts") openSettings("board"); else if (a === "inbox") openSettings("inbox");
+    else if (a === "alerts") openSettings("board"); else if (a === "inbox") openSettings("inbox"); else if (a === "approve") openSettings("approve"); else if (a === "reports") openSettings("reports");
   });
 }
 function refreshMonthRow(){
   const el = $("month-sum"); if (!el) return;
   const [f, t] = monthRange(cur.y, cur.m), h = hoursInRange(f, t), p = calcPay(shiftsInRange(f, t)), adj = adjFor(cur.y, cur.m);
-  const pend = shiftsInRange(f, t).filter(x => x.approved === false).length;
+  const pend = shiftsInRange(f, t).filter(isPending).length, rej = shiftsInRange(f, t).filter(x => x.rejected).length;
   el.innerHTML = `📊 סיכום חודש ${MONTHS[cur.m]} ${cur.y}: &nbsp; <b>${h.toFixed(2)}</b> שעות (${fmtHM(h)}) · ${workDays(f, t)} ימי עבודה
-    &nbsp;|&nbsp; ☀️ שעות יום ${fmtHM(p.dayH)} = ${money(p.dayPay)}
-    &nbsp;|&nbsp; 🌙 ${p.nights} לילות = ${money(p.nightPay)}
-    ${adj.map(a => ` &nbsp;|&nbsp; 🎁 ${esc(a.label)} ${+a.amount < 0 ? "−" : "+"}${money(Math.abs(+a.amount))}`).join("")}
-    &nbsp;|&nbsp; 💰 סה"כ לתשלום: <span class="g">${money(p.total + adjSum(adj))}</span>
-    ${pend ? ` &nbsp;|&nbsp; ⏳ ${pend} ממתינות לאישור` : ""}${isLocked(f) ? " &nbsp;|&nbsp; 🔒 החודש נעול" : ""}
+    &nbsp;|&nbsp; ☀️ שעות יום ${fmtHM(p.dayH)} = ${pm(p.dayPay)}
+    &nbsp;|&nbsp; 🌙 ${p.nights} לילות = ${pm(p.nightPay)}
+    ${adj.map(a => ` &nbsp;|&nbsp; 🎁 ${esc(a.label)} ${+a.amount < 0 ? "−" : "+"}${pm(Math.abs(+a.amount))}`).join("")}
+    &nbsp;|&nbsp; 💰 סה"כ לתשלום: <span class="g">${pm(p.total + adjSum(adj))}</span>
+    ${pend ? ` &nbsp;|&nbsp; ⏳ ${pend} ממתינות לאישור${shiftsInRange(f, t).some(x => isPending(x) && x.offPlan) ? " (משמרות מחוץ ללוח ישולמו אחרי אישור)" : ""}` : ""}${rej ? ` &nbsp;|&nbsp; ❌ ${rej} לא אושרו` : ""}${isLocked(f) ? " &nbsp;|&nbsp; 🔒 החודש נעול" : ""}${signHtml()}
     ${isAdmin ? `${pend ? `<button class="mbtn" data-mact="approveall">✔ אשר הכול (${pend})</button>` : ""}<button class="mbtn" data-mact="lock">${isLocked(f) ? "🔓 פתח נעילה" : "🔒 נעל חודש"}</button>` : ""}
     ${noteHtml("m:" + monthKey(cur.y, cur.m))}`;
 }
 function refreshWeekRows(){
   refreshMonthRow();
   document.querySelectorAll("[data-weeksum]").forEach(td => {
-    const ws = parseYmd(td.dataset.weeksum), we = addDays(ws, 6);
-    const h = hoursInRange(ymd(ws), ymd(we)), p = calcPay(shiftsInRange(ymd(ws), ymd(we)));
-    td.innerHTML = `📖 סיכום שבועי: ${h ? `&nbsp; <b>${h.toFixed(2)}</b> שעות (${fmtHM(h)}) &nbsp;·&nbsp; ${money(p.total)}${p.nights ? ` <span class="muted">(${p.nights} לילות)</span>` : ""}` : ""} ${noteHtml("w:" + td.dataset.weeksum)}`;
+    const ws = parseYmd(td.dataset.weeksum), we = addDays(ws, 6), [mf, mt] = monthRange(cur.y, cur.m);
+    const a = ymd(ws) < mf ? mf : ymd(ws), b = ymd(we) > mt ? mt : ymd(we);
+    const h = hoursInRange(a, b), p = calcPay(shiftsInRange(a, b).filter(s => !s.rejected)), part = a !== ymd(ws) || b !== ymd(we);
+    td.innerHTML = `📖 סיכום שבועי${part ? ` <span class="muted" style="font-size:12px">(רק הימים של ${MONTHS[cur.m]})</span>` : ""}: ${h ? `&nbsp; <b>${h.toFixed(2)}</b> שעות (${fmtHM(h)}) &nbsp;·&nbsp; ${pm(p.total)}${p.nights ? ` <span class="muted">(${p.nights} לילות)</span>` : ""}` : ""} ${noteHtml("w:" + td.dataset.weeksum)}`;
   });
 }
 
@@ -958,8 +1664,11 @@ async function onRowAction(e){
   if (!btn) { const wr = e.target.closest("tr.weekrow"); if (wr) { weekStart = parseYmd(wr.dataset.week); document.querySelectorAll("tr.weekrow").forEach(r => r.classList.toggle("active", r === wr)); renderCharts(); } return; }
   const tr = btn.closest("tr"), ds = tr.dataset.date, act = btn.dataset.act;
   try {
-    if (act === "approve") {
-      await DB.putShift({ ...shifts.get(tr.dataset.id), approved: true }); refreshComputed(tr); toast("המשמרת אושרה ✔"); return;
+    if (act === "approve" || act === "reject") {
+      const sh = shifts.get(tr.dataset.id), ok = act === "approve";
+      await setShiftFlags(viewEmail, sh, ok ? { approved: true, rejected: false } : { approved: false, rejected: true });
+      LOG.add(viewEmail, `${ok ? "אישר" : "לא אישר"} משמרת ${shiftTxt(sh)}`);
+      refreshComputed(tr); toast(ok ? "המשמרת אושרה ✔" : "המשמרת סומנה כלא מאושרת – לא תשולם"); adminScan(); return;
     }
     if (act === "add") {
       await DB.putShift({ id: newId(), date: ds, in: "", out: "", location: "", notes: "" });
@@ -967,10 +1676,16 @@ async function onRowAction(e){
     } else if (act === "del") {
       if (!tr.dataset.id) { toast("אין משמרת למחיקה בשורה הזאת"); return; }
       if (!confirm("למחוק את המשמרת?")) return;
-      await DB.delShift(tr.dataset.id); renderAll(); toast("המשמרת נמחקה");
+      const gone = { ...shifts.get(tr.dataset.id) };
+      await DB.delShift(tr.dataset.id); renderAll(); toastUndo("המשמרת נמחקה", async () => { await DB.putShift(gone); renderAll(); });
     } else if (act === "clear") {
       if (!tr.dataset.id) { tr.querySelectorAll("input").forEach(i => { if (i.dataset.f !== "location") i.value = ""; }); return; }
       await DB.putShift({ ...shifts.get(tr.dataset.id), in: "", out: "", notes: "", location: "" }); renderAll(); toast("השורה נוקתה");
+    } else if (act === "plan") {
+      const pl = planOn(ds)[0]; if (!pl) return;
+      const s = tr.dataset.id ? { ...shifts.get(tr.dataset.id) } : { id: newId(), date: ds, in: "", out: "", location: "", notes: "" };
+      s.in = pl.in; s.out = pl.out; if (pl.location) s.location = pl.location;
+      await DB.putShift(s); renderAll(); toast(`מולא לפי לוח המשמרות: \u2066${pl.in}–${pl.out}\u2069 ✔`);
     } else if (act === "fixed") {
       const wd = parseYmd(ds).getDay(), fx = settings.fixed[wd];
       if (!fx || !fx.in || !fx.out) { toast(`לא הוגדרו שעות קבועות ליום ${DAYS[wd]}. לחץ על "⏱ שעות קבועות" למעלה.`); return; }
@@ -997,13 +1712,7 @@ function renderSummary(){
     <div class="big">${h.toFixed(2)} שעות</div>
     <div class="progress" title="${target ? "מתוך יעד של " + target + " שעות" : ""}"><div style="width:${prog}%"></div></div>
     ${target ? `<div class="muted" style="font-size:12px">${prog}% מהיעד (${target} שעות)</div>` : ""}
-    <div class="paybox">
-      ☀️ שעות יום: <b>${fmtHM(p.dayH)}</b> × ${money(p.R.day)} = <b>${money(p.dayPay)}</b><br>
-      🌙 לילות: <b>${p.nights}</b> × ${money(p.R.nightFlat)} = <b>${money(p.nightPay)}</b><br>
-      ${p.premH ? `✡️ תוספת שבת/חג: <b>${fmtHM(p.premH)}</b> שעות × ${p.pct}% = <b>+${money(p.premPay)}</b> <span class="muted">(כלול בשעות היום)</span><br>` : ""}
-      ${adj.map(a => `🎁 <span${isAdmin ? ` title="${esc(a.reason)}"` : ""}>${esc(a.label)}</span>: <b class="${+a.amount < 0 ? "down" : "up"}">${+a.amount < 0 ? "−" : "+"}${money(Math.abs(+a.amount))}</b><br>`).join("")}
-      <span style="font-size:15px">💰 שכר החודש: <b style="color:var(--green)">${money(p.total + adjSum(adj))}</b></span>
-    </div>`;
+    <div class="muted" style="margin-top:8px;font-size:13px">📆 ${wd} ימי עבודה · ${nShifts} משמרות · הפירוט המלא בשורת הסיכום בתחתית הטבלה</div>`;
   const cmp = (a, b, fmt) => { if (!a && !b) return `<span class="muted">—</span>`; const d = a - b, pc = b ? Math.round(d / b * 100) : null; return `<span class="${d >= 0 ? "up" : "down"}">${d >= 0 ? "▲" : "▼"} ${fmt(Math.abs(d))}${pc !== null ? ` (${pc > 0 ? "+" : ""}${pc}%)` : ""}</span>`; };
   const nh = nextHoliday();
   const perDay = {}; list.forEach(s => perDay[s.date] = (perDay[s.date] || 0) + shiftHours(s));
@@ -1021,11 +1730,13 @@ function renderSummary(){
     ["📆 ימי עבודה", wd, `${nShifts} משמרות`],
     ["⏳ ממוצע למשמרת", nShifts ? fmtHM(h / nShifts) : "—", "שעות:דקות"],
     ["🌙 לילות החודש", p.nights, `${fmtHM(p.nightH)} שעות לילה`],
-    ["📈 לעומת חודש קודם", `<span style="font-size:17px">${cmp(h, ph, fmtHM)}</span>`, `שכר: ${cmp(p.total + adjSum(adj), pp.total + adjSum(adjFor(cur.y, cur.m - 1)), money)}`],
+    ["📈 לעומת חודש קודם", `<span style="font-size:17px">${cmp(h, ph, fmtHM)}</span>`, prefs.money ? `שכר: ${cmp(p.total + adjSum(adj), pp.total + adjSum(adjFor(cur.y, cur.m - 1)), money)}` : "שעות לעומת החודש הקודם"],
     ["🏆 היום החזק", bestDay ? fmtHM(bestDay[1]) : "—", bestDay ? `${DAYS[parseYmd(bestDay[0]).getDay()]} ${dm(parseYmd(bestDay[0]))}` : "אין עדיין"],
     ["🕎 החג הקרוב", nh ? `<span style="font-size:17px">${esc(nh.text)}</span>` : "—", nh ? `בעוד ${nh.days} ימים · ${dm(nh.d)}` : ""],
     ["🗓️ המשמרת הבאה", np ? `<span style="font-size:17px">${rng(np.in, np.out)}</span>` : "—", np ? `${DAYS[parseYmd(np.date).getDay()]} ${dm(parseYmd(np.date))}${np.location ? " · " + esc(np.location) : ""}` : "לא תוכננה"],
-    ...(pend ? [["⏳ ממתין לאישור", pend, "משמרות שעוד לא אושרו"]] : [])
+    ...(pend ? [["⏳ ממתין לאישור", pend, "משמרות שעוד לא אושרו"]] : []),
+    ...(list.some(s => s.kind) ? [["🏖️ ימי היעדרות", list.filter(s => s.kind).length, list.filter(s => s.kind).map(s => KIND[s.kind].split(" ")[1]).join(", ")]] : []),
+    ["🔥 רצף ימי עבודה", streakNow(), "ימים ברצף עד היום"]
   ].map(([l, v, s]) => `<div class="tile"><div class="l">${l}</div><div class="v">${v}</div><div class="s muted">${s}</div></div>`).join("");
 }
 
@@ -1107,9 +1818,9 @@ function renderShabbat(d){
   el.textContent = txt; el.classList.toggle("hidden", !txt);
 }
 function renderAnnounce(){
-  const t = (globalCfg.announce || "").trim();
+  const t = [(globalCfg.announce || "").trim() ? "📢 " + globalCfg.announce.trim() : "", aptAnnounceFor()].filter(Boolean).join("   ·   ");
   $("announce").classList.toggle("hidden", !t);
-  $("announce").textContent = t ? "📢 " + t : "";
+  $("announce").textContent = t;
 }
 
 // ================== גרפים ==================
@@ -1191,7 +1902,7 @@ function openFixed(){
 // ---- הוספת משמרת לתאריך ----
 function openAddDate(){
   const m = modal(`<h3>➕ הוספת משמרת בתאריך ${closeX}</h3>
-    <div class="frow"><label>תאריך</label><input type="date" id="ad-date" value="${ymd(today)}"></div>
+    <div class="frow"><label>תאריך</label><input type="date" id="ad-date" value="${ymd(today)}"><label style="min-width:auto">סוג</label><select id="ad-kind"><option value="">🕒 משמרת רגילה</option>${Object.entries(KIND).map(([k, v]) => `<option value="${k}">${v}</option>`).join("")}</select></div>
     <div class="frow"><label>כניסה</label><input type="text" class="tm" inputmode="numeric" maxlength="5" placeholder="--:--" autocomplete="off" id="ad-in"><label style="min-width:auto">יציאה</label><input type="text" class="tm" inputmode="numeric" maxlength="5" placeholder="--:--" autocomplete="off" id="ad-out"></div>
     <div class="frow"><label>דירה / מיקום</label><input id="ad-loc" list="loc-list" style="flex:1"></div>
     <div class="frow"><label>הוראות</label><input id="ad-notes" style="flex:1"></div>
@@ -1205,10 +1916,20 @@ function openAddDate(){
     m.querySelector("#ad-info").textContent = `יום ${DAYS[d.getDay()]} · ${hebDate(d)}` + (fx?.in ? " · מולאו השעות הקבועות" : "");
   };
   m.querySelector("#ad-date").onchange = upd; upd();
+  m.querySelector("#ad-kind").onchange = e => m.querySelectorAll("#ad-in,#ad-out").forEach(i => i.disabled = !!e.target.value);
+  m.insertAdjacentHTML("beforeend", `<div class="frow" style="margin-top:10px;border-top:1px dashed var(--line);padding-top:10px"><button class="b-gray" id="ad-copy">📋 העתק את כל המשמרות של השבוע שעבר לשבוע הזה</button></div>`);
+  m.querySelector("#ad-copy").onclick = async () => {
+    const ws = startOfWeek(today), prev = shiftsInRange(ymd(addDays(ws, -7)), ymd(addDays(ws, -1))).filter(x => x.in && x.out && !x.kind);
+    const add = prev.filter(x => !shiftsOn(ymd(addDays(parseYmd(x.date), 7))).length).map(x => ({ id: newId(), date: ymd(addDays(parseYmd(x.date), 7)), in: x.in, out: x.out, location: x.location || "", notes: "" }));
+    if (!add.length) return toast("אין מה להעתיק (או שהימים כבר מלאים)");
+    if (!confirm(`להעתיק ${add.length} משמרות מהשבוע שעבר לשבוע הזה?`)) return;
+    await DB.putMany(add); closeModal(); renderAll(); toast(`הועתקו ${add.length} משמרות ✔`);
+  };
   m.querySelector("#ad-save").onclick = async () => {
     const date = m.querySelector("#ad-date").value; if (!date) return toast("בחר תאריך");
     let loc = m.querySelector("#ad-loc").value.trim(); if (loc === locationFor(date)) loc = "";
-    await DB.putShift({ id: newId(), date, in: m.querySelector("#ad-in").value, out: m.querySelector("#ad-out").value, location: loc, notes: m.querySelector("#ad-notes").value.trim() });
+    const kind = m.querySelector("#ad-kind").value;
+    await DB.putShift(kind ? { id: newId(), date, in: "", out: "", location: loc, notes: m.querySelector("#ad-notes").value.trim() || KIND[kind], kind } : { id: newId(), date, in: m.querySelector("#ad-in").value, out: m.querySelector("#ad-out").value, location: loc, notes: m.querySelector("#ad-notes").value.trim() });
     closeModal(); const d = parseYmd(date); weekStart = startOfWeek(d); setMonth(d.getFullYear(), d.getMonth()); toast("המשמרת נוספה");
   };
 }
@@ -1233,6 +1954,16 @@ function openMe(){
     <div id="st-locs">${locs.length ? locs.map((l, i) => `<div class="list-item"><span><b>${esc(l.address)}</b> <span class="muted">מתאריך ${dmy(parseYmd(l.from))}</span></span><button class="mini del" data-rmloc="${i}">✕ הסר</button></div>`).join("") : `<div class="muted">עדיין לא הוגדרו דירות</div>`}</div>
     <div class="frow" style="margin-top:8px"><input id="st-loc-addr" placeholder="כתובת, למשל ז'בוטינסקי 107" style="flex:1"><input id="st-loc-from" type="date" value="${ymd(today)}"><button class="b-green" id="st-loc-add">＋ הוסף דירה</button></div>
 
+    <h4>⚙️ ההגדרות שלי (במכשיר הזה)</h4>
+    <div class="frow"><label style="min-width:auto"><input type="checkbox" id="pf-money" ${prefs.money ? "checked" : ""}> להציג סכומי כסף במסך הראשי</label></div>
+    <div class="frow"><label style="min-width:auto"><input type="checkbox" id="pf-only" ${prefs.onlyWork ? "checked" : ""}> להציג בטבלה רק ימים עם משמרות</label></div>
+    <div class="frow"><label style="min-width:auto"><input type="checkbox" id="pf-dash" ${prefs.dash ? "checked" : ""}> להציג גרפים ונתונים בפתיחה</label></div>
+    <div class="frow"><label style="min-width:auto"><input type="checkbox" id="pf-notify" ${prefs.notify ? "checked" : ""}> 🔔 תזכורת בדפדפן 30 דקות לפני משמרת (כשהמערכת פתוחה)</label></div>
+    <div class="frow"><label style="min-width:auto">🔠 גודל טקסט</label><button class="b-gray" id="pf-fm">א−</button><span id="pf-fv">${100 + (prefs.font || 0) * 8}%</span><button class="b-gray" id="pf-fp">א+</button></div>
+
+    <h4>🧾 תלוש שכר</h4>
+    <div class="frow"><input type="month" id="me-slip-m" value="${monthKey(cur.y, cur.m)}"><button class="b-blue" id="me-slip">🧾 הפק תלוש שכר (PDF)</button></div>
+
     <h4>⏱ שעות קבועות</h4>
     <button class="b-blue" id="me-fixed">פתח הגדרת שעות קבועות לימים</button>
 
@@ -1256,6 +1987,13 @@ function openMe(){
     settings.locations.push({ address, from }); await DB.putSettings(); renderAll(); openMe(); toast("הדירה נוספה ✔");
   };
   m.querySelector("#me-fixed").onclick = openFixed;
+  m.querySelector("#pf-money").onchange = e => { prefs.money = e.target.checked; savePrefs(); setMoneyBtn(); renderAll(); };
+  m.querySelector("#pf-only").onchange = e => { prefs.onlyWork = e.target.checked; savePrefs(); setOnlyBtn(); renderTable(); };
+  m.querySelector("#pf-dash").onchange = e => { prefs.dash = e.target.checked; savePrefs(); $("dash").open = prefs.dash; };
+  m.querySelector("#pf-notify").onchange = async e => { if (e.target.checked && typeof Notification !== "undefined") { const r = await Notification.requestPermission(); if (r !== "granted") { e.target.checked = false; return toast("הדפדפן לא אישר התראות"); } } prefs.notify = e.target.checked; savePrefs(); startNotify(); toast(prefs.notify ? "🔔 התזכורות הופעלו" : "התזכורות כבויות"); };
+  const fz = d => { prefs.font = Math.max(-2, Math.min(4, (prefs.font || 0) + d)); savePrefs(); applyFont(); m.querySelector("#pf-fv").textContent = (100 + prefs.font * 8) + "%"; };
+  m.querySelector("#pf-fm").onclick = () => fz(-1); m.querySelector("#pf-fp").onclick = () => fz(1);
+  m.querySelector("#me-slip").onclick = () => { const v = m.querySelector("#me-slip-m").value; if (!v) return; const [y, mm] = v.split("-").map(Number); exportSlips([selfMember()], y, mm - 1); };
   m.querySelector("#me-install").onclick = installApp;
   m.querySelectorAll("[data-acc]").forEach(b => b.onclick = () => {
     const i = +b.dataset.acc; try { localStorage.setItem("accent", i); } catch (e) {}
@@ -1268,19 +2006,19 @@ function openMe(){
 let settingsTab = "board";
 function openSettings(tab){
   if (!isAdmin) return toast("ההגדרות פתוחות למנהל בלבד");
-  if (tab) settingsTab = tab;
-  const T = [["board","📋 לוח עובדים"],["users","👥 עובדים ותעריפים"],["schedule","🗓️ לוח משמרות"],["apts","🏠 דירות"],["inbox",`✉️ הודעות${adminAlerts.unread ? ` (${adminAlerts.unread})` : ""}`],["adj","🎁 תוספות ובונוסים"],["rates","💰 תעריפים"],["backup","☁️ גיבוי ודוחות"],["announce","📢 הודעה לעובדים"]];
+  if (tab) settingsTab = tab; else if (adminAlerts.pending + adminAlerts.swaps + adminAlerts.alerts.length) settingsTab = "approve";
+  const T = [["approve",`✅ אישורים והתראות${adminAlerts.pending + adminAlerts.swaps + adminAlerts.alerts.length ? ` (${adminAlerts.pending + adminAlerts.swaps + adminAlerts.alerts.length})` : ""}`],["board","📋 לוח עובדים"],["reports",`🛠️ דיווחים${adminAlerts.reports ? ` (${adminAlerts.reports})` : ""}`],["users","👥 עובדים ותעריפים"],["schedule","🗓️ לוח משמרות"],["apts","🏠 דירות"],["inbox",`✉️ הודעות${adminAlerts.unread ? ` (${adminAlerts.unread})` : ""}`],["adj","🎁 תוספות ובונוסים"],["rates","💰 תעריפים"],["announce","📢 הודעה לעובדים"],["log","📜 יומן שינויים"],["backup","☁️ גיבוי ודוחות"]];
   const m = modal(`<h3>⚙️ הגדרות מנהל ${closeX}</h3>
     <div class="tabs">${T.map(([k, n]) => `<button data-tab="${k}" class="${k === settingsTab ? "on" : ""}">${n}</button>`).join("")}</div>
     <div id="tab-body"></div>`);
   m.classList.add("wide");
   m.querySelectorAll("[data-tab]").forEach(b => b.onclick = () => openSettings(b.dataset.tab));
   const body = m.querySelector("#tab-body");
-  ({ users: tabUsers, board: tabBoard, schedule: tabSchedule, apts: tabApts, inbox: tabInbox, adj: tabAdj, rates: tabRates, backup: tabBackup, announce: tabAnnounce })[settingsTab](body, m);
+  ({ approve: tabApprove, reports: tabReports, log: tabLog, users: tabUsers, board: tabBoard, schedule: tabSchedule, apts: tabApts, inbox: tabInbox, adj: tabAdj, rates: tabRates, backup: tabBackup, announce: tabAnnounce })[settingsTab](body, m);
 }
 
 async function listUsers(){
-  if (DEMO) return [{ email: viewEmail, name: settings.name, role: "admin", rates: userRates, adjustments: userAdj, locks: userLocks, plan: userPlan }];
+  if (DEMO) return [{ email: viewEmail, name: settings.name, role: "admin", rates: userRates, adjustments: userAdj, locks: userLocks, plan: userPlan, apt: userApt }];
   const q = await fb.f.getDocs(fb.f.collection(fb.db, "users"));
   return q.docs.map(d => ({ email: d.id, ...d.data() }));
 }
@@ -1288,7 +2026,7 @@ async function listUsers(){
 async function tabUsers(body, m){
   const G = globalCfg.rates;
   body.innerHTML = `
-    <div class="muted" style="margin-bottom:8px">לכל עובד יש מערכת שעות משלו. אפשר לקבוע לכל עובד תעריף אישי. אם משאירים ריק, העובד מקבל את התעריף הכללי (☀️ ${money(G.day)} לשעה · 🌙 ${money(G.nightFlat)} ללילה).</div>
+    <div class="muted" style="margin-bottom:8px">לכל עובד יש מערכת שעות משלו. 🏠 = הדירה שבה העובד עובד – המשמרות והקבלות שלו משויכות אליה אוטומטית. אפשר לקבוע לכל עובד תעריף אישי. אם משאירים ריק, העובד מקבל את התעריף הכללי (☀️ ${money(G.day)} לשעה · 🌙 ${money(G.nightFlat)} ללילה).</div>
     <div id="st-users">טוען...</div>
     <h4>＋ הוספת עובד</h4>
     <div class="frow"><input id="nu-name" placeholder="שם העובד" style="flex:1"><input id="nu-email" type="email" placeholder="מייל (שם משתמש)" style="flex:1.3"></div>
@@ -1306,27 +2044,38 @@ async function renderUsers(body){
   box.innerHTML = users.map(u => { const r = u.rates || {};
     return `<div class="list-item" style="flex-wrap:wrap" data-u="${esc(u.email)}">
       <span style="min-width:200px"><input class="u-name" value="${esc(u.name || "")}" placeholder="שם" style="width:140px"> <span class="muted">${esc(u.email)}</span> ${u.email === CFG.admin ? `<span class="up">· מנהל</span>` : ""}</span>
-      <span class="rates">☀️<input class="u-day" type="number" step="0.01" min="0" value="${esc(r.day || "")}" placeholder="${G.day}" title="תעריף שעת יום">🌙<input class="u-night" type="number" step="0.01" min="0" value="${esc(r.nightFlat || "")}" placeholder="${G.nightFlat}" title="סכום ללילה">
+      <span class="rates">📞<input class="u-phone" value="${esc(u.phone || "")}" placeholder="טלפון" style="width:110px" inputmode="tel">🏠<select class="u-apt" title="הדירה שבה העובד עובד"><option value="">— דירה —</option>${(globalCfg.apartments || []).map(a => `<option ${a.name === (u.apt || "") ? "selected" : ""}>${esc(a.name)}</option>`).join("")}${u.apt && !(globalCfg.apartments || []).some(a => a.name === u.apt) ? `<option selected>${esc(u.apt)}</option>` : ""}</select>
+      ☀️<input class="u-day" type="number" step="0.01" min="0" value="${esc(r.day || "")}" placeholder="${G.day}" title="תעריף שעת יום">🌙<input class="u-night" type="number" step="0.01" min="0" value="${esc(r.nightFlat || "")}" placeholder="${G.nightFlat}" title="סכום ללילה">
       <button class="mini add u-save">שמור</button>${u.email === CFG.admin ? "" : `<button class="mini del u-del">מחק</button>`}</span></div>`; }).join("");
   box.querySelectorAll("[data-u]").forEach(row => {
     const email = row.dataset.u;
     row.querySelector(".u-save").onclick = async () => {
       const name = row.querySelector(".u-name").value.trim();
       const rates = { day: +row.querySelector(".u-day").value || 0, nightFlat: +row.querySelector(".u-night").value || 0 };
+      const apt = row.querySelector(".u-apt").value, phone = row.querySelector(".u-phone").value.trim();
       try {
-        await DB.putUser(email, { name, rates });
+        const prevApt = (users.find(x => x.email === email) || {}).apt || "";
+        await DB.putUser(email, { name, rates, apt, phone });
+        if (apt && apt !== prevApt) {
+          const entry = { address: apt, from: ymd(today) };
+          if (email === viewEmail || DEMO) { settings.locations = [...(settings.locations || []).filter(l => !(l.from === entry.from)), entry]; await DB.putSettings(); }
+          else { const st = await fb.f.getDoc(fb.f.doc(fb.db, "settings", email)); const locs = [...((st.exists() && st.data().locations) || []).filter(l => l.from !== entry.from), entry]; await fb.f.setDoc(fb.f.doc(fb.db, "settings", email), { locations: locs }, { merge: true }); }
+          LOG.add(email, `שייך לדירה ${apt} מ-${dmy(today)}`);
+        }
         if (email === viewEmail) { settings.name = name; await DB.putSettings(); updateHeader(); }
         else if (!DEMO) await fb.f.setDoc(fb.f.doc(fb.db, "settings", email), { name }, { merge: true });
         renderAll(); fillUserSwitcher(); toast("נשמר ✔");
       } catch (e) { toast("שגיאה בשמירה: " + (e.code || e.message)); }
     };
     const del = row.querySelector(".u-del"); if (del) del.onclick = () => deleteUser(email, body);
+    const nb = document.createElement("button"); nb.className = "mini fix"; nb.textContent = "🗒️ הערה פרטית"; row.querySelector(".rates").appendChild(nb);
+    nb.onclick = async () => { const cur0 = await ANOTE.get(email).catch(() => ""); const t = prompt("הערה פרטית על העובד (רק אתה רואה):", cur0); if (t == null) return; await ANOTE.set(email, t.trim()); toast("ההערה נשמרה ✔"); };
   });
 }
 
 // ================== צוות: טעינת נתוני כל העובדים (מנהל) ==================
 async function loadTeam(){
-  if (DEMO) return [{ u: { email: viewEmail, name: settings.name, rates: userRates, adjustments: userAdj, locks: userLocks, plan: userPlan }, settings, shifts: [...shifts.values()] }];
+  if (DEMO) return [{ u: { email: viewEmail, name: settings.name, rates: userRates, adjustments: userAdj, locks: userLocks, plan: userPlan, apt: userApt }, settings, shifts: [...shifts.values()] }];
   const users = await listUsers(), out = [];
   await Promise.all(users.map(async u => {
     const [st, q] = await Promise.all([fb.f.getDoc(fb.f.doc(fb.db, "settings", u.email)), fb.f.getDocs(fb.f.collection(fb.db, "shifts", u.email, "items"))]);
@@ -1338,11 +2087,11 @@ function locForSettings(st, ds){ let loc = ""; [...(st?.locations || [])].sort((
 function memberMonth(mem, y, m){
   const [f, t] = monthRange(y, m), list = mem.shifts.filter(s => s.date >= f && s.date <= t);
   const R = ratesFor(mem.u.rates), p = calcPay(list, R), adj = adjFor(y, m, mem.u.adjustments || []);
-  const h = list.reduce((a, s) => a + shiftHours(s), 0);
+  const h = list.filter(s => !s.rejected).reduce((a, s) => a + shiftHours(s), 0);
   const planned = (mem.u.plan || []).filter(x => x.date >= f && x.date <= t).reduce((a, x) => a + shiftHours(x), 0);
   return { list, R, p, adj, extra: adjSum(adj), total: p.total + adjSum(adj), h, planned,
     days: new Set(list.filter(s => shiftHours(s) > 0).map(s => s.date)).size,
-    pending: list.filter(s => s.approved === false).length, locked: !!(mem.u.locks || {})[monthKey(y, m)],
+    pending: list.filter(isPending).length, locked: lockState(mem.u.locks, monthKey(y, m)), signed: (mem.settings?.signs || {})[monthKey(y, m)],
     live: mem.shifts.find(s => s.live && !s.out) };
 }
 function computeAlerts(team, y, m){
@@ -1357,12 +2106,13 @@ function computeAlerts(team, y, m){
         continue;
       }
       if (s.date < f || s.date > t) continue;
-      if (a != null && b == null && s.date < ymd(new Date())) al.push({ lvl: "amber", text: `${name}: חסרה שעת יציאה ב-${dm(parseYmd(s.date))} (כניסה ${s.in})` });
+      if (s.rejected || s.alertOk) continue;
+      if (a != null && b == null && s.date < ymd(new Date())) al.push({ lvl: "amber", text: `${name}: חסרה שעת יציאה ב-${dm(parseYmd(s.date))} (כניסה ${s.in})`, email: mem.u.email, s });
       const h = shiftHours(s);
-      if (h > 12) al.push({ lvl: "amber", text: `${name}: משמרת ארוכה של ${fmtHM(h)} שעות ב-${dm(parseYmd(s.date))}` });
+      if (h > 12) al.push({ lvl: "amber", text: `${name}: משמרת ארוכה של ${fmtHM(h)} שעות ב-${dm(parseYmd(s.date))} (${s.in}–${s.out})`, email: mem.u.email, s });
       if (a != null && b != null && h > 0) {
         const base = dayIdx(s.date) * 1440, S = base + a, E = base + (b < a ? b + 1440 : b);
-        ivs.push({ name, email: mem.u.email, loc: norm(s.location || locForSettings(mem.settings, s.date)), rawLoc: s.location || locForSettings(mem.settings, s.date), S, E, date: s.date, s });
+        if (!s.rejected && !s.alertOk) ivs.push({ name, email: mem.u.email, loc: norm(s.location || (locForSettings(mem.settings, s.date) || mem.u.apt || "")), rawLoc: s.location || (locForSettings(mem.settings, s.date) || mem.u.apt || ""), S, E, date: s.date, s });
       }
     }
   }
@@ -1370,19 +2120,30 @@ function computeAlerts(team, y, m){
     const x = ivs[i], y2 = ivs[j];
     if (x.email === y2.email || !x.loc || x.loc !== y2.loc) continue;
     const ov = ovl(x.S, x.E, y2.S, y2.E);
-    if (ov > 0) al.push({ lvl: "red", text: `חפיפה בדירה ${x.rawLoc}: ${x.name} (\u2066${x.s.in}–${x.s.out}\u2069) ו-${y2.name} (\u2066${y2.s.in}–${y2.s.out}\u2069) ב-${dm(parseYmd(x.date))}` });
+    if (ov > 0) al.push({ lvl: "red", text: `חפיפה בדירה ${x.rawLoc}: ${x.name} (\u2066${x.s.in}–${x.s.out}\u2069) ו-${y2.name} (\u2066${y2.s.in}–${y2.s.out}\u2069) ב-${dm(parseYmd(x.date))}`, email: y2.email, s: y2.s });
   }
+  const byW = {}; ivs.forEach(x => (byW[x.email] ||= []).push(x));
+  Object.values(byW).forEach(l => { l.sort((p, q) => p.S - q.S);
+    for (let i = 1; i < l.length; i++) { const gap = (l[i].S - l[i - 1].E) / 60; if (gap > 0 && gap < 8) al.push({ lvl: "amber", text: `${l[i].name}: רק ${fmtHM(gap)} שעות מנוחה בין משמרות (${dm(parseYmd(l[i - 1].date))} ${l[i - 1].s.out} → ${dm(parseYmd(l[i].date))} ${l[i].s.in})`, email: l[i].email, s: l[i].s }); }
+    const wk = {}; l.forEach(x => { const k = ymd(startOfWeek(parseYmd(x.date))); wk[k] = (wk[k] || 0) + (x.E - x.S) / 60; });
+    Object.entries(wk).forEach(([k, h]) => { if (h > 60) al.push({ lvl: "amber", text: `${l[0].name}: ${fmtHM(h)} שעות בשבוע של ${dm(parseYmd(k))} – יותר מ-60 שעות` }); });
+  });
   return al;
 }
 async function adminScan(){
   if (!isAdmin) return;
   try {
     const team = await loadTeam(), alerts = computeAlerts(team, today.getFullYear(), today.getMonth());
-    const pending = team.reduce((a, mem) => a + mem.shifts.filter(s => s.approved === false).length, 0);
+    const pending = team.reduce((a, mem) => a + mem.shifts.filter(isPending).length, 0);
     const unread = (await MSG.all()).filter(x => !x.read).length;
-    adminAlerts = { alerts, pending, unread };
-    const n = alerts.length + pending + unread;
-    $("settings-btn").innerHTML = `⚙️ הגדרות מנהל${n ? `<span class="badge-n">${n}</span>` : ""}`;
+    const reps = await REP.list().catch(() => []), reports = reps.filter(r => r.type !== "swap" && r.status === "open").length, swaps = reps.filter(r => r.type === "swap" && r.status === "open").length;
+    try { const mk = monthKey(today.getFullYear(), today.getMonth()), rc = await RCP.list();
+      (globalCfg.apartments || []).filter(a => +a.budget > 0).forEach(a => { const sp = rc.filter(r => r.apt === a.name && r.month === mk).reduce((x, r) => x + (+r.amount || 0), 0);
+        if (sp > +a.budget) alerts.push({ lvl: "red", text: `הדירה ${a.name} עברה את התקציב החודשי: ${money(sp)} מתוך ${money(+a.budget)}` }); });
+    } catch (e) {}
+    adminAlerts = { alerts, pending, unread, reports, swaps };
+    const n = alerts.length + pending + unread + reports + swaps;
+    $("settings-btn").innerHTML = `<span class="ic">⚙️</span>הגדרות מנהל${n ? `<span class="badge-n">${n}</span>` : ""}`;
     renderNotices();
   } catch (e) { console.warn("scan", e); }
 }
@@ -1397,26 +2158,35 @@ async function tabBoard(body){
     team = await loadTeam();
     const rows = team.map(mem => ({ mem, r: memberMonth(mem, cur.y, cur.m) }));
     const al = computeAlerts(team, cur.y, cur.m);
-    body.querySelector("#bd-alerts").innerHTML = al.length ? `<div class="notice admin" style="flex-direction:column;align-items:flex-start;margin-bottom:10px"><b>⚠️ התראות (${al.length})</b>${al.map(a => `<div style="font-weight:500">• ${esc(a.text)}</div>`).join("")}</div>` : `<div class="notice info" style="margin-bottom:10px">✔ אין התראות החודש</div>`;
+    const tot0 = rows.reduce((a, x) => ({ h: a.h + x.r.h, pay: a.pay + x.r.total, pend: a.pend + x.r.pending, sg: a.sg + (x.r.signed ? 1 : 0) }), { h: 0, pay: 0, pend: 0, sg: 0 });
+    const rc = await RCP.list().catch(() => []), mk0 = monthKey(cur.y, cur.m), rcm = rc.filter(r => r.month === mk0).reduce((a, r) => a + (+r.amount || 0), 0);
+    const live = rows.filter(x => x.r.live).length;
+    body.querySelector("#bd-alerts").innerHTML = `<div class="kpis"><div>👥 עובדים<b>${rows.length}</b></div><div>🕒 שעות הצוות<b>${fmtHM(tot0.h)}</b></div><div>💰 שכר כולל<b>${money(tot0.pay)}</b></div><div>🧾 קניות החודש<b>${money(rcm)}</b></div><div>⏳ ממתין לאישור<b>${tot0.pend}</b></div><div>✍️ חתמו<b>${tot0.sg}/${rows.length}</b></div></div>
+      ${al.length ? `<div class="notice admin" style="flex-direction:column;align-items:stretch;margin-bottom:10px"><b>⚠️ התראות (${al.length})</b>${al.map(a => `<div style="font-weight:500;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px">• ${esc(a.text)} ${alertActions(a)}</div>`).join("")}</div>` : `<div class="notice info" style="margin-bottom:10px">✔ אין התראות החודש</div>`}
+      <div class="frow"><button class="b-excel" id="bd-pay">📊 אקסל שכר לכל העובדים</button><button class="b-excel" id="bd-year">📅 דוח שנתי ${cur.y} (אקסל)</button></div>
+      ${rows.length > 1 ? `<h4>🏆 דירוג שעות החודש</h4>${[...rows].sort((a, b) => b.r.h - a.r.h).map((x, i) => `<div class="list-item"><span>${["🥇", "🥈", "🥉"][i] || (i + 1) + "."} <b>${esc(x.mem.u.name || x.mem.u.email)}</b></span><span>${fmtHM(x.r.h)} שעות</span></div>`).join("")}` : ""}`;
+    wireAlertActions(body, team, draw);
+    body.querySelector("#bd-pay").onclick = () => exportPayroll(team, cur.y, cur.m);
+    body.querySelector("#bd-year").onclick = () => exportYear(team, cur.y);
     const tot = rows.reduce((a, x) => ({ h: a.h + x.r.h, pay: a.pay + x.r.total, pl: a.pl + x.r.planned }), { h: 0, pay: 0, pl: 0 });
-    body.querySelector("#board").innerHTML = `<table class="otable"><thead><tr><th>עובד</th><th>מצב</th><th>ימים</th><th>שעות</th><th>מתוכנן</th><th>לילות</th><th>שבת/חג</th><th>שכר</th><th>אישור</th><th></th></tr></thead><tbody>
-      ${rows.map(({ mem, r }) => `<tr><td><b>${esc(mem.u.name || mem.u.email)}</b>${r.locked ? " 🔒" : ""}</td>
+    body.querySelector("#board").innerHTML = `<table class="otable"><thead><tr><th>עובד</th><th>מצב</th><th>ימים</th><th>שעות</th><th>מתוכנן</th><th>לילות</th><th>שבת/חג</th><th>שכר</th><th>אישור</th><th>חתימה</th><th></th></tr></thead><tbody>
+      ${rows.map(({ mem, r }) => `<tr><td><b>${esc(mem.u.name || mem.u.email)}</b>${r.locked ? " 🔒" : ""}${mem.u.phone ? ` <a href="tel:${esc(mem.u.phone)}" title="התקשר">📞</a> <a target="_blank" rel="noopener" href="https://wa.me/${esc(waNum(mem.u.phone))}" title="וואטסאפ">💬</a>` : ""}${(() => { const ap = aptObj(mem.u.apt || locForSettings(mem.settings, ymd(today))), tl = (ap?.tasks || "").split("\n").filter(x => x.trim()); if (!tl.length) return ""; const dn = (((mem.settings?.tasks || {})[ymd(today)] || {})[ap.name] || []).length; return `<div class="muted" style="font-size:11px">✅ משימות היום ${dn}/${tl.length}</div>`; })()}</td>
         <td>${r.live ? `<span class="up">🟢 במשמרת</span>` : `<span class="muted">—</span>`}</td><td>${r.days}</td><td>${fmtHM(r.h)}</td>
         <td>${r.planned ? `${fmtHM(r.planned)}<div class="${r.h >= r.planned ? "up" : "down"}" style="font-size:11px">${r.h >= r.planned ? "+" : "−"}${fmtHM(Math.abs(r.h - r.planned))}</div>` : "—"}</td>
         <td>${r.p.nights}</td><td>${r.p.premH ? fmtHM(r.p.premH) : "—"}</td>
         <td><b>${money(r.total)}</b>${r.extra ? `<div class="muted" style="font-size:11px">כולל תוספות ${money(r.extra)}</div>` : ""}</td>
         <td>${r.pending ? `<button class="mini apv" data-apv="${esc(mem.u.email)}">✔ אשר ${r.pending}</button>` : `<span class="up">✔</span>`}</td>
+        <td>${r.signed ? `<img src="${r.signed.img}" class="signthumb" title="נחתם ${new Date(r.signed.at).toLocaleDateString("he-IL")}">` : `<span class="muted">—</span>`}</td>
         <td style="white-space:nowrap"><button class="mini fix" data-open="${esc(mem.u.email)}">פתח</button> <button class="mini fix" data-slip="${esc(mem.u.email)}">🧾</button> <button class="mini fix" data-lk="${esc(mem.u.email)}">${r.locked ? "🔓" : "🔒"}</button></td></tr>`).join("")}
-      <tr><td><b>סה"כ</b></td><td></td><td></td><td><b>${fmtHM(tot.h)}</b></td><td>${tot.pl ? fmtHM(tot.pl) : ""}</td><td></td><td></td><td><b>${money(tot.pay)}</b></td><td></td><td></td></tr></tbody></table>`;
+      <tr><td><b>סה"כ</b></td><td></td><td></td><td><b>${fmtHM(tot.h)}</b></td><td>${tot.pl ? fmtHM(tot.pl) : ""}</td><td></td><td></td><td><b>${money(tot.pay)}</b></td><td></td><td></td><td></td></tr></tbody></table>`;
     const byEmail = e => team.find(x => x.u.email === e);
     body.querySelectorAll("[data-open]").forEach(b => b.onclick = async () => { closeModal(); if (!DEMO) { await openSystem(b.dataset.open); $("view-user").value = b.dataset.open; } });
     body.querySelectorAll("[data-slip]").forEach(b => b.onclick = () => exportSlips([byEmail(b.dataset.slip)], cur.y, cur.m));
-    body.querySelectorAll("[data-lk]").forEach(b => b.onclick = async () => { const mem = byEmail(b.dataset.lk), locks = { ...(mem.u.locks || {}) }, mk = monthKey(cur.y, cur.m); if (locks[mk]) delete locks[mk]; else locks[mk] = true; await DB.putUser(mem.u.email, { locks }); if (mem.u.email === viewEmail) { userLocks = locks; renderAll(); } toast(locks[mk] ? "החודש ננעל 🔒" : "הנעילה הוסרה 🔓"); draw(); });
+    body.querySelectorAll("[data-lk]").forEach(b => b.onclick = async () => { const mem = byEmail(b.dataset.lk), locks = { ...(mem.u.locks || {}) }, mk = monthKey(cur.y, cur.m); locks[mk] = !lockState(mem.u.locks, mk); await DB.putUser(mem.u.email, { locks }); LOG.add(mem.u.email, `${locks[mk] ? "נעל" : "פתח"} את ${MONTHS[cur.m]} ${cur.y}`); if (mem.u.email === viewEmail) { userLocks = locks; renderAll(); } toast(locks[mk] ? "החודש ננעל 🔒" : "הנעילה הוסרה 🔓"); draw(); });
     body.querySelectorAll("[data-apv]").forEach(b => b.onclick = async () => {
       const mem = byEmail(b.dataset.apv), [f, t] = monthRange(cur.y, cur.m);
-      const list = mem.shifts.filter(s => s.date >= f && s.date <= t && s.approved === false);
-      if (mem.u.email === viewEmail || DEMO) await DB.putMany(list.map(s => ({ ...s, approved: true })));
-      else { const bt = fb.f.writeBatch(fb.db); list.forEach(s => bt.update(fb.f.doc(fb.db, "shifts", mem.u.email, "items", s.id), { approved: true })); await bt.commit(); }
+      const list = mem.shifts.filter(s => s.date >= f && s.date <= t && isPending(s));
+      for (const s of list) { await setShiftFlags(mem.u.email, s, { approved: true, rejected: false }); LOG.add(mem.u.email, `אישר משמרת ${shiftTxt(s)}`); }
       renderAll(); toast(`אושרו ${list.length} משמרות ✔`); draw(); adminScan();
     });
   };
@@ -1433,10 +2203,11 @@ async function tabBoard(body){
 
 // ================== תלוש שכר ==================
 function slipHtml(mem, y, m){
+  const sig = (mem.settings?.signs || {})[monthKey(y, m)];
   const r = memberMonth(mem, y, m), p = r.p, R = r.R, name = mem.u.name || mem.settings?.name || mem.u.email;
   const td = "border:1px solid #ccc;padding:6px 8px;font-size:12.5px", th = td + ";background:#f0f2f6;font-weight:bold";
-  const rows = r.list.filter(s => shiftHours(s) > 0).sort((a, b) => (a.date + a.in).localeCompare(b.date + b.in))
-    .map(s => `<tr><td style="${td}">${dmy(parseYmd(s.date))}</td><td style="${td}">${DAYS[parseYmd(s.date).getDay()]}</td><td style="${td}">${rng(s.in, s.out)}</td><td style="${td}">${fmtHM(shiftHours(s))}</td><td style="${td}">${esc(s.location || locForSettings(mem.settings, s.date))}</td></tr>`).join("");
+  const rows = r.list.filter(s => shiftHours(s) > 0 && !s.rejected && !(s.approved === false && s.offPlan)).sort((a, b) => (a.date + a.in).localeCompare(b.date + b.in))
+    .map(s => `<tr><td style="${td}">${dmy(parseYmd(s.date))}</td><td style="${td}">${DAYS[parseYmd(s.date).getDay()]}</td><td style="${td}">${rng(s.in, s.out)}</td><td style="${td}">${fmtHM(shiftHours(s))}</td><td style="${td}">${esc(s.location || (locForSettings(mem.settings, s.date) || mem.u.apt || ""))}</td></tr>`).join("");
   const line = (a, b) => `<tr><td style="${td}">${a}</td><td style="${td};text-align:left;font-weight:bold">${b}</td></tr>`;
   return `<div dir="rtl" style="font-family:Arial,sans-serif;color:#000;background:#fff;padding:18px;width:760px">
     <div style="display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3px solid #0f2542;padding-bottom:8px;margin-bottom:12px">
@@ -1451,6 +2222,7 @@ function slipHtml(mem, y, m){
     </table>
     <div style="font-size:13px;margin-bottom:6px"><b>${r.days}</b> ימי עבודה · <b>${fmtHM(r.h)}</b> שעות${r.pending ? ` · ${r.pending} משמרות ממתינות לאישור` : ""}${r.locked ? " · החודש נעול" : ""}</div>
     <table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">תאריך</th><th style="${th}">יום</th><th style="${th}">שעות</th><th style="${th}">סה"כ</th><th style="${th}">דירה</th></tr></thead><tbody>${rows || `<tr><td colspan="5" style="${td}">אין משמרות</td></tr>`}</tbody></table>
+    ${sig ? `<div style="margin-top:14px;font-size:12.5px">✍️ העובד אישר את השעות וחתם ב-${new Date(sig.at).toLocaleDateString("he-IL")}:<br><img src="${sig.img}" style="height:60px;border-bottom:1px solid #999"></div>` : ""}
   </div>`;
 }
 async function exportSlips(members, y, m){
@@ -1463,7 +2235,7 @@ async function exportSlips(members, y, m){
   }
   toast(members.length > 1 ? `ירדו ${members.length} תלושים ✔` : "התלוש ירד ✔");
 }
-const selfMember = () => ({ u: { email: viewEmail, name: settings.name, rates: userRates, adjustments: userAdj, locks: userLocks, plan: userPlan }, settings, shifts: [...shifts.values()] });
+const selfMember = () => ({ u: { email: viewEmail, name: settings.name, rates: userRates, adjustments: userAdj, locks: userLocks, plan: userPlan, apt: userApt }, settings, shifts: [...shifts.values()] });
 
 // ================== סיכום חודשי במייל ==================
 function summaryText(mem, y, m){
@@ -1507,18 +2279,32 @@ async function tabSchedule(body){
     <div class="frow"><label>תאריך</label><input type="date" id="pl-date" value="${ymd(addDays(new Date(), 1))}"><label style="min-width:auto">משעה</label><input class="tm" id="pl-in" placeholder="--:--" maxlength="5"><label style="min-width:auto">עד</label><input class="tm" id="pl-out" placeholder="--:--" maxlength="5"></div>
     <div class="frow"><label>דירה</label><input id="pl-loc" list="loc-list" style="flex:1" placeholder="דירה / מיקום"><label style="min-width:auto">חזרה</label><select id="pl-rep"><option value="1">פעם אחת</option><option value="4">כל שבוע – 4 שבועות</option><option value="8">כל שבוע – 8 שבועות</option></select></div>
     <div class="frow"><label>הערה</label><input id="pl-note" style="flex:1" placeholder="לא חובה"><button class="b-green" id="pl-add">＋ הוסף למשמרות</button></div>
-    <h4>משמרות מתוכננות</h4><div id="pl-list">טוען...</div>`;
+    <h4>משמרות מתוכננות</h4><div id="pl-list">טוען...</div>
+    <h4>👥 כל הצוות – שבוע <span id="tw-lbl"></span></h4>
+    <div class="frow"><button class="b-gray" id="tw-prev">→ שבוע קודם</button><button class="b-gray" id="tw-next">שבוע הבא ←</button><button class="b-blue" id="tw-copy">📋 העתק את השבוע הזה לשבוע הבא (לכל הצוות)</button></div>
+    <div id="tw"></div><div id="cov"></div>`;
   const users = await listUsers(), sel = body.querySelector("#pl-user");
   sel.innerHTML = users.map(u => `<option value="${esc(u.email)}">${esc(u.name || u.email)}</option>`).join("");
   sel.value = users.some(u => u.email === viewEmail) ? viewEmail : users[0]?.email;
   const planOf = e => e === viewEmail ? userPlan : (users.find(u => u.email === e)?.plan || []);
-  const save = async (e, plan) => { await DB.putUser(e, { plan }); const u = users.find(x => x.email === e); if (u) u.plan = plan; renderAll(); draw(); };
+  const save = async (e, plan) => { await DB.putUser(e, { plan }); const u = users.find(x => x.email === e); if (u) u.plan = plan; renderAll(); draw(); if (body.querySelector("#tw")) body.querySelector("#tw").innerHTML = teamWeekHtml(users.map(x => ({ ...x, plan: planOf(x.email) })), startOfWeek(today)); };
   const draw = () => {
     const e = sel.value, list = planOf(e).filter(x => x.date >= ymd(addDays(new Date(), -7))).sort((a, b) => (a.date + a.in).localeCompare(b.date + b.in));
     body.querySelector("#pl-list").innerHTML = list.length ? list.map(x => `<div class="list-item"><span><b>${DAYS[parseYmd(x.date).getDay()]} ${dmy(parseYmd(x.date))}</b> · ${rng(x.in, x.out)}${x.location ? ` · 🏠 ${esc(x.location)}` : ""}${x.note ? ` <span class="muted">· ${esc(x.note)}</span>` : ""}</span><button class="mini del" data-rmpl="${esc(x.id)}">מחק</button></div>`).join("") : `<div class="muted">אין משמרות מתוכננות לעובד הזה</div>`;
     body.querySelectorAll("[data-rmpl]").forEach(b => b.onclick = () => save(sel.value, planOf(sel.value).filter(x => x.id !== b.dataset.rmpl)));
   };
   sel.onchange = draw; draw();
+  let tws = startOfWeek(today);
+  const drawTeam = () => { body.querySelector("#tw-lbl").textContent = `${dm(tws)}–${dm(addDays(tws, 6))}`; body.querySelector("#tw").innerHTML = teamWeekHtml(users.map(u => ({ ...u, plan: planOf(u.email) })), tws); body.querySelector("#cov").innerHTML = coverageHtml(users.map(u => ({ ...u, plan: planOf(u.email) }))); };
+  body.querySelector("#tw-prev").onclick = () => { tws = addDays(tws, -7); drawTeam(); };
+  body.querySelector("#tw-next").onclick = () => { tws = addDays(tws, 7); drawTeam(); };
+  body.querySelector("#tw-copy").onclick = async () => {
+    const a = ymd(tws), b = ymd(addDays(tws, 6)); let n = 0;
+    if (!confirm(`להעתיק את כל המשמרות המתוכננות של ${dm(tws)}–${dm(addDays(tws, 6))} לשבוע שאחריו?`)) return;
+    for (const u of users) { const pl = planOf(u.email), add = pl.filter(p => p.date >= a && p.date <= b).map(p => ({ ...p, id: newId(), date: ymd(addDays(parseYmd(p.date), 7)) })).filter(p => !pl.some(q => q.date === p.date && q.in === p.in)); if (add.length) { await save(u.email, [...pl, ...add]); n += add.length; } }
+    toast(`הועתקו ${n} משמרות מתוכננות ✔`); tws = addDays(tws, 7); drawTeam();
+  };
+  drawTeam();
   body.querySelectorAll(".tm").forEach(i => i.addEventListener("change", () => i.value = normTime(i.value)));
   body.querySelector("#pl-add").onclick = async () => {
     const e = sel.value, date = body.querySelector("#pl-date").value, inn = normTime(body.querySelector("#pl-in").value), out = normTime(body.querySelector("#pl-out").value);
@@ -1536,6 +2322,10 @@ function tabApts(body){
     <div id="ap-list">${A.length ? A.map((a, i) => `<div class="list-item" style="flex-direction:column;align-items:stretch" data-ap="${i}">
       <div class="frow" style="margin:0"><input class="ap-name" value="${esc(a.name)}" placeholder="שם הדירה" style="flex:1"><input class="ap-addr" value="${esc(a.address || "")}" placeholder="כתובת" style="flex:1"></div>
       <textarea class="ap-ins" rows="2" style="width:100%;margin-top:6px" placeholder="הוראות קבועות לדירה">${esc(a.instructions || "")}</textarea>
+      <div class="frow" style="margin:6px 0 0"><label style="min-width:auto">💰 תקציב קניות חודשי ₪</label><input class="ap-budget" type="number" min="0" step="10" value="${esc(a.budget || "")}" style="width:110px" placeholder="לא חובה"></div>
+      <div class="frow" style="margin:6px 0 0"><input class="ap-phone" value="${esc(a.phone || "")}" placeholder="📞 טלפון בדירה" style="flex:1" inputmode="tel"><input class="ap-info" value="${esc(a.info || "")}" placeholder="ℹ️ מידע: קוד כניסה, וויפי, איפה המפתח" style="flex:2"></div>
+      <textarea class="ap-tasks" rows="3" style="width:100%;margin-top:6px" placeholder="✅ משימות יומיות לעובד – כל משימה בשורה (למשל: לנקות מטבח / להוציא זבל / לבדוק תרופות)">${esc(a.tasks || "")}</textarea>
+      <input class="ap-sup" value="${esc(a.supplies || "")}" placeholder="🧴 רשימת ציוד לדירה, מופרד בפסיקים (ריק = רשימה רגילה)" style="width:100%;margin-top:6px">
       <div class="frow" style="margin:6px 0 0"><button class="mini add ap-save">שמור</button><button class="mini del ap-del">מחק</button></div></div>`).join("") : `<div class="muted">עדיין אין דירות</div>`}</div>
     <h4>＋ דירה חדשה</h4>
     <div class="frow"><input id="ap-name" placeholder="שם הדירה, למשל ז'בוטינסקי 107" style="flex:1"><input id="ap-addr" placeholder="כתובת מלאה (לא חובה)" style="flex:1"></div>
@@ -1546,7 +2336,7 @@ function tabApts(body){
   const save = async () => { await DB.putGlobal(); renderAll(); tabApts(body); };
   body.querySelectorAll("[data-ap]").forEach(row => {
     const i = +row.dataset.ap;
-    row.querySelector(".ap-save").onclick = async () => { globalCfg.apartments[i] = { ...globalCfg.apartments[i], name: row.querySelector(".ap-name").value.trim(), address: row.querySelector(".ap-addr").value.trim(), instructions: row.querySelector(".ap-ins").value.trim() }; await save(); toast("הדירה נשמרה ✔"); };
+    row.querySelector(".ap-save").onclick = async () => { globalCfg.apartments[i] = { ...globalCfg.apartments[i], name: row.querySelector(".ap-name").value.trim(), address: row.querySelector(".ap-addr").value.trim(), instructions: row.querySelector(".ap-ins").value.trim(), budget: +row.querySelector(".ap-budget").value || 0, supplies: row.querySelector(".ap-sup").value.trim(), phone: row.querySelector(".ap-phone").value.trim(), info: row.querySelector(".ap-info").value.trim(), tasks: row.querySelector(".ap-tasks").value.trim() }; await save(); toast("הדירה נשמרה ✔"); };
     row.querySelector(".ap-del").onclick = async () => { if (!confirm("למחוק את הדירה?")) return; globalCfg.apartments.splice(i, 1); await save(); };
   });
   body.querySelector("#ap-add").onclick = async () => {
@@ -1649,13 +2439,17 @@ function tabRates(body){
     <div class="frow"><label style="min-width:auto"><input type="checkbox" id="r-rn" ${R.restNight ? "checked" : ""}> להחיל את התוספת גם על סכום הלילה בליל שבת/חג</label></div>
     <div class="muted" style="font-size:12.5px;margin-bottom:10px">החגים נקבעים אוטומטית לפי לוח השנה העברי (ראש השנה, יום כיפור, סוכות, שמחת תורה, פסח, שבועות).</div>
     <h4>✔ אישור שעות</h4>
-    <div class="frow"><label style="min-width:auto"><input type="checkbox" id="r-apv" ${globalCfg.approval ? "checked" : ""}> שעות שעובד רושם מסומנות "ממתין לאישור" עד שאני מאשר</label></div>
+    <div class="frow"><label style="min-width:auto"><input type="checkbox" id="r-plan" ${globalCfg.planCheck !== false ? "checked" : ""}> משמרת שלא לפי לוח המשמרות (או בשעות שונות ביותר מ-<input id="r-tol" type="number" min="0" step="5" value="${+(globalCfg.planTol ?? 15)}" style="width:60px"> דקות) צריכה את האישור שלי, ורק אז תשולם</label></div>
+    <div class="frow"><label style="min-width:auto"><input type="checkbox" id="r-apv" ${globalCfg.approvalAll ? "checked" : ""}> כל שעה שעובד רושם (גם לפי הלוח) צריכה את האישור שלי</label></div>
+    <h4>🔒 נעילה אוטומטית</h4>
+    <div class="frow"><label style="min-width:auto"><input type="checkbox" id="r-al" ${globalCfg.autoLock?.on ? "checked" : ""}> לנעול כל חודש אוטומטית <input id="r-ald" type="number" min="0" max="31" value="${+(globalCfg.autoLock?.days ?? 5)}" style="width:60px"> ימים אחרי סוף החודש (העובד לא יוכל לשנות. אפשר לפתוח ידנית חודש מסוים)</label></div>
     <button class="b-green" id="r-save">שמור תעריפים</button>`;
   body.querySelector("#r-save").onclick = async () => {
     const q = id => body.querySelector(id);
     globalCfg.rates = { day: +q("#r-day").value || 0, nightFlat: +q("#r-night").value || 0, nightStart: normTime(q("#r-ns").value) || "00:00", nightEnd: normTime(q("#r-ne").value) || "06:30", partial: q("#r-part").value,
       restPct: Math.max(100, +q("#r-pct").value || 100), restStart: normTime(q("#r-rs").value) || "18:00", restEnd: normTime(q("#r-re").value) || "20:00", restNight: q("#r-rn").checked };
-    globalCfg.approval = q("#r-apv").checked;
+    globalCfg.approvalAll = q("#r-apv").checked; globalCfg.planCheck = q("#r-plan").checked; globalCfg.planTol = Math.max(0, +q("#r-tol").value || 0);
+    globalCfg.autoLock = { on: q("#r-al").checked, days: Math.max(0, +q("#r-ald").value || 0) };
     try { await DB.putGlobal(); renderAll(); toast("התעריפים נשמרו ✔"); } catch (e) { toast("שגיאה: " + (e.code || e.message)); }
   };
 }
@@ -1665,6 +2459,16 @@ function tabAnnounce(body){
     <textarea id="an-text" rows="3" style="width:100%" placeholder="למשל: שימו לב – ביום שישי המשרד סגור">${esc(globalCfg.announce || "")}</textarea>
     <div class="frow" style="margin-top:8px"><button class="b-green" id="an-save">שמור הודעה</button></div>`;
   body.querySelector("#an-save").onclick = async () => { globalCfg.announce = body.querySelector("#an-text").value.trim(); try { await DB.putGlobal(); renderAnnounce(); toast("ההודעה נשמרה ✔"); } catch (e) { toast("שגיאה: " + (e.code || e.message)); } };
+  const AA = globalCfg.aptAnnounce || {}, apts = (globalCfg.apartments || []).map(a => a.name);
+  body.insertAdjacentHTML("beforeend", `<h4>🏠 הודעה לעובדים של דירה מסוימת</h4>
+    <div class="muted" style="margin-bottom:6px">רק מי שעובד בדירה הזאת יראה את ההודעה.</div>
+    <div class="frow"><select id="aa-apt" style="flex:1">${apts.map(a => `<option>${esc(a)}</option>`).join("")}</select></div>
+    <textarea id="aa-text" rows="2" style="width:100%" placeholder="למשל: מחר מגיע טכנאי בשעה 10:00"></textarea>
+    <div class="frow" style="margin-top:6px"><button class="b-green" id="aa-save">שמור הודעה לדירה</button></div>
+    <div id="aa-list">${Object.entries(AA).filter(([, t]) => t).map(([a, t]) => `<div class="list-item"><span>🏠 <b>${esc(a)}</b>: ${esc(t)}</span><button class="mini del" data-aadel="${esc(a)}">מחק</button></div>`).join("")}</div>`);
+  const aSel = body.querySelector("#aa-apt"), aTx = body.querySelector("#aa-text"); if (aSel) { aTx.value = AA[aSel.value] || ""; aSel.onchange = () => aTx.value = AA[aSel.value] || ""; }
+  body.querySelector("#aa-save").onclick = async () => { if (!aSel.value) return toast("אין דירות – הוסף דירה בלשונית דירות"); globalCfg.aptAnnounce = { ...AA, [aSel.value]: aTx.value.trim() }; if (!aTx.value.trim()) delete globalCfg.aptAnnounce[aSel.value]; await DB.putGlobal(); toast("נשמר ✔"); tabAnnounce(body); };
+  body.querySelectorAll("[data-aadel]").forEach(b => b.onclick = async () => { const n = { ...AA }; delete n[b.dataset.aadel]; globalCfg.aptAnnounce = n; await DB.putGlobal(); tabAnnounce(body); });
 }
 
 // ---- גיבוי (מנהל בלבד) ----
@@ -1879,9 +2683,10 @@ async function openSystem(email, fallbackName){
   await DB.loadAll(email);
   if (!settings.name && fallbackName) settings.name = fallbackName;
   updateHeader(); show("app"); setMonth(cur.y, cur.m); renderGreeting();
-  ["settings-btn", "report-btn"].forEach(id => $(id).classList.toggle("hidden", !isAdmin));
+  $("settings-btn").classList.toggle("hidden", !isAdmin);
   $("msg-btn").classList.toggle("hidden", isAdmin);
-  if (isAdmin) { fillUserSwitcher(); setTimeout(maybeAutoBackup, 4000); setTimeout(maybeMonthlyReport, 9000); adminScan(); }
+  startNotify();
+  if (isAdmin) { clearInterval(openSystem._iv); openSystem._iv = setInterval(adminScan, 5 * 60000); fillUserSwitcher(); setTimeout(maybeAutoBackup, 4000); setTimeout(maybeMonthlyReport, 9000); adminScan(); }
 }
 function updateHeader(){
   $("who-name").textContent = settings.name || viewEmail;
@@ -2004,7 +2809,7 @@ async function deleteUser(email, m){
 
 // ================== מצב יום / לילה ==================
 function applyTheme(t){
-  document.documentElement.dataset.theme = t; $("theme-btn").textContent = "🌙/☀️ מצב תצוגה";
+  document.documentElement.dataset.theme = t; 
   try { localStorage.setItem("theme", t); } catch (e) {}
   if (!$("app").classList.contains("hidden")) renderCharts();
 }
@@ -2022,12 +2827,17 @@ function wire(){
   $("fp-pass2").onkeydown = e => { if (e.key === "Enter") saveNewPassword(); };
 
   $("sel-month").onchange = () => { const v = $("sel-month").value; if (v) { const [y, m] = v.split("-").map(Number); setMonth(y, m - 1); } };
-  $("report-btn").onclick = () => doFullBackup({ email: true });
   $("me-btn").onclick = openMe;
-  $("slip-btn").onclick = () => exportSlips([selfMember()], cur.y, cur.m);
   $("msg-btn").onclick = openMessages;
   $("rcp-btn").onclick = () => openReceipts().catch(e => toast("שגיאה: " + e.message));
-  $("locs-btn").onclick = openMe;
+  $("rep-btn").onclick = () => openReports().catch(e => toast("שגיאה: " + e.message));
+  $("help-btn").onclick = openHelp;
+  $("apt-btn").onclick = openAptCard;
+  $("stats-btn").onclick = openStats;
+  $("cal-btn").onclick = openCal;
+  $("money-btn").onclick = () => { prefs.money = !prefs.money; savePrefs(); setMoneyBtn(); renderAll(); };
+  $("only-btn").onclick = () => { prefs.onlyWork = !prefs.onlyWork; savePrefs(); setOnlyBtn(); renderTable(); };
+  $("dash").addEventListener("toggle", () => { prefs.dash = $("dash").open; savePrefs(); if ($("dash").open) renderCharts(); });
   $("prev-month").onclick = () => setMonth(cur.y, cur.m - 1);
   $("next-month").onclick = () => setMonth(cur.y, cur.m + 1);
   $("today-btn").onclick = () => { weekStart = startOfWeek(today); setMonth(today.getFullYear(), today.getMonth()); };
@@ -2062,8 +2872,8 @@ async function installApp(){
 // ================== הפעלה ==================
 (async function start(){
   let t = "light"; try { t = localStorage.getItem("theme") || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"); } catch (e) {}
-  document.documentElement.dataset.theme = t; $("theme-btn").textContent = "🌙/☀️ מצב תצוגה";
-  fillMonthSelectors(); wire();
+  document.documentElement.dataset.theme = t; 
+  fillMonthSelectors(); wire(); wireKeys(); watchOnline(); applyFont(); setMoneyBtn(); setOnlyBtn(); if (!prefs.dash) $("dash").open = false;
   await loadHebcal();
   try { const ac = localStorage.getItem("accent"); if (ac != null) applyAccent(+ac); } catch (e) {}
   setInterval(() => { if (!$("app").classList.contains("hidden")) { renderGreeting(); tickLive(); } }, 1000);
