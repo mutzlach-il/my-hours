@@ -1,0 +1,209 @@
+name: בניית אפליקציות אנדרואיד
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/android.yml']
+
+permissions:
+  contents: write
+
+concurrency:
+  group: android
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      KS_PASS: ${{ secrets.KS_PASS }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: בדיקת סיסמת חתימה
+        run: |
+          if [ -z "$KS_PASS" ]; then echo "::error::חסר הסוד KS_PASS בהגדרות המאגר (Settings → Secrets → Actions)"; exit 1; fi
+          if [ ${#KS_PASS} -lt 6 ]; then echo "::error::הסיסמה KS_PASS חייבת להיות לפחות 6 תווים"; exit 1; fi
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.14.3'
+
+      - name: מפתח חתימה (נוצר פעם אחת ונשמר מוצפן)
+        run: |
+          KS="$RUNNER_TEMP/ks.jks"
+          if [ -f android-signing/keystore.enc ]; then
+            openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 -in android-signing/keystore.enc -out "$KS" -pass env:KS_PASS
+          else
+            mkdir -p android-signing
+            keytool -genkeypair -keystore "$KS" -storetype PKCS12 -alias avraham -keyalg RSA -keysize 2048 -validity 10000 \
+              -storepass "$KS_PASS" -keypass "$KS_PASS" -dname "CN=Avraham, O=Mutzlach, C=IL"
+            openssl enc -aes-256-cbc -salt -pbkdf2 -iter 200000 -in "$KS" -out android-signing/keystore.enc -pass env:KS_PASS
+          fi
+          echo "KS_FILE=$KS" >> "$GITHUB_ENV"
+          FP=$(keytool -list -v -keystore "$KS" -storepass "$KS_PASS" -alias avraham | grep -m1 'SHA256:' | sed 's/.*SHA256: *//')
+          echo "FP=$FP" >> "$GITHUB_ENV"
+          echo "טביעת אצבע: $FP"
+
+      - name: יצירת פרויקט האנדרואיד
+        run: |
+          P="$RUNNER_TEMP/proj"; echo "P=$P" >> "$GITHUB_ENV"
+          mkdir -p "$P/app/src/main/res/values" \
+                   "$P/app/src/avraham/res/values" "$P/app/src/avraham/res/drawable" "$P/app/src/avraham/res/mipmap-anydpi-v26" \
+                   "$P/app/src/kabalot/res/values" "$P/app/src/kabalot/res/drawable" "$P/app/src/kabalot/res/mipmap-anydpi-v26"
+          cd "$P"
+          cat > settings.gradle <<'EOF'
+          pluginManagement { repositories { google(); mavenCentral(); gradlePluginPortal() } }
+          dependencyResolutionManagement { repositories { google(); mavenCentral() } }
+          rootProject.name = "avraham"
+          include ':app'
+          EOF
+          cat > build.gradle <<'EOF'
+          plugins { id 'com.android.application' version '8.11.1' apply false }
+          EOF
+          cat > gradle.properties <<'EOF'
+          android.useAndroidX=true
+          org.gradle.jvmargs=-Xmx3g -Dfile.encoding=UTF-8
+          EOF
+          cat > app/build.gradle <<'EOF'
+          plugins { id 'com.android.application' }
+          def vc = (project.findProperty('vc') ?: '1').toString().toInteger()
+          android {
+            namespace 'io.github.mutzlachil.avraham'
+            compileSdk 36
+            defaultConfig { minSdk 26; targetSdk 36; versionCode vc; versionName "1.0." + vc }
+            flavorDimensions = ['app']
+            productFlavors {
+              avraham {
+                dimension 'app'
+                applicationId 'io.github.mutzlachil.avraham'
+                manifestPlaceholders = [launchUrl: 'https://mutzlach-il.github.io/my-hours/?app=android']
+              }
+              kabalot {
+                dimension 'app'
+                applicationId 'io.github.mutzlachil.kabalot'
+                manifestPlaceholders = [launchUrl: 'https://mutzlach-il.github.io/my-hours/?mode=receipts&app=android']
+              }
+            }
+            signingConfigs {
+              release {
+                storeFile file(System.getenv('KS_FILE'))
+                storePassword System.getenv('KS_PASS')
+                keyAlias 'avraham'
+                keyPassword System.getenv('KS_PASS')
+              }
+            }
+            buildTypes { release { minifyEnabled false; signingConfig signingConfigs.release } }
+            lint { checkReleaseBuilds false; abortOnError false }
+          }
+          dependencies { implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.5.0' }
+          EOF
+          cat > app/src/main/AndroidManifest.xml <<'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+            <uses-permission android:name="android.permission.INTERNET"/>
+            <queries><intent><action android:name="android.support.customtabs.action.CustomTabsService"/></intent></queries>
+            <application android:label="@string/app_name" android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher"
+                android:allowBackup="true" android:supportsRtl="true" android:theme="@android:style/Theme.Translucent.NoTitleBar">
+              <meta-data android:name="asset_statements" android:resource="@string/asset_statements"/>
+              <activity android:name="com.google.androidbrowserhelper.trusted.LauncherActivity" android:exported="true" android:label="@string/app_name">
+                <meta-data android:name="android.support.customtabs.trusted.DEFAULT_URL" android:value="${launchUrl}"/>
+                <meta-data android:name="android.support.customtabs.trusted.STATUS_BAR_COLOR" android:resource="@color/primary"/>
+                <meta-data android:name="android.support.customtabs.trusted.NAVIGATION_BAR_COLOR" android:resource="@color/primary"/>
+                <intent-filter>
+                  <action android:name="android.intent.action.MAIN"/>
+                  <category android:name="android.intent.category.LAUNCHER"/>
+                </intent-filter>
+              </activity>
+              <activity android:name="com.google.androidbrowserhelper.trusted.FocusActivity"/>
+              <activity android:name="com.google.androidbrowserhelper.trusted.WebViewFallbackActivity" android:configChanges="orientation|screenSize|keyboardHidden"/>
+              <service android:name="com.google.androidbrowserhelper.trusted.DelegationService" android:enabled="true" android:exported="true">
+                <intent-filter>
+                  <action android:name="android.support.customtabs.trusted.TRUSTED_WEB_ACTIVITY_SERVICE"/>
+                  <category android:name="android.intent.category.DEFAULT"/>
+                </intent-filter>
+              </service>
+            </application>
+          </manifest>
+          EOF
+          cat > app/src/main/res/values/common.xml <<'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <resources>
+            <string name="asset_statements" translatable="false">[{ \"relation\": [\"delegate_permission/common.handle_all_urls\"], \"target\": {\"namespace\": \"web\", \"site\": \"https://mutzlach-il.github.io\"} }]</string>
+          </resources>
+          EOF
+          for F in avraham kabalot; do
+            cat > app/src/$F/res/mipmap-anydpi-v26/ic_launcher.xml <<'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+            <background android:drawable="@color/primary"/>
+            <foreground android:drawable="@drawable/ic_fg"/>
+          </adaptive-icon>
+          EOF
+          done
+          cat > app/src/avraham/res/values/strings.xml <<'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <resources>
+            <string name="app_name">אברהם</string>
+            <color name="primary">#0F2542</color>
+          </resources>
+          EOF
+          cat > app/src/kabalot/res/values/strings.xml <<'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <resources>
+            <string name="app_name">קבלות</string>
+            <color name="primary">#1F6B35</color>
+          </resources>
+          EOF
+          cat > app/src/avraham/res/drawable/ic_fg.xml <<'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="108dp" android:height="108dp" android:viewportWidth="512" android:viewportHeight="512">
+            <group android:scaleX="0.62" android:scaleY="0.62" android:pivotX="256" android:pivotY="256">
+              <path android:strokeColor="#FFFFFF" android:strokeWidth="30" android:fillColor="#00000000" android:pathData="M256,86a170,170 0,1 1,0 340a170,170 0,1 1,0 -340z"/>
+              <path android:strokeColor="#5B8FF0" android:strokeWidth="30" android:strokeLineCap="round" android:strokeLineJoin="round" android:fillColor="#00000000" android:pathData="M256,146v116l76,48"/>
+              <path android:fillColor="#FFFFFF" android:pathData="M256,238a18,18 0,1 1,0 36a18,18 0,1 1,0 -36z"/>
+            </group>
+          </vector>
+          EOF
+          cat > app/src/kabalot/res/drawable/ic_fg.xml <<'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="108dp" android:height="108dp" android:viewportWidth="512" android:viewportHeight="512">
+            <group android:scaleX="0.62" android:scaleY="0.62" android:pivotX="256" android:pivotY="256">
+              <path android:fillColor="#FFFFFF" android:pathData="M164,96h184a18,18 0,0 1,18 18V396l-36,24l-37,-24l-37,24l-37,-24l-37,24l-36,-24V114a18,18 0,0 1,18 -18z"/>
+              <path android:strokeColor="#1F6B35" android:strokeWidth="18" android:strokeLineCap="round" android:fillColor="#00000000" android:pathData="M186,160H326M186,214H326M186,268H276"/>
+              <path android:strokeColor="#1F6B35" android:strokeWidth="14" android:strokeLineCap="round" android:strokeLineJoin="round" android:fillColor="#00000000" android:pathData="M226,352V318h40v44M246,300v44M286,300v44"/>
+            </group>
+          </vector>
+          EOF
+
+      - name: בנייה
+        run: |
+          cd "$P"
+          gradle --no-daemon -Pvc=${{ github.run_number }} assembleRelease bundleRelease
+
+      - name: העלאה לאתר
+        run: |
+          V=${{ github.run_number }}
+          mkdir -p download
+          cp "$P/app/build/outputs/apk/avraham/release/app-avraham-release.apk" download/avraham.apk
+          cp "$P/app/build/outputs/apk/kabalot/release/app-kabalot-release.apk" download/kabalot.apk
+          cp "$P/app/build/outputs/bundle/avrahamRelease/app-avraham-release.aab" download/avraham-play.aab
+          cp "$P/app/build/outputs/bundle/kabalotRelease/app-kabalot-release.aab" download/kabalot-play.aab
+          cat > download/assetlinks.json <<EOF
+          [{"relation":["delegate_permission/common.handle_all_urls"],"target":{"namespace":"android_app","package_name":"io.github.mutzlachil.avraham","sha256_cert_fingerprints":["$FP"]}},
+           {"relation":["delegate_permission/common.handle_all_urls"],"target":{"namespace":"android_app","package_name":"io.github.mutzlachil.kabalot","sha256_cert_fingerprints":["$FP"]}}]
+          EOF
+          echo "1.0.$V" > download/version.txt
+          ls -la download
+          git config user.name "github-actions[bot]"
+          git config user.email "41898099+github-actions[bot]@users.noreply.github.com"
+          git add download android-signing/keystore.enc
+          git commit -m "אפליקציות אנדרואיד – גרסה 1.0.$V" || exit 0
+          git pull --rebase origin main
+          git push origin HEAD:main
