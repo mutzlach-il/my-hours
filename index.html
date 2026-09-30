@@ -2067,7 +2067,8 @@ async function tabUsers(body, m){
   body.innerHTML = `
     <div class="muted" style="margin-bottom:8px">לכל עובד יש מערכת שעות משלו. 🏠 = הדירה שבה העובד עובד – המשמרות והקבלות שלו משויכות אליה אוטומטית. אפשר לקבוע לכל עובד תעריף אישי. אם משאירים ריק, העובד מקבל את התעריף הכללי (☀️ ${money(G.day)} לשעה · 🌙 ${money(G.nightFlat)} ללילה).</div>
     <div class="notice info" style="flex-direction:column;align-items:stretch;gap:6px"><label style="display:flex;gap:8px;align-items:center;font-weight:600"><input type="checkbox" id="su-open" style="width:auto"> 🔓 הרשמה עצמית פתוחה – כל אחד יכול להיכנס לבד (עם Google או מייל)</label>
-      <span class="muted" style="font-weight:400">מי שנרשם לבד מופיע כאן עם 🆕, ומגיע אליך מייל. אפשר לשייך אותו לדירה, או ללחוץ ⛔ חסום.</span></div>
+      <span class="muted" style="font-weight:400">מי שנרשם לבד מופיע כאן עם 🆕, ומגיע אליך מייל. אפשר לשייך אותו לדירה, או ללחוץ ⛔ חסום (השעות שלו נשמרות, ואפשר לבטל את החסימה).</span></div>
+    <div id="su-blocked"></div>
     <div id="st-users">טוען...</div>
     <h4>＋ הוספת עובד</h4>
     <div class="frow"><input id="nu-name" placeholder="שם העובד" style="flex:1"><input id="nu-email" type="email" placeholder="מייל (שם משתמש)" style="flex:1.3"></div>
@@ -2079,6 +2080,7 @@ async function tabUsers(body, m){
   body.querySelector("#nu-add").onclick = () => DEMO ? toast("לא זמין במצב הדגמה") : addUser(body);
   const so = body.querySelector("#su-open");
   if (DEMO) so.checked = true; else signupCfg().then(c => so.checked = c.open !== false);
+  renderBlocked(body);
   so.onchange = async () => { if (DEMO) return toast("לא זמין במצב הדגמה"); try { await fb.f.setDoc(fb.f.doc(fb.db, "config", "signup"), { open: so.checked }, { merge: true }); toast(so.checked ? "ההרשמה העצמית פתוחה ✔" : "ההרשמה העצמית נסגרה – רק מי שכבר רשום יכול להיכנס"); } catch (e) { toast("שגיאה: " + (e.code || e.message)); so.checked = !so.checked; } };
   renderUsers(body);
 }
@@ -2756,12 +2758,8 @@ async function selfSignup(user, email){
   await f.setDoc(f.doc(fb.db, "users", email), { email, name, role: "user", createdAt: Date.now(), selfSignup: true, provider });
   try { await f.setDoc(f.doc(fb.db, "settings", email), { name }, { merge: true }); } catch (e) {}
   f.addDoc(f.collection(fb.db, "log"), { at: Date.now(), by: email, byName: name, target: email, text: `נרשם בעצמו למערכת (${provider === "google" ? "Google" : "מייל"})` }).catch(() => {});
-  try {
-    emailjs.init(CFG.emailjs.key);
-    emailjs.send(CFG.emailjs.service, CFG.emailjs.template, { from_name: CFG.senderName, reply_to: CFG.senderEmail, to_email: CFG.senderEmail, name: "מערכת השעות", to_name: CFG.senderEmail,
-      subject: `🆕 נרשם משתמש חדש: ${name}`,
-      message: `נרשם משתמש חדש למערכת:\nשם: ${name}\nמייל: ${email}\nדרך: ${provider === "google" ? "חשבון Google" : "מייל וסיסמה"}\n\nאפשר לשייך אותו לדירה או לחסום אותו בהגדרות מנהל ← עובדים:\n${location.origin}${location.pathname}` }).catch(() => {});
-  } catch (e) {}
+  // התראה למנהל – נשלחת דרך השרת, כך שהמייל של המנהל לא מופיע באתר
+  resetCall({ action: "notifyNewUser", email, name }).catch(() => {});
   setTimeout(() => toast(`ברוך הבא, ${name}! 👋`), 1500);
   return true;
 }
@@ -2912,10 +2910,33 @@ async function addUser(m){
 }
 async function blockUser(email, m){
   if (DEMO) return toast("לא זמין במצב הדגמה");
-  if (!confirm(`לחסום את ${email}?\nהמשתמש והשעות שלו יימחקו, והוא לא יוכל להירשם שוב.`)) return;
-  try { const c = await signupCfg(); await fb.f.setDoc(fb.f.doc(fb.db, "config", "signup"), { blocked: [...new Set([...(c.blocked || []), email])] }, { merge: true }); }
-  catch (e) { return toast("שגיאה בחסימה: " + (e.code || e.message)); }
-  LOG.add(email, "חסם את המשתמש"); await deleteUser(email, m, true); adminScan();
+  if (!confirm(`לחסום את ${email}?\nהוא לא יוכל להיכנס למערכת. השעות שלו נשמרות, ואפשר לבטל את החסימה בכל רגע.`)) return;
+  try {
+    const u = (await fb.f.getDoc(fb.f.doc(fb.db, "users", email))).data() || {};
+    const c = await signupCfg();
+    await fb.f.setDoc(fb.f.doc(fb.db, "config", "signup"), { blocked: [...new Set([...(c.blocked || []), email])], blockedInfo: { [email]: { name: u.name || "", apt: u.apt || "", phone: u.phone || "", rates: u.rates || null, provider: u.provider || "", at: Date.now() } } }, { merge: true });
+    await fb.f.deleteDoc(fb.f.doc(fb.db, "users", email));
+  } catch (e) { return toast("שגיאה בחסימה: " + (e.code || e.message)); }
+  LOG.add(email, "חסם את המשתמש"); toast("המשתמש נחסם ⛔"); renderUsers(m); renderBlocked(m); fillUserSwitcher(); adminScan();
+}
+async function unblockUser(email, m){
+  if (DEMO) return toast("לא זמין במצב הדגמה");
+  try {
+    const c = await signupCfg(), info = (c.blockedInfo || {})[email] || {};
+    const data = { email, name: info.name || email.split("@")[0], role: "user", createdAt: Date.now(), selfSignup: true, seen: true };
+    if (info.apt) data.apt = info.apt; if (info.phone) data.phone = info.phone; if (info.rates) data.rates = info.rates; if (info.provider) data.provider = info.provider;
+    await fb.f.setDoc(fb.f.doc(fb.db, "users", email), data);
+    await fb.f.setDoc(fb.f.doc(fb.db, "config", "signup"), { blocked: (c.blocked || []).filter(x => x !== email) }, { merge: true });
+  } catch (e) { return toast("שגיאה בביטול החסימה: " + (e.code || e.message)); }
+  LOG.add(email, "ביטל חסימה של המשתמש"); toast("החסימה בוטלה ✔ – הוא יכול להיכנס שוב"); renderUsers(m); renderBlocked(m); fillUserSwitcher();
+}
+async function renderBlocked(body){
+  const box = body.querySelector("#su-blocked"); if (!box || DEMO) return;
+  const c = await signupCfg(), list = c.blocked || [];
+  if (!list.length) { box.innerHTML = ""; return; }
+  box.innerHTML = `<h4>⛔ חסומים (${list.length})</h4>` + list.map(e => { const i = (c.blockedInfo || {})[e] || {};
+    return `<div class="list-item"><span><b>${esc(i.name || e)}</b> <span class="muted">${esc(e)}${i.at ? ` · נחסם ב-${new Date(i.at).toLocaleDateString("he-IL")}` : ""}</span></span><button class="mini add" data-unb="${esc(e)}">↩️ בטל חסימה</button></div>`; }).join("");
+  box.querySelectorAll("[data-unb]").forEach(b => b.onclick = () => unblockUser(b.dataset.unb, body));
 }
 async function deleteUser(email, m, noAsk){
   if (!noAsk && !confirm(`למחוק את המשתמש ${email} ואת כל השעות שלו? אי אפשר לבטל.`)) return;
