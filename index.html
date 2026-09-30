@@ -280,15 +280,27 @@ tr.weekrow.active td{outline:2px solid var(--green);outline-offset:-2px}
   <div class="login-card">
     <div id="login-view">
       <h2 id="login-title">אברהם – שעות ונוכחות</h2>
-      <div class="sub" id="login-sub">כניסה למערכת – רק משתמשים שהמנהל רשם יכולים להיכנס</div>
+      <div class="sub" id="login-sub">כל אחד יכול להיכנס – עם חשבון Google, או בהרשמה עם מייל</div>
       <input type="email" id="login-email" placeholder="שם משתמש (מייל)" autocomplete="username">
       <input type="password" id="login-password" placeholder="סיסמה" autocomplete="current-password">
       <button id="login-btn">כניסה</button>
       <div class="or-sep"><span>או</span></div>
       <button id="google-btn" class="gbtn"><svg viewBox="0 0 48 48" width="18" height="18" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg> כניסה עם חשבון Google (ג'ימייל)</button>
+      <button class="linkbtn" id="signup-link">✍️ אין לך חשבון? הרשמה חדשה עם מייל</button>
       <button class="linkbtn" id="forgot-link">שכחתי סיסמה</button>
       <div id="login-msg" class="msg"></div>
       <div class="install-card"><button class="b-blue" id="login-install">📲 הורד את האפליקציה לטלפון</button></div>
+    </div>
+    <div id="signup-view" class="hidden">
+      <h2>✍️ הרשמה חדשה</h2>
+      <div class="sub">ממלאים שם, מייל וסיסמה. נשלח אליך מייל אימות – לוחצים על הקישור ונכנסים.</div>
+      <input id="su-name" placeholder="השם שלך" autocomplete="name">
+      <input type="email" id="su-email" placeholder="המייל שלך" autocomplete="email">
+      <input type="password" id="su-pass" placeholder="סיסמה (לפחות 6 תווים)" autocomplete="new-password">
+      <button id="su-btn" class="b-green">הירשם</button>
+      <div class="muted" style="margin-top:8px;font-size:13px">💡 יש לך ג'ימייל? הכי פשוט – חוזרים ולוחצים "כניסה עם חשבון Google". השם נלקח אוטומטית מהחשבון.</div>
+      <button class="linkbtn" id="su-back">→ חזרה לכניסה</button>
+      <div id="su-msg" class="msg"></div>
     </div>
     <div id="forgot-view" class="hidden">
       <h2>שחזור סיסמה</h2>
@@ -1616,20 +1628,21 @@ function renderNotices(){
   const md = missingDaysNotice(); if (md) out.push(md);
   const apt = aptFor(locationFor(ds));
   if (apt && apt.instructions) out.push(`<div class="notice info">🏠 הוראות הדירה – ${esc(apt.name)}${apt.address && apt.address !== apt.name ? ` (${esc(apt.address)})` : ""}: <span style="font-weight:500">${esc(apt.instructions)}</span></div>`);
-  if (isAdmin && (adminAlerts.alerts.length || adminAlerts.pending || adminAlerts.unread || adminAlerts.reports || adminAlerts.swaps)) {
+  if (isAdmin && (adminAlerts.alerts.length || adminAlerts.pending || adminAlerts.unread || adminAlerts.reports || adminAlerts.swaps || adminAlerts.newUsers)) {
     const parts = [];
+    if (adminAlerts.newUsers) parts.push(`🆕 ${adminAlerts.newUsers} משתמשים חדשים נרשמו לבד`);
     if (adminAlerts.alerts.length) parts.push(`⚠️ ${adminAlerts.alerts.length} התראות (אפשר לאשר או לא לאשר)`);
     if (adminAlerts.pending) parts.push(`⏳ ${adminAlerts.pending} משמרות מחוץ ללוח ממתינות לאישור`);
     if (adminAlerts.swaps) parts.push(`🔄 ${adminAlerts.swaps} בקשות החלפה`);
     if (adminAlerts.reports) parts.push(`🛠️ ${adminAlerts.reports} דיווחים מהדירות`);
     if (adminAlerts.unread) parts.push(`✉️ ${adminAlerts.unread} הודעות חדשות`);
-    out.push(`<div class="notice admin">${parts.join(" &nbsp;·&nbsp; ")} ${adminAlerts.pending || adminAlerts.swaps || adminAlerts.alerts.length ? `<button class="b-green" data-nact="approve">✅ אשר / דחה</button>` : ""}${adminAlerts.reports ? `<button class="b-gray" data-nact="reports">🛠️ דיווחים</button>` : ""}<button class="b-gray" data-nact="alerts">📋 לוח</button>${adminAlerts.unread ? `<button class="b-gray" data-nact="inbox">הודעות</button>` : ""}</div>`);
+    out.push(`<div class="notice admin">${parts.join(" &nbsp;·&nbsp; ")} ${adminAlerts.pending || adminAlerts.swaps || adminAlerts.alerts.length ? `<button class="b-green" data-nact="approve">✅ אשר / דחה</button>` : ""}${adminAlerts.reports ? `<button class="b-gray" data-nact="reports">🛠️ דיווחים</button>` : ""}<button class="b-gray" data-nact="alerts">📋 לוח</button>${adminAlerts.unread ? `<button class="b-gray" data-nact="inbox">הודעות</button>` : ""}${adminAlerts.newUsers ? `<button class="b-blue" data-nact="users">🆕 מי נרשם</button>` : ""}</div>`);
   }
   box.innerHTML = out.join("");
   box.querySelectorAll("[data-nact]").forEach(b => b.onclick = () => {
     const a = b.dataset.nact;
     if (a === "in") $("punch-in")?.click(); else if (a === "out") $("punch-out")?.click();
-    else if (a === "alerts") openSettings("board"); else if (a === "inbox") openSettings("inbox"); else if (a === "approve") openSettings("approve"); else if (a === "reports") openSettings("reports");
+    else if (a === "alerts") openSettings("board"); else if (a === "inbox") openSettings("inbox"); else if (a === "approve") openSettings("approve"); else if (a === "reports") openSettings("reports"); else if (a === "users") openSettings("users");
   });
 }
 function refreshMonthRow(){
@@ -2053,6 +2066,8 @@ async function tabUsers(body, m){
   const G = globalCfg.rates;
   body.innerHTML = `
     <div class="muted" style="margin-bottom:8px">לכל עובד יש מערכת שעות משלו. 🏠 = הדירה שבה העובד עובד – המשמרות והקבלות שלו משויכות אליה אוטומטית. אפשר לקבוע לכל עובד תעריף אישי. אם משאירים ריק, העובד מקבל את התעריף הכללי (☀️ ${money(G.day)} לשעה · 🌙 ${money(G.nightFlat)} ללילה).</div>
+    <div class="notice info" style="flex-direction:column;align-items:stretch;gap:6px"><label style="display:flex;gap:8px;align-items:center;font-weight:600"><input type="checkbox" id="su-open" style="width:auto"> 🔓 הרשמה עצמית פתוחה – כל אחד יכול להיכנס לבד (עם Google או מייל)</label>
+      <span class="muted" style="font-weight:400">מי שנרשם לבד מופיע כאן עם 🆕, ומגיע אליך מייל. אפשר לשייך אותו לדירה, או ללחוץ ⛔ חסום.</span></div>
     <div id="st-users">טוען...</div>
     <h4>＋ הוספת עובד</h4>
     <div class="frow"><input id="nu-name" placeholder="שם העובד" style="flex:1"><input id="nu-email" type="email" placeholder="מייל (שם משתמש)" style="flex:1.3"></div>
@@ -2062,17 +2077,22 @@ async function tabUsers(body, m){
     <div class="frow"><input id="st-target" type="number" min="0" step="1" value="${esc(settings.monthlyTarget || "")}" style="width:120px"><button class="b-green" id="st-save">שמור יעד</button><span class="muted">(לפס ההתקדמות – לא חובה)</span></div>`;
   body.querySelector("#st-save").onclick = async () => { settings.monthlyTarget = +body.querySelector("#st-target").value || 0; await DB.putSettings(); renderAll(); toast("היעד נשמר ✔"); };
   body.querySelector("#nu-add").onclick = () => DEMO ? toast("לא זמין במצב הדגמה") : addUser(body);
+  const so = body.querySelector("#su-open");
+  if (DEMO) so.checked = true; else signupCfg().then(c => so.checked = c.open !== false);
+  so.onchange = async () => { if (DEMO) return toast("לא זמין במצב הדגמה"); try { await fb.f.setDoc(fb.f.doc(fb.db, "config", "signup"), { open: so.checked }, { merge: true }); toast(so.checked ? "ההרשמה העצמית פתוחה ✔" : "ההרשמה העצמית נסגרה – רק מי שכבר רשום יכול להיכנס"); } catch (e) { toast("שגיאה: " + (e.code || e.message)); so.checked = !so.checked; } };
   renderUsers(body);
 }
 async function renderUsers(body){
   const box = body.querySelector("#st-users"); if (!box) return;
-  const users = await listUsers(), G = globalCfg.rates;
+  const users = (await listUsers()).sort((a, b) => (b.selfSignup && !b.seen ? 1 : 0) - (a.selfSignup && !a.seen ? 1 : 0)), G = globalCfg.rates;
+  const when = t => t ? new Date(t).toLocaleString("he-IL", { day: "numeric", month: "numeric", hour: "2-digit", minute: "2-digit" }) : "";
   box.innerHTML = users.map(u => { const r = u.rates || {};
+    const meta = `${u.selfSignup ? `<div class="muted" style="width:100%;font-size:12px">${!u.seen ? `<b class="up">🆕 חדש</b> · ` : ""}נרשם לבד ${u.provider === "google" ? "עם Google" : "עם מייל"} ב-${when(u.createdAt)}${u.lastLogin ? ` · נכנס לאחרונה ${when(u.lastLogin)}` : ""}${!u.seen ? ` <button class="mini add u-seen">✔ ראיתי</button>` : ""}</div>` : u.lastLogin ? `<div class="muted" style="width:100%;font-size:12px">נכנס לאחרונה ${when(u.lastLogin)}</div>` : ""}`;
     return `<div class="list-item" style="flex-wrap:wrap" data-u="${esc(u.email)}">
       <span style="min-width:200px"><input class="u-name" value="${esc(u.name || "")}" placeholder="שם" style="width:140px"> <span class="muted">${esc(u.email)}</span> ${u.email === ADMIN ? `<span class="up">· מנהל</span>` : ""}</span>
       <span class="rates">📞<input class="u-phone" value="${esc(u.phone || "")}" placeholder="טלפון" style="width:110px" inputmode="tel">🏠<select class="u-apt" title="הדירה שבה העובד עובד"><option value="">— דירה —</option>${(globalCfg.apartments || []).map(a => `<option ${a.name === (u.apt || "") ? "selected" : ""}>${esc(a.name)}</option>`).join("")}${u.apt && !(globalCfg.apartments || []).some(a => a.name === u.apt) ? `<option selected>${esc(u.apt)}</option>` : ""}</select>
       ☀️<input class="u-day" type="number" step="0.01" min="0" value="${esc(r.day || "")}" placeholder="${G.day}" title="תעריף שעת יום">🌙<input class="u-night" type="number" step="0.01" min="0" value="${esc(r.nightFlat || "")}" placeholder="${G.nightFlat}" title="סכום ללילה">
-      <button class="mini add u-save">שמור</button>${u.email === ADMIN ? "" : `<button class="mini del u-del">מחק</button>`}</span></div>`; }).join("");
+      <button class="mini add u-save">שמור</button>${u.email === ADMIN ? "" : `<button class="mini del u-del">מחק</button><button class="mini del u-block" title="מחיקה + לא יוכל להירשם שוב">⛔ חסום</button>`}</span>${meta}</div>`; }).join("");
   box.querySelectorAll("[data-u]").forEach(row => {
     const email = row.dataset.u;
     row.querySelector(".u-save").onclick = async () => {
@@ -2094,6 +2114,8 @@ async function renderUsers(body){
       } catch (e) { toast("שגיאה בשמירה: " + (e.code || e.message)); }
     };
     const del = row.querySelector(".u-del"); if (del) del.onclick = () => deleteUser(email, body);
+    const blk = row.querySelector(".u-block"); if (blk) blk.onclick = () => blockUser(email, body);
+    const sn = row.querySelector(".u-seen"); if (sn) sn.onclick = async () => { await DB.putUser(email, { seen: true }); renderUsers(body); adminScan(); };
     const nb = document.createElement("button"); nb.className = "mini fix"; nb.textContent = "🗒️ הערה פרטית"; row.querySelector(".rates").appendChild(nb);
     nb.onclick = async () => { const cur0 = await ANOTE.get(email).catch(() => ""); const t = prompt("הערה פרטית על העובד (רק אתה רואה):", cur0); if (t == null) return; await ANOTE.set(email, t.trim()); toast("ההערה נשמרה ✔"); };
   });
@@ -2167,8 +2189,9 @@ async function adminScan(){
       (globalCfg.apartments || []).filter(a => +a.budget > 0).forEach(a => { const sp = rc.filter(r => r.apt === a.name && r.month === mk).reduce((x, r) => x + (+r.amount || 0), 0);
         if (sp > +a.budget) alerts.push({ lvl: "red", text: `הדירה ${a.name} עברה את התקציב החודשי: ${money(sp)} מתוך ${money(+a.budget)}` }); });
     } catch (e) {}
-    adminAlerts = { alerts, pending, unread, reports, swaps };
-    const n = alerts.length + pending + unread + reports + swaps;
+    let newUsers = 0; try { newUsers = (await listUsers()).filter(u => u.selfSignup && !u.seen).length; } catch (e) {}
+    adminAlerts = { alerts, pending, unread, reports, swaps, newUsers };
+    const n = alerts.length + pending + unread + reports + swaps + newUsers;
     $("settings-btn").innerHTML = `<span class="ic">⚙️</span>הגדרות מנהל${n ? `<span class="badge-n">${n}</span>` : ""}`;
     renderNotices();
   } catch (e) { console.warn("scan", e); }
@@ -2694,6 +2717,7 @@ async function initFirebase(){
 }
 async function onAuth(user){
   if (!user) { me = null; ADMIN = null; isAdmin = false; $("modal-root").innerHTML = ""; show("login-screen"); return; }
+  if (signupPending) return;
   const { a, f } = fb, email = norm(user.email);
   const adminUser = await isAdminEmail(email);
   try {
@@ -2707,12 +2731,60 @@ async function onAuth(user){
     }
     let u = await f.getDoc(f.doc(fb.db, "users", email));
     if (!u.exists() && adminUser) { await f.setDoc(f.doc(fb.db, "users", email), { email, role: "admin", name: "", createdAt: Date.now() }); u = await f.getDoc(f.doc(fb.db, "users", email)); }
-    if (!u.exists()) { await a.signOut(fb.auth); setMsg("login-msg", "אין לך הרשאת גישה למערכת. פנה למנהל.", false); return; }
+    if (!u.exists()) { if (!(await selfSignup(user, email))) return; u = await f.getDoc(f.doc(fb.db, "users", email)); }
+    else if (!adminUser) f.setDoc(f.doc(fb.db, "users", email), { lastLogin: Date.now() }, { merge: true }).catch(() => {});
     me = email; isAdmin = adminUser; ADMIN = adminUser ? email : null;
     await openSystem(email, u.data().name);
   } catch (err) {
     console.error(err); await a.signOut(fb.auth); setMsg("login-msg", "שגיאה בטעינה: " + (err.code || err.message), false);
   }
+}
+// ---- הרשמה עצמית: כל אחד נכנס לבד, השם נלקח מהחשבון ----
+let signupPending = false;
+async function signupCfg(){ try { const c = await fb.f.getDoc(fb.f.doc(fb.db, "config", "signup")); return c.exists() ? c.data() : {}; } catch (e) { return {}; } }
+async function selfSignup(user, email){
+  const { a, f } = fb, cfg = await signupCfg();
+  if ((cfg.blocked || []).includes(email)) { await a.signOut(fb.auth); setMsg("login-msg", "אין לך הרשאת גישה למערכת. פנה למנהל.", false); return false; }
+  if (cfg.open === false) { await a.signOut(fb.auth); setMsg("login-msg", "ההרשמה למערכת סגורה כרגע. פנה למנהל.", false); return false; }
+  if (!user.emailVerified) {
+    try { await a.sendEmailVerification(user); } catch (e) {}
+    await a.signOut(fb.auth); $("login-email").value = email;
+    setMsg("login-msg", `שלחנו מייל אימות ל-${email}. לחץ על הקישור שבמייל ואז היכנס שוב עם המייל והסיסמה.`, true); return false;
+  }
+  const name = (user.displayName || "").trim() || email.split("@")[0];
+  const provider = (user.providerData || []).some(p => p.providerId === "google.com") ? "google" : "email";
+  await f.setDoc(f.doc(fb.db, "users", email), { email, name, role: "user", createdAt: Date.now(), selfSignup: true, provider });
+  try { await f.setDoc(f.doc(fb.db, "settings", email), { name }, { merge: true }); } catch (e) {}
+  f.addDoc(f.collection(fb.db, "log"), { at: Date.now(), by: email, byName: name, target: email, text: `נרשם בעצמו למערכת (${provider === "google" ? "Google" : "מייל"})` }).catch(() => {});
+  try {
+    emailjs.init(CFG.emailjs.key);
+    emailjs.send(CFG.emailjs.service, CFG.emailjs.template, { from_name: CFG.senderName, reply_to: CFG.senderEmail, to_email: CFG.senderEmail, name: "מערכת השעות", to_name: CFG.senderEmail,
+      subject: `🆕 נרשם משתמש חדש: ${name}`,
+      message: `נרשם משתמש חדש למערכת:\nשם: ${name}\nמייל: ${email}\nדרך: ${provider === "google" ? "חשבון Google" : "מייל וסיסמה"}\n\nאפשר לשייך אותו לדירה או לחסום אותו בהגדרות מנהל ← עובדים:\n${location.origin}${location.pathname}` }).catch(() => {});
+  } catch (e) {}
+  setTimeout(() => toast(`ברוך הבא, ${name}! 👋`), 1500);
+  return true;
+}
+function showSignup(on){
+  $("login-view").classList.toggle("hidden", on); $("signup-view").classList.toggle("hidden", !on);
+  if (on) { $("su-email").value = $("login-email").value; setMsg("su-msg", "", true); $("su-name").focus(); }
+}
+async function signup(){
+  const name = $("su-name").value.trim(), email = norm($("su-email").value), pass = $("su-pass").value;
+  if (!name) return setMsg("su-msg", "הקלד את השם שלך.", false);
+  if (!email || pass.length < 6) return setMsg("su-msg", "הקלד מייל וסיסמה של לפחות 6 תווים.", false);
+  if (DEMO) return setMsg("su-msg", "לא זמין במצב הדגמה.", false);
+  const cfg = await signupCfg().catch(() => ({}));
+  $("su-btn").disabled = true; signupPending = true;
+  try {
+    const c = await fb.a.createUserWithEmailAndPassword(fb.auth, email, pass);
+    await fb.a.updateProfile(c.user, { displayName: name });
+    await fb.a.sendEmailVerification(c.user);
+    await fb.a.signOut(fb.auth);
+    showSignup(false); $("login-email").value = email; $("login-password").value = "";
+    setMsg("login-msg", `✔ נרשמת! שלחנו מייל אימות ל-${email}. לחץ על הקישור שבמייל, ואז היכנס כאן עם המייל והסיסמה.`, true);
+  } catch (e) { setMsg("su-msg", e.code === "auth/email-already-in-use" ? "המייל הזה כבר רשום – חזור לכניסה (או \"שכחתי סיסמה\")." : errText(e), false); }
+  finally { signupPending = false; $("su-btn").disabled = false; }
 }
 const RCP_MODE = document.documentElement.classList.contains("mode-rcp");
 async function openReceiptsPage(){
@@ -2838,8 +2910,15 @@ async function addUser(m){
   m.querySelector("#nu-name").value = m.querySelector("#nu-email").value = m.querySelector("#nu-pass").value = "";
   setMsg("nu-msg", "המשתמש נוסף ✔" + note, true); renderUsers(m); fillUserSwitcher();
 }
-async function deleteUser(email, m){
-  if (!confirm(`למחוק את המשתמש ${email} ואת כל השעות שלו? אי אפשר לבטל.`)) return;
+async function blockUser(email, m){
+  if (DEMO) return toast("לא זמין במצב הדגמה");
+  if (!confirm(`לחסום את ${email}?\nהמשתמש והשעות שלו יימחקו, והוא לא יוכל להירשם שוב.`)) return;
+  try { const c = await signupCfg(); await fb.f.setDoc(fb.f.doc(fb.db, "config", "signup"), { blocked: [...new Set([...(c.blocked || []), email])] }, { merge: true }); }
+  catch (e) { return toast("שגיאה בחסימה: " + (e.code || e.message)); }
+  LOG.add(email, "חסם את המשתמש"); await deleteUser(email, m, true); adminScan();
+}
+async function deleteUser(email, m, noAsk){
+  if (!noAsk && !confirm(`למחוק את המשתמש ${email} ואת כל השעות שלו? אי אפשר לבטל.`)) return;
   const { f } = fb;
   try {
     const q = await f.getDocs(f.collection(fb.db, "shifts", email, "items"));
@@ -2861,6 +2940,8 @@ function applyTheme(t){
 function wire(){
   $("login-btn").onclick = login;
   $("google-btn").onclick = googleLogin;
+  $("signup-link").onclick = () => showSignup(true); $("su-back").onclick = () => showSignup(false); $("su-btn").onclick = signup;
+  $("su-pass").addEventListener("keydown", e => { if (e.key === "Enter") signup(); });
   $("login-password").onkeydown = e => { if (e.key === "Enter") login(); };
   $("forgot-link").onclick = () => showForgot(true);
   $("fp-back").onclick = () => showForgot(false);
@@ -2878,7 +2959,7 @@ function wire(){
   $("login-install").onclick = installApp; $("rcpbar-install").onclick = installApp;
   if (IN_APP) { $("login-install").parentElement.classList.add("hidden"); $("rcpbar-install").classList.add("hidden"); }
   $("rcpbar-out").onclick = () => $("logout-btn").click();
-  if (document.documentElement.classList.contains("mode-rcp")) { $("login-title").textContent = "📸 קבלות וחשבונות"; $("login-sub").textContent = "כניסה – רק משתמשים שהמנהל רשם יכולים להיכנס"; }
+  if (document.documentElement.classList.contains("mode-rcp")) { $("login-title").textContent = "📸 קבלות וחשבונות"; $("login-sub").textContent = "כל אחד יכול להיכנס – עם חשבון Google, או בהרשמה עם מייל"; }
   $("apt-btn").onclick = openAptCard;
   $("stats-btn").onclick = openStats;
   $("cal-btn").onclick = openCal;
@@ -2923,13 +3004,13 @@ async function installApp(){
         <li>פותחים את האפליקציה ונכנסים עם שם המשתמש והסיסמה.</li>
       </ol>
       <div style="text-align:center"><a class="btnlink b-blue" href="${apk}" download>⬇️ ההורדה לא התחילה? לחץ כאן</a></div>
-      <div class="muted" style="margin-top:10px">מי שהמנהל לא רשם – לא יוכל להיכנס.</div>`);
+      <div class="muted" style="margin-top:10px">נכנסים עם חשבון Google, או נרשמים עם מייל – השם נלקח אוטומטית.</div>`);
     return;
   }
   if (installEvt) { installEvt.prompt(); const r = await installEvt.userChoice.catch(() => null); installEvt = null; if (r && r.outcome === "accepted") toast("האפליקציה הותקנה ✔"); return; }
   const ios = /iphone|ipad|ipod/i.test(navigator.userAgent), rcp = document.documentElement.classList.contains("mode-rcp"), url = rcp ? RCP_URL : APP_URL;
   const m = modal(`<h3>📲 הורדת האפליקציה "${rcp ? "קבלות" : "אברהם"}" לטלפון ${closeX}</h3>
-    <div class="muted" style="margin-bottom:8px">כל טלפון יכול להוריד. אחרי ההתקנה נכנסים עם שם משתמש (מייל) וסיסמה – מי שהמנהל לא רשם לא יוכל להיכנס.</div>
+    <div class="muted" style="margin-bottom:8px">כל טלפון יכול להוריד. אחרי ההתקנה נכנסים עם חשבון Google, או נרשמים עם מייל וסיסמה.</div>
     <div class="qrbox" id="qr"></div>
     <div style="text-align:center;margin-bottom:10px"><b dir="ltr">${url}</b><br><button class="b-gray" id="in-copy" style="margin-top:6px">📋 העתק קישור</button> <a class="btnlink b-wa" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent((rcp ? "📸 אפליקציית הקבלות: " : "📱 אפליקציית השעות אברהם: ") + url)}">🟢 שלח בוואטסאפ</a></div>
     <h4>🤖 אנדרואיד (Chrome)</h4><ol style="line-height:1.9"><li>פותחים את הקישור ב-<b>Chrome</b>.</li><li>לוחצים על <b>⋮</b> (שלוש הנקודות למעלה).</li><li>בוחרים <b>"התקנת אפליקציה"</b> או <b>"הוספה למסך הבית"</b>.</li></ol>
