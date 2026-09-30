@@ -226,6 +226,11 @@ tr.weekrow.active td{outline:2px solid var(--green);outline-offset:-2px}
 .launcher button:hover{transform:translateY(-2px);border-color:var(--accent)}
 .launcher button .ic{font-size:24px;line-height:1}
 .launcher button .badge-n{position:absolute;top:6px;left:6px;margin:0}
+.adm-title{font-weight:700;font-size:13px;color:var(--muted,#5b6b82);margin:-4px 4px 6px}
+.adminbar button{border-top:3px solid #2f6fd6}
+.adminbar button .badge-n{position:absolute;top:6px;left:6px;margin:0}
+.geo{font-size:11px;margin-top:2px}.geo a{text-decoration:none}
+.bbar{height:10px;border-radius:6px;background:var(--line);overflow:hidden;margin:4px 0}.bbar i{display:block;height:100%;border-radius:6px}
 .launcher .lx-admin{background:linear-gradient(135deg,#0f2542,#1d3b66);color:#fff}
 .dash{margin-bottom:12px}
 .dash>summary{cursor:pointer;font-weight:800;padding:8px 12px;background:var(--card);border:1px solid var(--line);border-radius:10px;margin-bottom:10px;list-style:none}
@@ -353,9 +358,23 @@ tr.weekrow.active td{outline:2px solid var(--green);outline-offset:-2px}
     <button id="cal-btn"><span class="ic">📅</span>חגים ולוח</button>
     <button id="me-btn"><span class="ic">👤</span>אזור אישי והגדרות</button>
     <button id="help-btn"><span class="ic">📖</span>הוראות</button>
-    <button id="settings-btn" class="hidden lx-admin"><span class="ic">⚙️</span>הגדרות מנהל</button>
     <button id="theme-btn"><span class="ic">🌓</span>מצב תצוגה</button>
     <button id="logout-btn"><span class="ic">🚪</span>יציאה</button>
+  </div>
+
+  <div id="admin-wrap" class="hidden">
+    <div class="adm-title">🛡️ ניהול יומי</div>
+    <div class="launcher adminbar" id="admin-bar">
+      <button data-adm="approve"><span class="ic">✅</span>אישורים</button>
+      <button data-adm="board"><span class="ic">📋</span>לוח עובדים</button>
+      <button data-adm="live"><span class="ic">🟢</span>בזמן אמת</button>
+      <button data-adm="users"><span class="ic">👥</span>עובדים</button>
+      <button data-adm="schedule"><span class="ic">🗓️</span>לוח משמרות</button>
+      <button data-adm="reports"><span class="ic">🛠️</span>דיווחים</button>
+      <button data-adm="inbox"><span class="ic">✉️</span>הודעות</button>
+      <button data-adm="announce"><span class="ic">📢</span>הודעה לעובדים</button>
+      <button id="settings-btn" class="hidden lx-admin"><span class="ic">⚙️</span>הגדרות מנהל</button>
+    </div>
   </div>
 
   <div id="announce" class="announce hidden"></div>
@@ -662,6 +681,10 @@ const DB = {
     if (DEMO) return this.demoSave();
     const { id, ...data } = s;
     await fb.f.setDoc(fb.f.doc(fb.db, "shifts", viewEmail, "items", id), data);
+    if (globalCfg.gps && !isAdmin && s.date === ymd(today)) {
+      const need = []; if (s.in && s.in !== old?.in) need.push("geoIn"); if (s.out && s.out !== old?.out) need.push("geoOut");
+      if (need.length) geoNow().then(g => { if (!g) return; const cur0 = shifts.get(id); if (!cur0) return; const add = {}; need.forEach(k => add[k] = g); shifts.set(id, { ...cur0, ...add }); fb.f.setDoc(fb.f.doc(fb.db, "shifts", viewEmail, "items", id), add, { merge: true }).catch(() => {}); });
+    }
   },
   async delShift(id){
     const old = shifts.get(id); if (old && !isAdmin && isLocked(old.date)) throw new Error("החודש נעול על ידי המנהל – אי אפשר לשנות");
@@ -787,7 +810,10 @@ async function openReceipts(){
     <hr style="margin:14px 0;border:0;border-top:1px solid var(--line)">
     <div class="frow"><label>הצג</label><select id="rc-month"></select>${isAdmin ? `<select id="rc-fapt"><option value="">כל הדירות</option></select>` : ""}</div>
     <div id="rc-sum"></div>
+    ${isAdmin ? `<div id="rc-budget"></div>` : ""}
     <div class="rcp-chart"><canvas id="rc-chart"></canvas></div>
+    ${isAdmin ? `<details class="card" style="padding:8px 12px;margin:8px 0"><summary><b>🔎 השוואת מחירים</b> <span class="muted">– כמה עולה אותו מוצר בכל דירה</span></summary>
+      <div class="frow" style="margin-top:8px"><input id="rc-q" placeholder="מה לחפש? למשל: נייר טואלט, חלב, מצעים" style="flex:1"></div><div id="rc-cmp" class="muted">כתוב שם של מוצר (כפי שהעובדים כותבים ב"מה קנו").</div></details>` : ""}
     <div class="frow"><button class="b-excel" id="rc-xlsx">📊 ייצוא לאקסל</button><button class="b-red" id="rc-pdf">📄 PDF עם תמונות</button></div>
     <div id="rc-list">טוען...</div>`);
   let img = "", all = [], cur_list = [], cur_label = "";
@@ -800,7 +826,8 @@ async function openReceipts(){
     const amt = m.querySelector("#rc-amount"), st = m.querySelector("#rc-ocr");
     if (!amt.value) {
       st.textContent = "🔍 מזהה את הסכום מהקבלה...";
-      try { const v = await ocrAmount(img); if (v && !amt.value) { amt.value = v.toFixed(2); st.innerHTML = `<span class="up">✔ זוהה ${money(v)} – בדוק שזה נכון</span>`; } else if (!v) st.textContent = "לא הצלחתי לזהות סכום – כתוב אותו ידנית"; }
+      try { const v = await ocrAmount(img); const dd = m.querySelector("#rc-date"); if (ocrAmount.lastDate && dd.value === ymd(today) && ocrAmount.lastDate !== dd.value) { dd.value = ocrAmount.lastDate; }
+        if (v && !amt.value) { amt.value = v.toFixed(2); st.innerHTML = `<span class="up">✔ זוהה ${money(v)}${ocrAmount.lastDate ? ` · תאריך ${ocrAmount.lastDate.split("-").reverse().join("/")}` : ""} – בדוק שזה נכון</span>`; } else if (!v) st.textContent = "לא הצלחתי לזהות סכום – כתוב אותו ידנית"; }
       catch (e) { st.textContent = "זיהוי אוטומטי לא זמין – כתוב את הסכום ידנית"; }
     }
   };
@@ -843,6 +870,10 @@ async function openReceipts(){
       ${rows.length ? `<table class="rcp-table"><thead><tr><th>דירה</th><th>${esc(mLabel)}</th>${isAdmin && mv !== "all" ? "<th>תקציב חודשי</th>" : ""}<th>סה״כ כל החודשים</th></tr></thead><tbody>${rows.map(([a, o]) => { const b = +((globalCfg.apartments || []).find(x => x.name === a)?.budget) || 0;
         return `<tr><td>🏠 ${esc(a)}</td><td>${money(o.month)} <span class="muted">(${o.n})</span></td>${isAdmin && mv !== "all" ? `<td>${b ? `${money(b)} · ${o.month > b ? `<span class="rcp-over">⚠️ חריגה של ${money(o.month - b)}</span>` : `<span class="up">נשאר ${money(b - o.month)}</span>`}` : `<span class="muted">לא הוגדר</span>`}</td>` : ""}<td>${money(o.all)}</td></tr>`; }).join("")}</tbody></table>` : ""}`;
     drawRcpChart(m.querySelector("#rc-chart"), all.filter(r => !fv || r.apt === fv));
+    const bb = m.querySelector("#rc-budget");
+    if (bb) { const apts = (globalCfg.apartments || []).filter(a => +a.budget > 0 && (!fv || a.name === fv));
+      bb.innerHTML = mv !== "all" && apts.length ? `<h4>💰 תקציב ${esc(mLabel)}</h4>` + apts.map(a => { const sp = (byApt[a.name] || {}).month || 0, b = +a.budget, pc = Math.round(sp / b * 100), col = pc > 100 ? "#d64545" : pc > 80 ? "#e6a100" : "#2b8a4a";
+        return `<div style="margin-bottom:6px"><div class="frow" style="margin:0;justify-content:space-between"><span>🏠 ${esc(a.name)}</span><span>${money(sp)} מתוך ${money(b)} · <b style="color:${col}">${pc}%</b></span></div><div class="bbar"><i style="width:${Math.min(pc, 100)}%;background:${col}"></i></div></div>`; }).join("") : ""; }
     cur_list = list; cur_label = `${mLabel}${fv ? " - " + fv : ""}`;
     m.querySelector("#rc-list").innerHTML = list.length ? list.map(r => `<div class="list-item rcp-item">
       <img class="rcp-thumb" src="${r.img}" data-full="${r.id}" alt="קבלה" title="לחץ להגדלה">
@@ -852,6 +883,16 @@ async function openReceipts(){
       ${isAdmin || r.from === me ? `<button class="iconbtn mini" data-rdel="${r.id}" title="מחק">🗑️</button>` : ""}</div>`).join("") : `<div class="muted">אין קבלות ב${esc(mLabel)}</div>`;
   };
   msel.onchange = draw; if (fsel) fsel.onchange = draw;
+  const qIn = m.querySelector("#rc-q");
+  if (qIn) qIn.oninput = () => {
+    const q = qIn.value.trim(), box = m.querySelector("#rc-cmp"); if (q.length < 2) { box.innerHTML = `כתוב שם של מוצר (כפי שהעובדים כותבים ב"מה קנו").`; return; }
+    const hit = all.filter(r => (r.note || "").includes(q)).sort((a, b) => b.date.localeCompare(a.date));
+    if (!hit.length) { box.innerHTML = `לא נמצאו קבלות עם "${esc(q)}".`; return; }
+    const g = {}; hit.forEach(r => { const o = g[r.apt] || (g[r.apt] = []); o.push(+r.amount || 0); });
+    const st = Object.entries(g).map(([a, l]) => ({ a, n: l.length, avg: l.reduce((x, y) => x + y, 0) / l.length, min: Math.min(...l), max: Math.max(...l) })).sort((x, y) => x.avg - y.avg);
+    box.innerHTML = `<table class="rcp-table"><thead><tr><th>דירה</th><th>ממוצע</th><th>הכי זול</th><th>הכי יקר</th><th>קבלות</th></tr></thead><tbody>${st.map((x, i) => `<tr><td>${i === 0 && st.length > 1 ? "🏆 " : ""}🏠 ${esc(x.a)}</td><td><b>${money(x.avg)}</b></td><td>${money(x.min)}</td><td>${money(x.max)}</td><td>${x.n}</td></tr>`).join("")}</tbody></table>
+      <div class="muted" style="margin-top:6px">אחרונות:</div>${hit.slice(0, 15).map(r => `<div class="list-item"><span>${r.date.split("-").reverse().join("/")} · 🏠 ${esc(r.apt)} · ${esc(r.note)}</span><b>${money(+r.amount || 0)}</b></div>`).join("")}`;
+  };
   m.querySelector("#rc-xlsx").onclick = () => exportReceipts(cur_list, cur_label, "xlsx").catch(e => toast("שגיאה: " + e.message));
   m.querySelector("#rc-pdf").onclick = () => exportReceipts(cur_list, cur_label, "pdf").catch(e => toast("שגיאה: " + e.message));
   m.querySelector("#rc-list").onclick = async e => {
@@ -1107,6 +1148,77 @@ async function tabApprove(body){
 }
 
 // ---- מנהל: יומן שינויים ----
+// ================== דוחות וייצוא חכם ==================
+async function buildReport(y, m){
+  const team = await loadTeam(), mk = monthKey(y, m);
+  const rows = team.filter(x => x.u.email !== ADMIN || memberMonth(x, y, m).h > 0).map(mem => ({ name: mem.u.name || mem.u.email, apt: mem.u.apt || "", r: memberMonth(mem, y, m) }));
+  let rc = []; try { rc = (await RCP.list()).filter(r => r.month === mk); } catch (e) {}
+  const byApt = {}; rc.forEach(r => { byApt[r.apt] = (byApt[r.apt] || 0) + (+r.amount || 0); });
+  const tot = rows.reduce((a, x) => ({ h: a.h + x.r.h, pay: a.pay + x.r.total, days: a.days + x.r.days, nights: a.nights + x.r.p.nights }), { h: 0, pay: 0, days: 0, nights: 0 });
+  return { y, m, rows, byApt, rcTotal: rc.reduce((a, r) => a + (+r.amount || 0), 0), rcN: rc.length, tot };
+}
+function reportText(R){
+  return `דוח חודשי – ${MONTHS[R.m]} ${R.y}\n\n👥 עובדים (${R.rows.length}):\n` + R.rows.map(x => `• ${x.name}${x.apt ? " (" + x.apt + ")" : ""}: ${x.r.h.toFixed(2)} שעות, ${x.r.days} ימים, ${x.r.p.nights} לילות – ${money(x.r.total)}${x.r.extra ? " (כולל תוספות " + money(x.r.extra) + ")" : ""}${x.r.signed ? " ✔ חתם" : ""}`).join("\n")
+    + `\n\nסה"כ: ${R.tot.h.toFixed(2)} שעות · ${R.tot.days} ימי עבודה · ${R.tot.nights} לילות · שכר ${money(R.tot.pay)}`
+    + `\n\n🧾 קניות לדירות (${R.rcN} קבלות, ${money(R.rcTotal)}):\n` + (Object.entries(R.byApt).map(([a, v]) => `• ${a}: ${money(v)}`).join("\n") || "אין קבלות");
+}
+async function printReport(y, m){
+  const w = window.open("", "_blank"); if (!w) return toast("הדפדפן חסם חלון חדש – אפשר חלונות קופצים");
+  w.document.write(`<p style="font-family:Arial;padding:30px">מכין את הדוח...</p>`);
+  const R = await buildReport(y, m), maxH = Math.max(1, ...R.rows.map(x => x.r.h)), maxP = Math.max(1, ...R.rows.map(x => x.r.total));
+  const bar = (v, mx, c) => `<div style="background:#eef2f8;border-radius:5px;height:12px;width:100%"><div style="width:${Math.round(v / mx * 100)}%;height:12px;border-radius:5px;background:${c}"></div></div>`;
+  const aptsB = (globalCfg.apartments || []).reduce((o, a) => (o[a.name] = +a.budget || 0, o), {});
+  w.document.open(); w.document.write(`<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"><title>דוח ${MONTHS[m]} ${y}</title><style>
+    body{font-family:Arial,Helvetica,sans-serif;color:#14213d;max-width:900px;margin:0 auto;padding:24px}h1{margin:0 0 4px}h2{margin:26px 0 8px;font-size:18px;border-bottom:2px solid #0f2542;padding-bottom:4px}
+    .k{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}.k div{background:#f2f5fa;border-radius:10px;padding:10px;text-align:center}.k b{display:block;font-size:22px;margin-top:4px}
+    table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:6px 8px;border-bottom:1px solid #dde3ec;text-align:right;vertical-align:middle}th{background:#0f2542;color:#fff}
+    .muted{color:#5b6b82;font-size:12px}.pb{margin:14px 0}button{padding:10px 18px;font-size:15px;border-radius:8px;border:0;background:#0f2542;color:#fff;cursor:pointer}
+    @media print{.noprint{display:none}body{padding:0}}</style></head><body>
+    <div class="noprint pb"><button onclick="print()">🖨️ הדפס / שמור כ-PDF</button></div>
+    <h1>📊 דוח חודשי – ${MONTHS[m]} ${y}</h1><div class="muted">הופק ב-${new Date().toLocaleString("he-IL")} · מערכת "אברהם"</div>
+    <div class="k"><div>👥 עובדים<b>${R.rows.length}</b></div><div>🕒 שעות<b>${fmtHM(R.tot.h)}</b></div><div>💰 שכר<b>${money(R.tot.pay)}</b></div><div>🧾 קניות<b>${money(R.rcTotal)}</b></div></div>
+    <h2>👥 שעות ושכר לפי עובד</h2><table><thead><tr><th>עובד</th><th>דירה</th><th>ימים</th><th>שעות</th><th style="width:22%"></th><th>לילות</th><th>שכר</th><th style="width:18%"></th><th>חתם</th></tr></thead><tbody>
+    ${R.rows.map(x => `<tr><td><b>${esc(x.name)}</b></td><td>${esc(x.apt)}</td><td>${x.r.days}</td><td>${fmtHM(x.r.h)}</td><td>${bar(x.r.h, maxH, "#2f6fd6")}</td><td>${x.r.p.nights}</td><td><b>${money(x.r.total)}</b></td><td>${bar(x.r.total, maxP, "#2b8a4a")}</td><td>${x.r.signed ? "✔" : "—"}</td></tr>`).join("")}
+    <tr><td><b>סה"כ</b></td><td></td><td>${R.tot.days}</td><td><b>${fmtHM(R.tot.h)}</b></td><td></td><td>${R.tot.nights}</td><td><b>${money(R.tot.pay)}</b></td><td></td><td></td></tr></tbody></table>
+    <h2>🧾 קניות לדירות</h2>${Object.keys(R.byApt).length ? `<table><thead><tr><th>דירה</th><th>הוצאה</th><th>תקציב</th><th style="width:35%"></th></tr></thead><tbody>${Object.entries(R.byApt).sort((a, b) => b[1] - a[1]).map(([a, v]) => { const b = aptsB[a] || 0, c = b && v > b ? "#d64545" : "#2b8a4a"; return `<tr><td>🏠 ${esc(a)}</td><td><b>${money(v)}</b></td><td>${b ? money(b) : "—"}</td><td>${b ? bar(Math.min(v, b), b, c) + `<span class="muted">${Math.round(v / b * 100)}%</span>` : ""}</td></tr>`; }).join("")}</tbody></table>` : `<div class="muted">אין קבלות בחודש הזה.</div>`}
+    <div class="muted" style="margin-top:30px">חתימת המנהל: ____________________</div></body></html>`); w.document.close();
+}
+async function sendAccountant(y, m, silent){
+  const A = globalCfg.accountant || {}; if (!A.email) { if (!silent) toast("קודם תכתוב את המייל של מנהל החשבונות ותשמור"); return false; }
+  const R = await buildReport(y, m);
+  emailjs.init(CFG.emailjs.key);
+  await emailjs.send(CFG.emailjs.service, CFG.emailjs.template, { from_name: CFG.senderName, reply_to: CFG.senderEmail, to_email: A.email, name: A.name || A.email, to_name: A.email,
+    subject: `דוח שעות, שכר והוצאות – ${MONTHS[m]} ${y}`, message: `שלום ${A.name || ""},\n\nמצורף הדוח החודשי:\n\n${reportText(R)}\n\nבברכה,\n${CFG.senderName}` });
+  LOG.add(me, `שלח דוח ${MONTHS[m]} ${y} למנהל החשבונות`);
+  return true;
+}
+async function maybeAccountant(){
+  const A = globalCfg.accountant || {}; if (!isAdmin || DEMO || !A.auto || !A.email) return;
+  const pm = new Date(today.getFullYear(), today.getMonth() - 1, 1), key = monthKey(pm.getFullYear(), pm.getMonth()); if (A.lastSent === key) return;
+  globalCfg.accountant = { ...A, lastSent: key }; await DB.putGlobal();
+  try { if (await sendAccountant(pm.getFullYear(), pm.getMonth(), true)) toast(`📧 דוח ${MONTHS[pm.getMonth()]} נשלח למנהל החשבונות`); } catch (e) { console.warn(e); }
+}
+async function tabReportsX(body){
+  const A = globalCfg.accountant || {};
+  body.innerHTML = `<div class="frow"><label>חודש</label><input type="month" id="rx-month" value="${cur.y}-${String(cur.m + 1).padStart(2, "0")}"></div>
+    <h4>🖨️ דוח ויזואלי</h4><div class="muted" style="margin-bottom:6px">דוח מעוצב עם גרפים: שעות ושכר לכל עובד, וקניות לכל דירה מול התקציב. מדפיסים או שומרים כ-PDF.</div>
+    <div class="frow"><button class="b-blue" id="rx-print">🖨️ פתח דוח חודשי מעוצב</button></div>
+    <h4>📊 ייצוא לאקסל</h4><div class="frow"><button class="b-excel" id="rx-pay">📊 אקסל שכר לכל העובדים</button><button class="b-excel" id="rx-year">📅 דוח שנתי (אקסל)</button></div>
+    <h4>📧 מנהל חשבונות – בלחיצה אחת</h4>
+    <div class="frow"><input id="rx-acc" type="email" value="${esc(A.email || "")}" placeholder="המייל של מנהל החשבונות" style="flex:1.4"><input id="rx-accname" value="${esc(A.name || "")}" placeholder="שם (לא חובה)" style="flex:1"></div>
+    <div class="frow"><label style="min-width:auto;display:flex;gap:6px;align-items:center"><input type="checkbox" id="rx-auto" style="width:auto" ${A.auto ? "checked" : ""}> לשלוח לו אוטומטית בתחילת כל חודש את הדוח של החודש שעבר</label></div>
+    <div class="frow"><button class="b-green" id="rx-save">💾 שמור</button><button class="b-purple" id="rx-send">📧 שלח עכשיו את הדוח של החודש שבחרת</button></div>
+    <div id="rx-msg" class="msg"></div>`;
+  const ym = () => { const [y, mm] = body.querySelector("#rx-month").value.split("-").map(Number); return [y || cur.y, (mm || cur.m + 1) - 1]; };
+  body.querySelector("#rx-print").onclick = () => { const [y, mm] = ym(); printReport(y, mm).catch(e => toast("שגיאה: " + e.message)); };
+  body.querySelector("#rx-pay").onclick = async () => { const [y, mm] = ym(); exportPayroll(await loadTeam(), y, mm); };
+  body.querySelector("#rx-year").onclick = async () => { const [y] = ym(); exportYear(await loadTeam(), y); };
+  body.querySelector("#rx-save").onclick = async () => { if (DEMO) return toast("לא זמין במצב הדגמה");
+    globalCfg.accountant = { ...(globalCfg.accountant || {}), email: norm(body.querySelector("#rx-acc").value), name: body.querySelector("#rx-accname").value.trim(), auto: body.querySelector("#rx-auto").checked };
+    await DB.putGlobal(); setMsg("rx-msg", "נשמר ✔", true); };
+  body.querySelector("#rx-send").onclick = async () => { if (DEMO) return toast("לא זמין במצב הדגמה"); const [y, mm] = ym(); const b = body.querySelector("#rx-send"); b.disabled = true;
+    try { if (await sendAccountant(y, mm)) setMsg("rx-msg", `הדוח של ${MONTHS[mm]} ${y} נשלח ✔`, true); } catch (e) { setMsg("rx-msg", "השליחה נכשלה: " + (e.text || e.message), false); } b.disabled = false; };
+}
 let liveUnsubs = [], liveFilter = "";
 const ago = t => { const s = Math.round((Date.now() - t) / 1000); return s < 60 ? "עכשיו" : s < 3600 ? `לפני ${Math.round(s / 60)} דק׳` : s < 86400 ? `לפני ${Math.round(s / 3600)} שע׳` : new Date(t).toLocaleString("he-IL", { day: "numeric", month: "numeric", hour: "2-digit", minute: "2-digit" }); };
 async function tabLive(body){
@@ -1182,6 +1294,9 @@ function signHtml(){
 async function ocrAmount(img){
   await loadScript("https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js");
   const { data } = await Tesseract.recognize(img, "eng");
+  ocrAmount.lastDate = "";
+  try { const dm = (data.text || "").match(/(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{2,4})/);
+    if (dm) { let y = +dm[3]; if (y < 100) y += 2000; const d = new Date(y, +dm[2] - 1, +dm[1]), age = (Date.now() - d) / 864e5; if (!isNaN(d) && age >= -1 && age <= 120) ocrAmount.lastDate = ymd(d); } } catch (e) {}
   const txt = (data.text || "").replace(/(\d)\s*[,.]\s*(\d{2})(?!\d)/g, "$1.$2");
   const nums = (txt.match(/\d{1,5}\.\d{2}(?!\d)/g) || []).map(Number).filter(n => n > 0 && n < 50000);
   if (!nums.length) return null;
@@ -1235,7 +1350,7 @@ function openHelp(){
     sign: goTable("#month-sum"), dash: () => { closeModal(); $("dash").open = true; renderCharts(); goTable("#dash")(); }, launcher: goTable("#launcher"),
     excel: () => { closeModal(); exportExcel().catch(e => toast(e.message)); }, pdf: () => { closeModal(); exportPDF().catch(e => toast(e.message)); }
   };
-  ["approve", "board", "reports", "users", "blocked", "live", "schedule", "apts", "inbox", "adj", "rates", "announce", "log", "backup"].forEach(t => GO["s_" + t] = () => openSettings(t));
+  ["approve", "board", "reports", "users", "blocked", "live", "reportsx", "schedule", "apts", "inbox", "adj", "rates", "announce", "log", "backup"].forEach(t => GO["s_" + t] = () => openSettings(t));
   const W = [
     ["🧭 המסך הראשי – איך הוא בנוי", `למעלה: השם, התאריך (לועזי ועברי) והשעון. מתחתיו <b>קוביות</b> – כל קובייה פותחת חלון: הוספת משמרת, שעות קבועות, קבלות, הדירה שלי, דיווח לדירה, הודעה למנהל, הנתונים שלי, חגים ולוח, אזור אישי והגדרות, הוראות, מצב תצוגה ויציאה. מתחת לקוביות: הודעות חשובות (צהוב/כחול), "📈 גרפים ונתונים" שאפשר לקפל, ובסוף – טבלת החודש.`, "launcher", "לקוביות"],
     ["🕒 רישום שעות בטבלה", `לכל יום בחודש יש שורה. כותבים שעת כניסה ויציאה (למשל 0800 → 08:00) – נשמר לבד. <b>⚡ שעות</b> – ממלא את השעות הקבועות של אותו יום בשבוע. <b>🗓️ לפי הלוח</b> – מופיע ביום שהמנהל תכנן לך משמרת, וממלא בדיוק לפי הלוח. <b>+</b> – עוד משמרת באותו יום (למשל משמרת מפוצלת). <b>✕ איפוס</b> – מנקה את השורה. <b>X</b> – מוחק (ויש "↩ בטל" לכמה שניות). בסוף כל שבוע – סיכום שבועי, ובסוף החודש – סיכום חודשי.`, "table", "לטבלה"],
@@ -1413,6 +1528,15 @@ function openCal(){
 }
 
 // ================== הדירה שלי ==================
+// ---- מיקום GPS (אופציונלי) ----
+function geoNow(){ return new Promise(res => { if (!navigator.geolocation) return res(null); navigator.geolocation.getCurrentPosition(p => res({ lat: +p.coords.latitude.toFixed(5), lng: +p.coords.longitude.toFixed(5), acc: Math.round(p.coords.accuracy), at: Date.now() }), () => res(null), { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 }); }); }
+function distM(a, b){ const R = 6371000, t = x => x * Math.PI / 180, dLa = t(b.lat - a.lat), dLo = t(b.lng - a.lng); const h = Math.sin(dLa / 2) ** 2 + Math.cos(t(a.lat)) * Math.cos(t(b.lat)) * Math.sin(dLo / 2) ** 2; return 2 * R * Math.asin(Math.sqrt(h)); }
+function geoBadge(g, aptName, label){
+  if (!g) return ""; const ap = aptObj(aptName), map = `https://maps.google.com/?q=${g.lat},${g.lng}`;
+  if (ap && ap.lat) { const d = distM(g, ap), ok = d <= (+globalCfg.gpsRadius || 250), t = d >= 1000 ? (d / 1000).toFixed(1) + ' ק"מ' : Math.round(d) + " מ׳";
+    return `<a href="${map}" target="_blank" rel="noopener" class="${ok ? "up" : "down"}" title="דיוק ±${g.acc} מ׳">📍 ${label}: ${ok ? "בדירה ✔" : t + " מהדירה ⚠️"}</a>`; }
+  return `<a href="${map}" target="_blank" rel="noopener" title="דיוק ±${g.acc} מ׳">📍 ${label}: מיקום</a>`;
+}
 function aptObj(name){ return (globalCfg.apartments || []).find(a => a.name === name) || null; }
 function openAptCard(){
   const name = myApt(), a = aptObj(name), ds = ymd(today);
@@ -1573,7 +1697,7 @@ function renderTable(){
       html += `<td><input type="text" class="tm" inputmode="numeric" maxlength="5" placeholder="--:--" autocomplete="off" data-f="out" value="${s ? esc(s.out) : ""}"${dis}></td>`;
       html += `<td class="hours" data-hours>${hoursCell(s)}</td>`;
       if (i === 0) html += `<td class="daytotal" rowspan="${n}" data-daytotal="${ds}">${hoursOnDate(ds) ? fmtHM(hoursOnDate(ds)) : ""}</td>`;
-      html += `<td><input class="loc" list="loc-list" data-f="location" value="${esc(s && s.location ? s.location : defLoc)}" placeholder="דירה / מיקום"${dis}></td>`;
+      html += `<td><input class="loc" list="loc-list" data-f="location" value="${esc(s && s.location ? s.location : defLoc)}" placeholder="דירה / מיקום"${dis}>${isAdmin && s && (s.geoIn || s.geoOut) ? `<div class="geo">${geoBadge(s.geoIn, s.location || defLoc, "כניסה")} ${geoBadge(s.geoOut, s.location || defLoc, "יציאה")}</div>` : ""}</td>`;
       html += `<td><div class="notecell">${i === 0 && plan.length ? `<span class="planbadge" title="${esc(plan.map(p => p.note).filter(Boolean).join(" · "))}">🗓️ מתוכנן ${plan.map(p => `${rng(p.in, p.out)}${p.location ? " · " + esc(p.location) : ""}`).join(", ")}</span>` : ""}${i === 0 && notes.length ? `<span class="holtxt">${esc(notes.map(x => x.text).join(" · "))}</span>` : ""}<input class="note" data-f="notes" value="${s ? esc(s.notes) : ""}" placeholder=""${dis}></div></td>`;
       html += lk ? `<td><span class="muted">🔒 נעול</span></td></tr>` : `<td><div class="rowacts">
         ${plan.length ? `<button class="mini apv" data-act="plan" title="מלא לפי לוח המשמרות">🗓️ לפי הלוח</button>` : `<button class="mini fixb" data-act="fixed" title="מלא שעות קבועות ליום ${DAYS[d.getDay()]}">⚡ שעות</button>`}
@@ -2081,17 +2205,24 @@ function openMe(){
 
 // ---- הגדרות מנהל ----
 let settingsTab = "board";
+const ADM_DAILY = { approve: "✅ אישורים והתראות", board: "📋 לוח עובדים", live: "🟢 בזמן אמת", users: "👥 עובדים", schedule: "🗓️ לוח משמרות", reports: "🛠️ דיווחים מהדירות", inbox: "✉️ הודעות מהעובדים", announce: "📢 הודעה לעובדים" };
+const ADM_SETTINGS = [["apts", "🏠 דירות ומיקום"], ["rates", "💰 תעריפים"], ["adj", "🎁 תוספות ובונוסים"], ["reportsx", "📊 דוחות וייצוא"], ["backup", "☁️ גיבוי"], ["blocked", "⛔ חסומים ושחזור"], ["log", "📜 יומן שינויים"]];
 function openSettings(tab){
   if (!isAdmin) return toast("ההגדרות פתוחות למנהל בלבד");
-  if (tab) settingsTab = tab; else if (adminAlerts.pending + adminAlerts.swaps + adminAlerts.alerts.length) settingsTab = "approve";
-  const T = [["approve",`✅ אישורים והתראות${adminAlerts.pending + adminAlerts.swaps + adminAlerts.alerts.length ? ` (${adminAlerts.pending + adminAlerts.swaps + adminAlerts.alerts.length})` : ""}`],["board","📋 לוח עובדים"],["reports",`🛠️ דיווחים${adminAlerts.reports ? ` (${adminAlerts.reports})` : ""}`],["users","👥 עובדים ותעריפים"],["blocked","⛔ חסומים ושחזור"],["schedule","🗓️ לוח משמרות"],["apts","🏠 דירות"],["inbox",`✉️ הודעות${adminAlerts.unread ? ` (${adminAlerts.unread})` : ""}`],["adj","🎁 תוספות ובונוסים"],["rates","💰 תעריפים"],["announce","📢 הודעה לעובדים"],["live","🟢 בזמן אמת"],["log","📜 יומן שינויים"],["backup","☁️ גיבוי ודוחות"]];
-  const m = modal(`<h3>⚙️ הגדרות מנהל ${closeX}</h3>
-    <div class="tabs">${T.map(([k, n]) => `<button data-tab="${k}" class="${k === settingsTab ? "on" : ""}">${n}</button>`).join("")}</div>
-    <div id="tab-body"></div>`);
+  if (!tab) tab = ADM_SETTINGS.some(a => a[0] === settingsTab) ? settingsTab : "apts";
+  settingsTab = tab;
+  const F = { approve: tabApprove, reports: tabReports, log: tabLog, users: tabUsers, blocked: tabBlocked, live: tabLive, board: tabBoard, schedule: tabSchedule, apts: tabApts, inbox: tabInbox, adj: tabAdj, rates: tabRates, backup: tabBackup, announce: tabAnnounce, reportsx: tabReportsX };
+  let m;
+  if (ADM_DAILY[tab]) m = modal(`<h3>${ADM_DAILY[tab]} ${closeX}</h3><div id="tab-body"></div>`);
+  else {
+    m = modal(`<h3>⚙️ הגדרות מנהל ${closeX}</h3>
+      <div class="muted" style="margin:-4px 0 8px;font-size:12.5px">כאן נמצאים דברים שלא צריך כל יום. הדברים היומיים נמצאים בסרגל "🛡️ ניהול יומי" במסך הראשי.</div>
+      <div class="tabs">${ADM_SETTINGS.map(([k, n]) => `<button data-tab="${k}" class="${k === tab ? "on" : ""}">${n}</button>`).join("")}</div>
+      <div id="tab-body"></div>`);
+    m.querySelectorAll("[data-tab]").forEach(b => b.onclick = () => openSettings(b.dataset.tab));
+  }
   m.classList.add("wide");
-  m.querySelectorAll("[data-tab]").forEach(b => b.onclick = () => openSettings(b.dataset.tab));
-  const body = m.querySelector("#tab-body");
-  ({ approve: tabApprove, reports: tabReports, log: tabLog, users: tabUsers, blocked: tabBlocked, live: tabLive, board: tabBoard, schedule: tabSchedule, apts: tabApts, inbox: tabInbox, adj: tabAdj, rates: tabRates, backup: tabBackup, announce: tabAnnounce })[settingsTab](body, m);
+  F[tab](m.querySelector("#tab-body"), m);
 }
 
 async function listUsers(){
@@ -2241,7 +2372,8 @@ async function adminScan(){
     let newUsers = 0; try { newUsers = (await listUsers()).filter(u => (u.selfSignup && !u.seen) || u.pending).length; } catch (e) {}
     adminAlerts = { alerts, pending, unread, reports, swaps, newUsers };
     const n = alerts.length + pending + unread + reports + swaps + newUsers;
-    $("settings-btn").innerHTML = `<span class="ic">⚙️</span>הגדרות מנהל${n ? `<span class="badge-n">${n}</span>` : ""}`;
+    const bd = (k, v) => { const b = document.querySelector(`[data-adm="${k}"]`); if (!b) return; b.querySelector(".badge-n")?.remove(); if (v) b.insertAdjacentHTML("beforeend", `<span class="badge-n">${v}</span>`); };
+    bd("approve", alerts.length + pending + swaps); bd("reports", reports); bd("inbox", unread); bd("users", newUsers);
     renderNotices();
   } catch (e) { console.warn("scan", e); }
 }
@@ -2416,7 +2548,10 @@ async function tabSchedule(body){
 // ================== ניהול דירות (מנהל) ==================
 function tabApts(body){
   const A = globalCfg.apartments || [];
-  body.innerHTML = `<div class="muted" style="margin-bottom:10px">רשימת כל הדירות עם הוראות קבועות. עובד שעובד בדירה רואה את ההוראות שלה בראש המסך. אפשר גם לשייך עובד לדירה מתאריך מסוים.</div>
+  body.innerHTML = `<div class="notice info" style="flex-direction:column;align-items:stretch;gap:6px;margin-bottom:10px"><label style="display:flex;gap:8px;align-items:center;font-weight:600"><input type="checkbox" id="gps-on" style="width:auto" ${globalCfg.gps ? "checked" : ""}> 📍 יומן נוכחות לפי מיקום (GPS) – אופציונלי</label>
+      <span class="muted" style="font-weight:400">כשזה דלוק, כשעובד רושם שעת כניסה או יציאה של היום, הטלפון שומר את המיקום שלו (אחרי שהעובד מאשר). בטבלת השעות שלו תראה "📍 בדירה ✔" או כמה רחוק הוא היה. כדי להשוות – קבע לכל דירה את המיקום שלה (כפתור "📍 קבע מיקום" כשאתה בדירה).</span>
+      <div class="frow" style="margin:0"><label style="min-width:auto">טווח "בדירה" (מטרים)</label><input type="number" id="gps-r" min="50" step="50" value="${esc(globalCfg.gpsRadius || 250)}" style="width:100px"><button class="mini add" id="gps-save">שמור</button></div></div>
+    <div class="muted" style="margin-bottom:10px">רשימת כל הדירות עם הוראות קבועות. עובד שעובד בדירה רואה את ההוראות שלה בראש המסך. אפשר גם לשייך עובד לדירה מתאריך מסוים.</div>
     <div id="ap-list">${A.length ? A.map((a, i) => `<div class="list-item" style="flex-direction:column;align-items:stretch" data-ap="${i}">
       <div class="frow" style="margin:0"><input class="ap-name" value="${esc(a.name)}" placeholder="שם הדירה" style="flex:1"><input class="ap-addr" value="${esc(a.address || "")}" placeholder="כתובת" style="flex:1"></div>
       <textarea class="ap-ins" rows="2" style="width:100%;margin-top:6px" placeholder="הוראות קבועות לדירה">${esc(a.instructions || "")}</textarea>
@@ -2424,7 +2559,7 @@ function tabApts(body){
       <div class="frow" style="margin:6px 0 0"><input class="ap-phone" value="${esc(a.phone || "")}" placeholder="📞 טלפון בדירה" style="flex:1" inputmode="tel"><input class="ap-info" value="${esc(a.info || "")}" placeholder="ℹ️ מידע: קוד כניסה, וויפי, איפה המפתח" style="flex:2"></div>
       <textarea class="ap-tasks" rows="3" style="width:100%;margin-top:6px" placeholder="✅ משימות יומיות לעובד – כל משימה בשורה (למשל: לנקות מטבח / להוציא זבל / לבדוק תרופות)">${esc(a.tasks || "")}</textarea>
       <input class="ap-sup" value="${esc(a.supplies || "")}" placeholder="🧴 רשימת ציוד לדירה, מופרד בפסיקים (ריק = רשימה רגילה)" style="width:100%;margin-top:6px">
-      <div class="frow" style="margin:6px 0 0"><button class="mini add ap-save">שמור</button><button class="mini del ap-del">מחק</button></div></div>`).join("") : `<div class="muted">עדיין אין דירות</div>`}</div>
+      <div class="frow" style="margin:6px 0 0"><button class="mini add ap-save">שמור</button><button class="mini fix ap-geo">📍 ${a.lat ? "עדכן מיקום (מוגדר ✔)" : "קבע מיקום – אני בדירה עכשיו"}</button>${a.lat ? `<a class="mini" target="_blank" rel="noopener" href="https://maps.google.com/?q=${a.lat},${a.lng}">🗺️ מפה</a>` : ""}<button class="mini del ap-del">מחק</button></div></div>`).join("") : `<div class="muted">עדיין אין דירות</div>`}</div>
     <h4>＋ דירה חדשה</h4>
     <div class="frow"><input id="ap-name" placeholder="שם הדירה, למשל ז'בוטינסקי 107" style="flex:1"><input id="ap-addr" placeholder="כתובת מלאה (לא חובה)" style="flex:1"></div>
     <textarea id="ap-ins" rows="2" style="width:100%" placeholder="הוראות קבועות, למשל: קוד כניסה 1234, תרופות בשעה 8:00, לסגור את הגז"></textarea>
@@ -2432,9 +2567,13 @@ function tabApts(body){
     <h4>🔗 שיוך עובד לדירה</h4>
     <div class="frow"><select id="as-user" style="flex:1"></select><select id="as-apt" style="flex:1">${A.map((a, i) => `<option value="${i}">${esc(a.name)}</option>`).join("")}</select><label style="min-width:auto">מתאריך</label><input type="date" id="as-from" value="${ymd(today)}"><button class="b-blue" id="as-go">שייך</button></div>`;
   const save = async () => { await DB.putGlobal(); renderAll(); tabApts(body); };
+  body.querySelector("#gps-on").onchange = async e => { if (DEMO) return toast("לא זמין במצב הדגמה"); globalCfg.gps = e.target.checked; await DB.putGlobal(); toast(globalCfg.gps ? "📍 רישום מיקום הופעל" : "רישום מיקום כובה"); };
+  body.querySelector("#gps-save").onclick = async () => { if (DEMO) return toast("לא זמין במצב הדגמה"); globalCfg.gpsRadius = +body.querySelector("#gps-r").value || 250; await DB.putGlobal(); toast("נשמר ✔"); };
   body.querySelectorAll("[data-ap]").forEach(row => {
     const i = +row.dataset.ap;
     row.querySelector(".ap-save").onclick = async () => { globalCfg.apartments[i] = { ...globalCfg.apartments[i], name: row.querySelector(".ap-name").value.trim(), address: row.querySelector(".ap-addr").value.trim(), instructions: row.querySelector(".ap-ins").value.trim(), budget: +row.querySelector(".ap-budget").value || 0, supplies: row.querySelector(".ap-sup").value.trim(), phone: row.querySelector(".ap-phone").value.trim(), info: row.querySelector(".ap-info").value.trim(), tasks: row.querySelector(".ap-tasks").value.trim() }; await save(); toast("הדירה נשמרה ✔"); };
+    row.querySelector(".ap-geo").onclick = async () => { if (DEMO) return toast("לא זמין במצב הדגמה"); toast("📍 מאתר את המיקום..."); const g = await geoNow(); if (!g) return toast("לא הצלחתי לקבל מיקום – אשר גישה למיקום בדפדפן");
+      globalCfg.apartments[i] = { ...globalCfg.apartments[i], lat: g.lat, lng: g.lng }; await save(); toast(`מיקום הדירה נשמר ✔ (דיוק ±${g.acc} מ׳)`); };
     row.querySelector(".ap-del").onclick = async () => { if (!confirm("למחוק את הדירה?")) return; globalCfg.apartments.splice(i, 1); await save(); };
   });
   body.querySelector("#ap-add").onclick = async () => {
@@ -2867,11 +3006,11 @@ async function openSystem(email, fallbackName){
   if (!settings.name && fallbackName) settings.name = fallbackName;
   updateHeader(); show("app"); setMonth(cur.y, cur.m); renderGreeting();
   if (!isAdmin && !DEMO) { LOG.add(email, `נכנס למערכת (${LIVE.device()})`); LIVE.start(); }
-  $("settings-btn").classList.toggle("hidden", !isAdmin);
+  $("settings-btn").classList.toggle("hidden", !isAdmin); $("admin-wrap").classList.toggle("hidden", !isAdmin); ["apt-btn", "rep-btn"].forEach(id => $(id).classList.toggle("hidden", isAdmin));
   $("msg-btn").classList.toggle("hidden", isAdmin);
   startNotify();
   if (RCP_MODE) openReceiptsPage();
-  if (isAdmin) { clearInterval(openSystem._iv); openSystem._iv = setInterval(adminScan, 5 * 60000); fillUserSwitcher(); setTimeout(maybeAutoBackup, 4000); setTimeout(maybeMonthlyReport, 9000); adminScan(); }
+  if (isAdmin) { clearInterval(openSystem._iv); openSystem._iv = setInterval(adminScan, 5 * 60000); fillUserSwitcher(); setTimeout(maybeAutoBackup, 4000); setTimeout(maybeMonthlyReport, 9000); setTimeout(maybeAccountant, 14000); adminScan(); }
 }
 function updateHeader(){
   $("who-name").textContent = settings.name || viewEmail;
@@ -3131,6 +3270,7 @@ function wire(){
   $("pdf-btn").onclick = () => exportPDF().catch(e => toast("שגיאה ב-PDF: " + e.message));
   $("excel-btn").onclick = () => exportExcel().catch(e => toast("שגיאה באקסל: " + e.message));
   $("settings-btn").onclick = () => openSettings();
+  document.querySelectorAll("[data-adm]").forEach(b => b.onclick = () => openSettings(b.dataset.adm));
   $("theme-btn").onclick = () => applyTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark");
   $("logout-btn").onclick = async () => { if (DEMO) { location.href = location.pathname; return; } await fb.a.signOut(fb.auth); $("login-password").value = ""; };
   $("view-user").onchange = async e => { await openSystem(e.target.value); toast("מוצגת המערכת של " + (settings.name || viewEmail)); };
