@@ -1203,7 +1203,7 @@ function openHelp(){
     sign: goTable("#month-sum"), dash: () => { closeModal(); $("dash").open = true; renderCharts(); goTable("#dash")(); }, launcher: goTable("#launcher"),
     excel: () => { closeModal(); exportExcel().catch(e => toast(e.message)); }, pdf: () => { closeModal(); exportPDF().catch(e => toast(e.message)); }
   };
-  ["approve", "board", "reports", "users", "schedule", "apts", "inbox", "adj", "rates", "announce", "log", "backup"].forEach(t => GO["s_" + t] = () => openSettings(t));
+  ["approve", "board", "reports", "users", "blocked", "schedule", "apts", "inbox", "adj", "rates", "announce", "log", "backup"].forEach(t => GO["s_" + t] = () => openSettings(t));
   const W = [
     ["🧭 המסך הראשי – איך הוא בנוי", `למעלה: השם, התאריך (לועזי ועברי) והשעון. מתחתיו <b>קוביות</b> – כל קובייה פותחת חלון: הוספת משמרת, שעות קבועות, קבלות, הדירה שלי, דיווח לדירה, הודעה למנהל, הנתונים שלי, חגים ולוח, אזור אישי והגדרות, הוראות, מצב תצוגה ויציאה. מתחת לקוביות: הודעות חשובות (צהוב/כחול), "📈 גרפים ונתונים" שאפשר לקפל, ובסוף – טבלת החודש.`, "launcher", "לקוביות"],
     ["🕒 רישום שעות בטבלה", `לכל יום בחודש יש שורה. כותבים שעת כניסה ויציאה (למשל 0800 → 08:00) – נשמר לבד. <b>⚡ שעות</b> – ממלא את השעות הקבועות של אותו יום בשבוע. <b>🗓️ לפי הלוח</b> – מופיע ביום שהמנהל תכנן לך משמרת, וממלא בדיוק לפי הלוח. <b>+</b> – עוד משמרת באותו יום (למשל משמרת מפוצלת). <b>✕ איפוס</b> – מנקה את השורה. <b>X</b> – מוחק (ויש "↩ בטל" לכמה שניות). בסוף כל שבוע – סיכום שבועי, ובסוף החודש – סיכום חודשי.`, "table", "לטבלה"],
@@ -1234,6 +1234,7 @@ function openHelp(){
     ["📋 לוח עובדים", `תמונת מצב של החודש הנבחר: למעלה – שעות הצוות, שכר כולל, קניות החודש, ממתינים לאישור וכמה חתמו. אחר כך התראות (עם ✔/✖/✏️), אקסל שכר לכל העובדים, דוח שנתי, 🏆 דירוג שעות, וטבלה לכל עובד: 📞/💬 טלפון ווואטסאפ, משימות שהושלמו היום, ימים, שעות, מתוכנן מול בוצע, לילות, שבת/חג, שכר, אישור, חתימה, ופעולות: פתח את המערכת שלו, 🧾 תלוש, 🔒 נעילה. למעלה: נעילת החודש לכולם, תלושים לכולם ושליחת סיכום במייל.`, "s_board", "ללוח עובדים"],
     ["🛠️ דיווחים", `תקלות (עם תמונה ו-🚨 דחוף) ורשימות "חסר ציוד" מהעובדים, ו🛒 רשימת קניות מרוכזת לכל דירה. כותבים תשובה ומסמנים "✔ טופל" / "✔ נקנה" – העובד רואה.`, "s_reports", "לדיווחים"],
     ["👥 עובדים ותעריפים", `הוספת עובד (שם, מייל, סיסמה) ומחיקה. לכל עובד: שם, 📞 טלפון, <b>🏠 הדירה שלו</b> (המשמרות, הקבלות והדיווחים שלו משויכים אליה אוטומטית מהיום), תעריף אישי (יום/לילה – ריק = כללי) ו🗒️ הערה פרטית שרק אתה רואה. למטה – יעד שעות חודשי.`, "s_users", "לעובדים"],
+    ["⛔ חסומים ושחזור", `כל מי שחסמת מופיע כאן. חסימה לא מוחקת שעות – לחיצה על <b>↩️ בטל חסימה</b> מחזירה את העובד עם הדירה, הטלפון והשעות שלו.`, "s_blocked", "לחסומים"],
     ["🗓️ לוח משמרות", `קובעים לכל עובד תאריך, שעות ודירה (אפשר חזרה כל שבוע ל-4 או 8 שבועות). משמרת שהעובד רושם לפי הלוח מאושרת לבד. למטה: טבלת כל הצוות לשבוע (חיצים לשבוע קודם/הבא), 📋 העתקת השבוע לשבוע הבא לכל הצוות, ו🧩 כיסוי דירות – אילו דירות בלי משמרת ב-7 הימים הקרובים.`, "s_schedule", "ללוח משמרות"],
     ["🏠 דירות", `לכל דירה: שם, כתובת, 📞 טלפון, ℹ️ מידע (קוד, וויפי, מפתח), הוראות קבועות (מופיעות לעובד בראש המסך), ✅ משימות יומיות (שורה לכל משימה), 💰 תקציב קניות חודשי (התראה כשעוברים אותו) ו🧴 רשימת ציוד לסימון. למטה – שיוך עובד לדירה מתאריך מסוים.`, "s_apts", "לדירות"],
     ["✉️ הודעות מעובדים", `הודעות שהעובדים שלחו לך. עונים, והעובד רואה את התשובה.`, "s_inbox", "להודעות"],
@@ -1572,7 +1573,8 @@ const noteOf = (k, f = "notes") => (settings[f] || {})[k] || "";
 // הוראות: המנהל כותב ב-notes, העובד כותב ב-wnotes. כל אחד עורך רק את שלו, ושניהם רואים את שתיהן.
 function noteHtml(k){
   const t = noteOf(k), u = noteOf(k, "wnotes"), mine = isAdmin ? "notes" : "wnotes", has = isAdmin ? t : u;
-  const locked = !isAdmin && isLocked(k.slice(0, 1) === "m" ? k.slice(2) + "-01" : k.slice(2));
+  const mf0 = monthRange(cur.y, cur.m)[0], dk = k.slice(0, 1) === "m" ? k.slice(2) + "-01" : (k.slice(2) < mf0 ? mf0 : k.slice(2));
+  const locked = !isAdmin && isLocked(dk);
   return `${t ? `<span class="wnote">📝 הוראות המנהל: ${esc(t)}</span>` : ""}${u ? `<span class="wnote wnote-w">🗒️ הוראות העובד: ${esc(u)}</span>` : ""}`
     + (locked ? "" : `<button class="notebtn" data-note="${k}" data-nf="${mine}">${has ? "✏️ ערוך הוראות" : "＋ הוסף הוראות"}</button>`);
 }
@@ -1664,7 +1666,9 @@ function refreshWeekRows(){
     const ws = parseYmd(td.dataset.weeksum), we = addDays(ws, 6), [mf, mt] = monthRange(cur.y, cur.m);
     const a = ymd(ws) < mf ? mf : ymd(ws), b = ymd(we) > mt ? mt : ymd(we);
     const h = hoursInRange(a, b), p = calcPay(shiftsInRange(a, b).filter(s => !s.rejected)), part = a !== ymd(ws) || b !== ymd(we);
-    td.innerHTML = `📖 סיכום שבועי${part ? ` <span class="muted" style="font-size:12px">(רק הימים של ${MONTHS[cur.m]})</span>` : ""}: ${h ? `&nbsp; <b>${h.toFixed(2)}</b> שעות (${fmtHM(h)}) &nbsp;·&nbsp; ${money(p.total)}${p.nights ? ` <span class="muted">(${p.nights} לילות)</span>` : ""}` : ""} ${noteHtml("w:" + td.dataset.weeksum)}`;
+    const pm = MONTHS[(cur.m + 11) % 12], nm = MONTHS[(cur.m + 1) % 12];
+    const why = part ? ` <span class="muted" style="font-size:12px" title="כך סכום כל השבועות שווה בדיוק לסיכום החודש">(${a !== ymd(ws) ? `השבוע התחיל ב${pm}` : `השבוע ממשיך ב${nm}`} – מוצגים רק הימים של ${MONTHS[cur.m]}, כדי שהסכום יתאים לסיכום החודש)</span>` : "";
+    td.innerHTML = `📖 סיכום שבועי${why}: ${h ? `&nbsp; <b>${h.toFixed(2)}</b> שעות (${fmtHM(h)}) &nbsp;·&nbsp; ${money(p.total)}${p.nights ? ` <span class="muted">(${p.nights} לילות)</span>` : ""}` : `<span class="muted">אין עדיין שעות בשבוע הזה</span>`} ${noteHtml("w:" + td.dataset.weeksum)}`;
   });
 }
 
@@ -2046,14 +2050,14 @@ let settingsTab = "board";
 function openSettings(tab){
   if (!isAdmin) return toast("ההגדרות פתוחות למנהל בלבד");
   if (tab) settingsTab = tab; else if (adminAlerts.pending + adminAlerts.swaps + adminAlerts.alerts.length) settingsTab = "approve";
-  const T = [["approve",`✅ אישורים והתראות${adminAlerts.pending + adminAlerts.swaps + adminAlerts.alerts.length ? ` (${adminAlerts.pending + adminAlerts.swaps + adminAlerts.alerts.length})` : ""}`],["board","📋 לוח עובדים"],["reports",`🛠️ דיווחים${adminAlerts.reports ? ` (${adminAlerts.reports})` : ""}`],["users","👥 עובדים ותעריפים"],["schedule","🗓️ לוח משמרות"],["apts","🏠 דירות"],["inbox",`✉️ הודעות${adminAlerts.unread ? ` (${adminAlerts.unread})` : ""}`],["adj","🎁 תוספות ובונוסים"],["rates","💰 תעריפים"],["announce","📢 הודעה לעובדים"],["log","📜 יומן שינויים"],["backup","☁️ גיבוי ודוחות"]];
+  const T = [["approve",`✅ אישורים והתראות${adminAlerts.pending + adminAlerts.swaps + adminAlerts.alerts.length ? ` (${adminAlerts.pending + adminAlerts.swaps + adminAlerts.alerts.length})` : ""}`],["board","📋 לוח עובדים"],["reports",`🛠️ דיווחים${adminAlerts.reports ? ` (${adminAlerts.reports})` : ""}`],["users","👥 עובדים ותעריפים"],["blocked","⛔ חסומים ושחזור"],["schedule","🗓️ לוח משמרות"],["apts","🏠 דירות"],["inbox",`✉️ הודעות${adminAlerts.unread ? ` (${adminAlerts.unread})` : ""}`],["adj","🎁 תוספות ובונוסים"],["rates","💰 תעריפים"],["announce","📢 הודעה לעובדים"],["log","📜 יומן שינויים"],["backup","☁️ גיבוי ודוחות"]];
   const m = modal(`<h3>⚙️ הגדרות מנהל ${closeX}</h3>
     <div class="tabs">${T.map(([k, n]) => `<button data-tab="${k}" class="${k === settingsTab ? "on" : ""}">${n}</button>`).join("")}</div>
     <div id="tab-body"></div>`);
   m.classList.add("wide");
   m.querySelectorAll("[data-tab]").forEach(b => b.onclick = () => openSettings(b.dataset.tab));
   const body = m.querySelector("#tab-body");
-  ({ approve: tabApprove, reports: tabReports, log: tabLog, users: tabUsers, board: tabBoard, schedule: tabSchedule, apts: tabApts, inbox: tabInbox, adj: tabAdj, rates: tabRates, backup: tabBackup, announce: tabAnnounce })[settingsTab](body, m);
+  ({ approve: tabApprove, reports: tabReports, log: tabLog, users: tabUsers, blocked: tabBlocked, board: tabBoard, schedule: tabSchedule, apts: tabApts, inbox: tabInbox, adj: tabAdj, rates: tabRates, backup: tabBackup, announce: tabAnnounce })[settingsTab](body, m);
 }
 
 async function listUsers(){
@@ -2969,7 +2973,7 @@ async function openUserCard(email){
     catch (e) { toast("שליחת המייל נכשלה: " + (e.text || e.message)); }
   };
   m.querySelector("#uc-view").onclick = () => { closeModal(); const sel = $("view-user"); if (sel && [...sel.options].some(o => o.value === email)) { sel.value = email; sel.dispatchEvent(new Event("change")); } else toast("אפשר לבחור אותו ברשימה למעלה"); };
-  m.querySelector("#uc-block").onclick = async () => { await blockUser(email, m); if (!$("modal-root").firstChild || !(await listUsers()).some(x => x.email === email)) openSettings("users"); };
+  m.querySelector("#uc-block").onclick = async () => { await blockUser(email, m); if (!(await listUsers()).some(x => x.email === email)) openSettings("blocked"); };
   m.querySelector("#uc-del").onclick = async () => { await deleteUser(email, m); if (!(await listUsers()).some(x => x.email === email)) openSettings("users"); };
 }
 async function blockUser(email, m){
@@ -2992,7 +2996,14 @@ async function unblockUser(email, m){
     await fb.f.setDoc(fb.f.doc(fb.db, "users", email), data);
     await fb.f.setDoc(fb.f.doc(fb.db, "config", "signup"), { blocked: (c.blocked || []).filter(x => x !== email) }, { merge: true });
   } catch (e) { return toast("שגיאה בביטול החסימה: " + (e.code || e.message)); }
-  LOG.add(email, "ביטל חסימה של המשתמש"); toast("החסימה בוטלה ✔ – הוא יכול להיכנס שוב"); renderUsers(m); renderBlocked(m); fillUserSwitcher();
+  LOG.add(email, "ביטל חסימה של המשתמש"); toast("החסימה בוטלה ✔ – הוא יכול להיכנס שוב"); renderUsers(m); fillUserSwitcher();
+  if (settingsTab === "blocked" && $("tab-body")) tabBlocked($("tab-body")); else renderBlocked(m);
+}
+async function tabBlocked(body){
+  body.innerHTML = `<div class="notice info" style="margin-bottom:10px">⛔ כאן רואים את כל מי שחסמת. חסימה לא מוחקת שעות – לוחצים <b>↩️ בטל חסימה</b> והעובד חוזר עם הדירה, הטלפון והשעות שלו.</div><div id="su-blocked">טוען...</div>`;
+  if (DEMO) { body.querySelector("#su-blocked").innerHTML = `<div class="muted">במצב הדגמה אין חסומים.</div>`; return; }
+  await renderBlocked(body);
+  const box = body.querySelector("#su-blocked"); if (box && !box.innerHTML.trim()) box.innerHTML = `<div class="notice info">✔ אין כרגע אף משתמש חסום.</div>`;
 }
 async function renderBlocked(body){
   const box = body.querySelector("#su-blocked"); if (!box || DEMO) return;
