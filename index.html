@@ -692,6 +692,7 @@ const MSG = {
   async send(text){
     const m = { from: me, fromName: settings.name || me, text, at: Date.now(), read: false, reply: "", replyAt: 0 };
     if (DEMO) { const l = this.demo(); l.push({ id: newId(), ...m }); this.demoSet(l); return; }
+    LOG.add(me, `שלח הודעה למנהל – ${String(text).slice(0, 60)}`);
     await fb.f.addDoc(fb.f.collection(fb.db, "messages"), m);
   },
   async mine(){
@@ -721,6 +722,7 @@ const RCP = {
     const d = { from: me, fromName: isAdmin ? "המנהל" : (settings.name || me), at: Date.now(), ...r };
     if (DEMO) { const l = this.demo(); l.push({ id: newId(), ...d }); this.demoSet(l); return; }
     await fb.f.addDoc(fb.f.collection(fb.db, "receipts"), d);
+    LOG.add(me, `הוסיף קבלה ${money(+r.amount || 0)}${r.apt ? " · " + r.apt : ""}${r.note ? " – " + r.note : ""}`);
   },
   async list(){
     if (DEMO) { const l = this.demo(); return (isAdmin ? l : l.filter(x => x.from === me)).sort((a, b) => b.date.localeCompare(a.date) || b.at - a.at); }
@@ -945,6 +947,7 @@ const REP = {
     const d = { from: me, fromName: isAdmin ? "המנהל" : (settings.name || me), at: Date.now(), status: "open", reply: "", ...r };
     if (DEMO) { const l = this.demo(); l.push({ id: newId(), ...d }); this.demoSet(l); return; }
     await fb.f.addDoc(fb.f.collection(fb.db, "reports"), d);
+    LOG.add(me, `שלח ${({ fault: "דיווח תקלה", supply: "רשימת חוסרים", swap: "בקשת החלפת משמרת" })[r.type] || "דיווח"}${r.apt ? " · " + r.apt : ""}${r.text ? " – " + String(r.text).slice(0, 60) : ""}`);
   },
   async list(){
     if (DEMO) { const l = this.demo(); return (isAdmin ? l : l.filter(x => x.from === me)).sort((a, b) => b.at - a.at); }
@@ -1104,6 +1107,35 @@ async function tabApprove(body){
 }
 
 // ---- מנהל: יומן שינויים ----
+let liveUnsubs = [], liveFilter = "";
+const ago = t => { const s = Math.round((Date.now() - t) / 1000); return s < 60 ? "עכשיו" : s < 3600 ? `לפני ${Math.round(s / 60)} דק׳` : s < 86400 ? `לפני ${Math.round(s / 3600)} שע׳` : new Date(t).toLocaleString("he-IL", { day: "numeric", month: "numeric", hour: "2-digit", minute: "2-digit" }); };
+async function tabLive(body){
+  liveUnsubs.forEach(u => { try { u(); } catch (e) {} }); liveUnsubs = [];
+  body.innerHTML = `<div class="notice info" style="margin-bottom:10px">🟢 כאן רואים <b>בזמן אמת</b> מי מחובר עכשיו, באיזה מסך הוא נמצא, ומה כל עובד עשה במערכת (כניסות, משמרות, קבלות, דיווחים, הודעות ומעבר בין מסכים). הרשימה מתעדכנת לבד.</div>
+    <h4>🟢 מחוברים עכשיו</h4><div id="lv-on">טוען...</div>
+    <h4>📜 מה קורה – עדכון חי</h4>
+    <div class="frow"><select id="lv-user"><option value="">כל העובדים</option></select><label style="min-width:auto;display:flex;gap:6px;align-items:center"><input type="checkbox" id="lv-views" style="width:auto" checked> להראות גם מעבר בין מסכים</label></div>
+    <div id="lv-feed">טוען...</div>`;
+  if (DEMO) { body.querySelector("#lv-on").innerHTML = `<div class="list-item"><span>🟢 <b>דוגמה – משה</b> · 📸 קבלות קניות לדירה · 📱 טלפון</span><span class="muted">עכשיו</span></div>`; body.querySelector("#lv-feed").innerHTML = `<div class="muted">במצב הדגמה אין פעילות אמיתית.</div>`; return; }
+  const users = await listUsers(), nm = e => users.find(u => u.email === e)?.name || e;
+  const sel = body.querySelector("#lv-user"); sel.innerHTML += users.filter(u => u.email !== ADMIN).map(u => `<option value="${esc(u.email)}">${esc(u.name || u.email)}</option>`).join(""); sel.value = liveFilter;
+  let pres = [], feed = [];
+  const drawOn = () => {
+    const now = Date.now(), on = pres.filter(p => p.online !== false && now - p.at < 3 * 60000).sort((a, b) => b.at - a.at), off = pres.filter(p => !on.includes(p)).sort((a, b) => b.at - a.at).slice(0, 15);
+    body.querySelector("#lv-on").innerHTML = (on.length ? on.map(p => `<div class="list-item" style="border-right:4px solid #2b8a4a"><span>🟢 <b>${esc(p.name || nm(p.email))}</b> · ${esc(p.screen || "")} · ${esc(p.device || "")}${p.rcp ? " · אפליקציית קבלות" : ""}</span><span class="muted">${ago(p.at)}</span></div>`).join("") : `<div class="muted">אף עובד לא מחובר כרגע.</div>`)
+      + (off.length ? `<details style="margin-top:6px"><summary class="muted">⚪ נראו לאחרונה (${off.length})</summary>${off.map(p => `<div class="list-item"><span>⚪ ${esc(p.name || nm(p.email))} · ${esc(p.screen || "")}</span><span class="muted">${ago(p.at)}</span></div>`).join("")}</details>` : "");
+  };
+  const drawFeed = () => {
+    const u = sel.value, views = body.querySelector("#lv-views").checked;
+    const l = feed.filter(x => (!u || x.target === u || x.by === u) && (views || !String(x.text).startsWith("👁️"))).slice(0, 150);
+    body.querySelector("#lv-feed").innerHTML = l.length ? `<table class="rcp-table"><thead><tr><th>מתי</th><th>מי</th><th>מה</th></tr></thead><tbody>${l.map(x => `<tr><td style="white-space:nowrap">${ago(x.at)}</td><td>${esc(x.by === ADMIN ? "המנהל" : (x.byName || nm(x.by)))}${x.target && x.target !== x.by ? ` <span class="muted">← ${esc(nm(x.target))}</span>` : ""}</td><td>${esc(x.text)}</td></tr>`).join("")}</tbody></table>` : `<div class="muted">אין עדיין פעילות${u ? " של העובד הזה" : ""}.</div>`;
+  };
+  sel.onchange = () => { liveFilter = sel.value; drawFeed(); }; body.querySelector("#lv-views").onchange = drawFeed;
+  const { f } = fb, err = e => { body.querySelector("#lv-on").innerHTML = `<div class="msg err">לא ניתן לטעון: ${esc(e.code || e.message)}</div>`; };
+  liveUnsubs.push(f.onSnapshot(f.collection(fb.db, "presence"), s => { pres = s.docs.map(d => ({ email: d.id, ...d.data() })); drawOn(); }, err));
+  liveUnsubs.push(f.onSnapshot(f.query(f.collection(fb.db, "log"), f.orderBy("at", "desc"), f.limit(300)), s => { feed = s.docs.map(d => ({ id: d.id, ...d.data() })); drawFeed(); }, err));
+  const iv = setInterval(() => { if (!document.body.contains(body) || settingsTab !== "live") { clearInterval(iv); liveUnsubs.forEach(u => { try { u(); } catch (e) {} }); liveUnsubs = []; return; } drawOn(); drawFeed(); }, 15000);
+}
 async function tabLog(body){
   body.innerHTML = `<div class="muted" style="margin-bottom:10px">כל שינוי במשמרות, אישורים, נעילות והחלפות – מי עשה, מה ומתי.</div>
     <div class="frow"><select id="lg-user"><option value="">כל העובדים</option></select><input id="lg-q" placeholder="חיפוש" style="flex:1"></div><div id="lg-list">טוען...</div>`;
@@ -1203,7 +1235,7 @@ function openHelp(){
     sign: goTable("#month-sum"), dash: () => { closeModal(); $("dash").open = true; renderCharts(); goTable("#dash")(); }, launcher: goTable("#launcher"),
     excel: () => { closeModal(); exportExcel().catch(e => toast(e.message)); }, pdf: () => { closeModal(); exportPDF().catch(e => toast(e.message)); }
   };
-  ["approve", "board", "reports", "users", "blocked", "schedule", "apts", "inbox", "adj", "rates", "announce", "log", "backup"].forEach(t => GO["s_" + t] = () => openSettings(t));
+  ["approve", "board", "reports", "users", "blocked", "live", "schedule", "apts", "inbox", "adj", "rates", "announce", "log", "backup"].forEach(t => GO["s_" + t] = () => openSettings(t));
   const W = [
     ["🧭 המסך הראשי – איך הוא בנוי", `למעלה: השם, התאריך (לועזי ועברי) והשעון. מתחתיו <b>קוביות</b> – כל קובייה פותחת חלון: הוספת משמרת, שעות קבועות, קבלות, הדירה שלי, דיווח לדירה, הודעה למנהל, הנתונים שלי, חגים ולוח, אזור אישי והגדרות, הוראות, מצב תצוגה ויציאה. מתחת לקוביות: הודעות חשובות (צהוב/כחול), "📈 גרפים ונתונים" שאפשר לקפל, ובסוף – טבלת החודש.`, "launcher", "לקוביות"],
     ["🕒 רישום שעות בטבלה", `לכל יום בחודש יש שורה. כותבים שעת כניסה ויציאה (למשל 0800 → 08:00) – נשמר לבד. <b>⚡ שעות</b> – ממלא את השעות הקבועות של אותו יום בשבוע. <b>🗓️ לפי הלוח</b> – מופיע ביום שהמנהל תכנן לך משמרת, וממלא בדיוק לפי הלוח. <b>+</b> – עוד משמרת באותו יום (למשל משמרת מפוצלת). <b>✕ איפוס</b> – מנקה את השורה. <b>X</b> – מוחק (ויש "↩ בטל" לכמה שניות). בסוף כל שבוע – סיכום שבועי, ובסוף החודש – סיכום חודשי.`, "table", "לטבלה"],
@@ -1234,6 +1266,7 @@ function openHelp(){
     ["📋 לוח עובדים", `תמונת מצב של החודש הנבחר: למעלה – שעות הצוות, שכר כולל, קניות החודש, ממתינים לאישור וכמה חתמו. אחר כך התראות (עם ✔/✖/✏️), אקסל שכר לכל העובדים, דוח שנתי, 🏆 דירוג שעות, וטבלה לכל עובד: 📞/💬 טלפון ווואטסאפ, משימות שהושלמו היום, ימים, שעות, מתוכנן מול בוצע, לילות, שבת/חג, שכר, אישור, חתימה, ופעולות: פתח את המערכת שלו, 🧾 תלוש, 🔒 נעילה. למעלה: נעילת החודש לכולם, תלושים לכולם ושליחת סיכום במייל.`, "s_board", "ללוח עובדים"],
     ["🛠️ דיווחים", `תקלות (עם תמונה ו-🚨 דחוף) ורשימות "חסר ציוד" מהעובדים, ו🛒 רשימת קניות מרוכזת לכל דירה. כותבים תשובה ומסמנים "✔ טופל" / "✔ נקנה" – העובד רואה.`, "s_reports", "לדיווחים"],
     ["👥 עובדים ותעריפים", `הוספת עובד (שם, מייל, סיסמה) ומחיקה. לכל עובד: שם, 📞 טלפון, <b>🏠 הדירה שלו</b> (המשמרות, הקבלות והדיווחים שלו משויכים אליה אוטומטית מהיום), תעריף אישי (יום/לילה – ריק = כללי) ו🗒️ הערה פרטית שרק אתה רואה. למטה – יעד שעות חודשי.`, "s_users", "לעובדים"],
+    ["🟢 בזמן אמת", `רואים מי מחובר עכשיו ובאיזה מסך הוא נמצא (טלפון/מחשב/אפליקציה), ורשימה חיה של כל מה שהעובדים עושים: כניסות, משמרות, קבלות, דיווחים, הודעות ומעבר בין מסכים. אפשר לסנן לפי עובד. גם מהכרטיס של עובד – "🟢 מה הוא עושה".`, "s_live", "לזמן אמת"],
     ["⛔ חסומים ושחזור", `כל מי שחסמת מופיע כאן. חסימה לא מוחקת שעות – לחיצה על <b>↩️ בטל חסימה</b> מחזירה את העובד עם הדירה, הטלפון והשעות שלו.`, "s_blocked", "לחסומים"],
     ["🗓️ לוח משמרות", `קובעים לכל עובד תאריך, שעות ודירה (אפשר חזרה כל שבוע ל-4 או 8 שבועות). משמרת שהעובד רושם לפי הלוח מאושרת לבד. למטה: טבלת כל הצוות לשבוע (חיצים לשבוע קודם/הבא), 📋 העתקת השבוע לשבוע הבא לכל הצוות, ו🧩 כיסוי דירות – אילו דירות בלי משמרת ב-7 הימים הקרובים.`, "s_schedule", "ללוח משמרות"],
     ["🏠 דירות", `לכל דירה: שם, כתובת, 📞 טלפון, ℹ️ מידע (קוד, וויפי, מפתח), הוראות קבועות (מופיעות לעובד בראש המסך), ✅ משימות יומיות (שורה לכל משימה), 💰 תקציב קניות חודשי (התראה כשעוברים אותו) ו🧴 רשימת ציוד לסימון. למטה – שיוך עובד לדירה מתאריך מסוים.`, "s_apts", "לדירות"],
@@ -1909,11 +1942,12 @@ function renderCharts(){
 // ================== חלונות ==================
 function modal(html){
   $("modal-root").innerHTML = `<div class="modal-bg"><div class="modal">${html}</div></div>`;
+  try { const h = $("modal-root").querySelector("h3"); if (h) LIVE.set(h.textContent.replace("✕", "")); } catch (e) {}
   const bg = $("modal-root").firstChild;
   bg.addEventListener("click", e => { if (e.target === bg || e.target.closest("[data-close]")) closeModal(); });
   return bg.querySelector(".modal");
 }
-function closeModal(){ $("modal-root").innerHTML = ""; if (typeof RCP_MODE !== "undefined" && RCP_MODE && me && !$("app").classList.contains("hidden")) setTimeout(() => { if (!$("modal-root").firstChild) openReceiptsPage(); }, 0); }
+function closeModal(){ $("modal-root").innerHTML = ""; try { LIVE.set("מסך ראשי"); } catch (e) {} if (typeof RCP_MODE !== "undefined" && RCP_MODE && me && !$("app").classList.contains("hidden")) setTimeout(() => { if (!$("modal-root").firstChild) openReceiptsPage(); }, 0); }
 const closeX = `<button class="iconbtn mini" data-close>✕</button>`;
 
 // ---- שעות קבועות ----
@@ -2050,14 +2084,14 @@ let settingsTab = "board";
 function openSettings(tab){
   if (!isAdmin) return toast("ההגדרות פתוחות למנהל בלבד");
   if (tab) settingsTab = tab; else if (adminAlerts.pending + adminAlerts.swaps + adminAlerts.alerts.length) settingsTab = "approve";
-  const T = [["approve",`✅ אישורים והתראות${adminAlerts.pending + adminAlerts.swaps + adminAlerts.alerts.length ? ` (${adminAlerts.pending + adminAlerts.swaps + adminAlerts.alerts.length})` : ""}`],["board","📋 לוח עובדים"],["reports",`🛠️ דיווחים${adminAlerts.reports ? ` (${adminAlerts.reports})` : ""}`],["users","👥 עובדים ותעריפים"],["blocked","⛔ חסומים ושחזור"],["schedule","🗓️ לוח משמרות"],["apts","🏠 דירות"],["inbox",`✉️ הודעות${adminAlerts.unread ? ` (${adminAlerts.unread})` : ""}`],["adj","🎁 תוספות ובונוסים"],["rates","💰 תעריפים"],["announce","📢 הודעה לעובדים"],["log","📜 יומן שינויים"],["backup","☁️ גיבוי ודוחות"]];
+  const T = [["approve",`✅ אישורים והתראות${adminAlerts.pending + adminAlerts.swaps + adminAlerts.alerts.length ? ` (${adminAlerts.pending + adminAlerts.swaps + adminAlerts.alerts.length})` : ""}`],["board","📋 לוח עובדים"],["reports",`🛠️ דיווחים${adminAlerts.reports ? ` (${adminAlerts.reports})` : ""}`],["users","👥 עובדים ותעריפים"],["blocked","⛔ חסומים ושחזור"],["schedule","🗓️ לוח משמרות"],["apts","🏠 דירות"],["inbox",`✉️ הודעות${adminAlerts.unread ? ` (${adminAlerts.unread})` : ""}`],["adj","🎁 תוספות ובונוסים"],["rates","💰 תעריפים"],["announce","📢 הודעה לעובדים"],["live","🟢 בזמן אמת"],["log","📜 יומן שינויים"],["backup","☁️ גיבוי ודוחות"]];
   const m = modal(`<h3>⚙️ הגדרות מנהל ${closeX}</h3>
     <div class="tabs">${T.map(([k, n]) => `<button data-tab="${k}" class="${k === settingsTab ? "on" : ""}">${n}</button>`).join("")}</div>
     <div id="tab-body"></div>`);
   m.classList.add("wide");
   m.querySelectorAll("[data-tab]").forEach(b => b.onclick = () => openSettings(b.dataset.tab));
   const body = m.querySelector("#tab-body");
-  ({ approve: tabApprove, reports: tabReports, log: tabLog, users: tabUsers, blocked: tabBlocked, board: tabBoard, schedule: tabSchedule, apts: tabApts, inbox: tabInbox, adj: tabAdj, rates: tabRates, backup: tabBackup, announce: tabAnnounce })[settingsTab](body, m);
+  ({ approve: tabApprove, reports: tabReports, log: tabLog, users: tabUsers, blocked: tabBlocked, live: tabLive, board: tabBoard, schedule: tabSchedule, apts: tabApts, inbox: tabInbox, adj: tabAdj, rates: tabRates, backup: tabBackup, announce: tabAnnounce })[settingsTab](body, m);
 }
 
 async function listUsers(){
@@ -2806,11 +2840,33 @@ async function openReceiptsPage(){
   const bg = $("modal-root").firstChild; if (bg) bg.classList.add("rcpfull");
   $("rcpbar-name").textContent = "· " + (isAdmin ? "מנהל – כל הדירות" : (settings.name || me));
 }
+// ================== פעילות בזמן אמת ==================
+const LIVE = {
+  screen: "מסך ראשי", last: "", iv: null,
+  device(){ return IN_APP ? "📱 אפליקציה" : /android|iphone|ipad|mobile/i.test(navigator.userAgent) ? "📱 טלפון" : "💻 מחשב"; },
+  ping(online = true){
+    if (DEMO || !me || isAdmin || !fb) return;
+    fb.f.setDoc(fb.f.doc(fb.db, "presence", me), { name: settings.name || me, at: Date.now(), screen: this.screen, online, device: this.device(), rcp: !!RCP_MODE }).catch(() => {});
+  },
+  set(screen){
+    screen = String(screen || "מסך ראשי").replace(/\s+/g, " ").trim().slice(0, 50) || "מסך ראשי";
+    if (screen === this.screen) return; this.screen = screen; this.ping();
+    if (!isAdmin && me && !DEMO && screen !== this.last) { this.last = screen; LOG.add(me, "👁️ פתח: " + screen); }
+  },
+  start(){
+    if (DEMO || isAdmin) return;
+    clearInterval(this.iv); this.iv = setInterval(() => { if (document.visibilityState === "visible") this.ping(); }, 60000);
+    document.addEventListener("visibilitychange", () => this.ping(document.visibilityState === "visible"));
+    window.addEventListener("pagehide", () => this.ping(false));
+    this.ping();
+  }
+};
 async function openSystem(email, fallbackName){
   viewEmail = email;
   await DB.loadAll(email);
   if (!settings.name && fallbackName) settings.name = fallbackName;
   updateHeader(); show("app"); setMonth(cur.y, cur.m); renderGreeting();
+  if (!isAdmin && !DEMO) { LOG.add(email, `נכנס למערכת (${LIVE.device()})`); LIVE.start(); }
   $("settings-btn").classList.toggle("hidden", !isAdmin);
   $("msg-btn").classList.toggle("hidden", isAdmin);
   startNotify();
@@ -2938,7 +2994,7 @@ async function openUserCard(email){
     <div class="frow"><input id="uc-note" value="${esc(note || "")}" placeholder="🗒️ הערה פרטית (רק אתה רואה)" style="flex:1"></div>
     <div class="frow"><button class="b-green" id="uc-save">✔ ${u.pending ? "אשר ושמור" : "שמור"}</button><button class="b-gray" id="uc-back">→ לרשימת העובדים</button></div>
     <h4>📣 ברוך הבא</h4>
-    <div class="frow"><button class="btnlink b-wa" id="uc-wa">💬 שלח בוואטסאפ</button><button class="b-blue" id="uc-mail">📧 שלח במייל</button><button class="b-gray" id="uc-view">👁️ צפה בשעות שלו</button></div>
+    <div class="frow"><button class="btnlink b-wa" id="uc-wa">💬 שלח בוואטסאפ</button><button class="b-blue" id="uc-mail">📧 שלח במייל</button><button class="b-gray" id="uc-view">👁️ צפה בשעות שלו</button><button class="b-gray" id="uc-live">🟢 מה הוא עושה</button></div>
     <h4>⚠️ פעולות</h4>
     <div class="frow"><button class="b-red" id="uc-block">⛔ חסום</button><button class="b-gray" id="uc-del">🗑 מחק לגמרי</button></div>
     <div id="nu-msg" class="msg"></div>`);
@@ -2972,6 +3028,7 @@ async function openUserCard(email){
     try { emailjs.init(CFG.emailjs.key); await emailjs.send(CFG.emailjs.service, CFG.emailjs.template, { from_name: CFG.senderName, reply_to: CFG.senderEmail, to_email: email, name: val("#uc-name") || email, to_name: email, subject: "ברוך הבא למערכת אברהם 👋", message: welcome() }); toast("מייל ברוך הבא נשלח ✔"); }
     catch (e) { toast("שליחת המייל נכשלה: " + (e.text || e.message)); }
   };
+  m.querySelector("#uc-live").onclick = () => { liveFilter = email; openSettings("live"); };
   m.querySelector("#uc-view").onclick = () => { closeModal(); const sel = $("view-user"); if (sel && [...sel.options].some(o => o.value === email)) { sel.value = email; sel.dispatchEvent(new Event("change")); } else toast("אפשר לבחור אותו ברשימה למעלה"); };
   m.querySelector("#uc-block").onclick = async () => { await blockUser(email, m); if (!(await listUsers()).some(x => x.email === email)) openSettings("blocked"); };
   m.querySelector("#uc-del").onclick = async () => { await deleteUser(email, m); if (!(await listUsers()).some(x => x.email === email)) openSettings("users"); };
