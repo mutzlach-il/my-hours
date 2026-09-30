@@ -410,14 +410,17 @@ const CFG = {
     messagingSenderId: "869467101665",
     appId: "1:869467101665:web:fbe5f713c1d3ed93e0daa0"
   },
-  admin: "ay0533115854@gmail.com",
-  senderName: "מוצלח",          // השם שמופיע כשולח במיילים
+  adminHash: "a0bf82e1f9d31227f3bcbd311ac51eb8da558c00cf4de2d04dc6725e47db51e7", // המנהל מזוהה לפי טביעת אצבע מוצפנת של המייל – המייל עצמו לא כתוב בקוד
+  senderName: "חזון דב",          // השם שמופיע כשולח במיילים
   senderEmail: "bnyytmrkwt@gmail.com", // המייל של החברה שממנו נשלחים המיילים
   emailjs: { service: "service_nybca58", template: "template_gzcqacc", key: "6G0YaH5dH_TKKk_hu" },
   // כתובת סקריפט שליחת הקוד (Apps Script). ריק = שחזור בקוד עדיין לא הופעל
   resetApi: "https://script.google.com/macros/s/AKfycbwmfTL90LvRP1Md-D09KlEsZQyr2GJoHzCDLhM7iGe9ee-T-f-NNYnLA62EPippqoKeFA/exec"
 };
 const FB_VER = "10.12.2";
+let ADMIN = null; // מייל המנהל – ידוע רק בזמן שהמנהל עצמו מחובר
+async function sha256hex(x){ const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(x)); return [...new Uint8Array(b)].map(n => n.toString(16).padStart(2, "0")).join(""); }
+async function isAdminEmail(e){ return !!e && (await sha256hex(norm(e))) === CFG.adminHash; }
 const DAYS = ["ראשון","שני","שלישי","רביעי","חמישי","שישי","שבת"];
 const DAYL = ["א׳","ב׳","ג׳","ד׳","ה׳","ו׳","שבת"];
 const MONTHS = ["ינואר","פברואר","מרץ","אפריל","מאי","יוני","יולי","אוגוסט","ספטמבר","אוקטובר","נובמבר","דצמבר"];
@@ -1450,10 +1453,10 @@ function coverageHtml(users){
 
 // ================== מנהל: הערות פרטיות על עובד ==================
 const ANOTE = {
-  async get(email){ if (DEMO) { try { return JSON.parse(localStorage.getItem("demo_anote") || "{}")[email] || ""; } catch (e) { return ""; } } const d = await fb.f.getDoc(fb.f.doc(fb.db, "settings", CFG.admin)); return (d.exists() && (d.data().workerNotes || {})[email]) || ""; },
+  async get(email){ if (DEMO) { try { return JSON.parse(localStorage.getItem("demo_anote") || "{}")[email] || ""; } catch (e) { return ""; } } const d = await fb.f.getDoc(fb.f.doc(fb.db, "settings", ADMIN)); return (d.exists() && (d.data().workerNotes || {})[email]) || ""; },
   async set(email, text){ if (DEMO) { let o = {}; try { o = JSON.parse(localStorage.getItem("demo_anote") || "{}"); } catch (e) {} o[email] = text; localStorage.setItem("demo_anote", JSON.stringify(o)); return; }
-    await fb.f.setDoc(fb.f.doc(fb.db, "settings", CFG.admin), { workerNotes: { [email]: text } }, { merge: true });
-    if (viewEmail === CFG.admin) settings.workerNotes = { ...(settings.workerNotes || {}), [email]: text }; }
+    await fb.f.setDoc(fb.f.doc(fb.db, "settings", ADMIN), { workerNotes: { [email]: text } }, { merge: true });
+    if (viewEmail === ADMIN) settings.workerNotes = { ...(settings.workerNotes || {}), [email]: text }; }
 };
 
 // ================== קיצורי מקלדת ==================
@@ -2066,10 +2069,10 @@ async function renderUsers(body){
   const users = await listUsers(), G = globalCfg.rates;
   box.innerHTML = users.map(u => { const r = u.rates || {};
     return `<div class="list-item" style="flex-wrap:wrap" data-u="${esc(u.email)}">
-      <span style="min-width:200px"><input class="u-name" value="${esc(u.name || "")}" placeholder="שם" style="width:140px"> <span class="muted">${esc(u.email)}</span> ${u.email === CFG.admin ? `<span class="up">· מנהל</span>` : ""}</span>
+      <span style="min-width:200px"><input class="u-name" value="${esc(u.name || "")}" placeholder="שם" style="width:140px"> <span class="muted">${esc(u.email)}</span> ${u.email === ADMIN ? `<span class="up">· מנהל</span>` : ""}</span>
       <span class="rates">📞<input class="u-phone" value="${esc(u.phone || "")}" placeholder="טלפון" style="width:110px" inputmode="tel">🏠<select class="u-apt" title="הדירה שבה העובד עובד"><option value="">— דירה —</option>${(globalCfg.apartments || []).map(a => `<option ${a.name === (u.apt || "") ? "selected" : ""}>${esc(a.name)}</option>`).join("")}${u.apt && !(globalCfg.apartments || []).some(a => a.name === u.apt) ? `<option selected>${esc(u.apt)}</option>` : ""}</select>
       ☀️<input class="u-day" type="number" step="0.01" min="0" value="${esc(r.day || "")}" placeholder="${G.day}" title="תעריף שעת יום">🌙<input class="u-night" type="number" step="0.01" min="0" value="${esc(r.nightFlat || "")}" placeholder="${G.nightFlat}" title="סכום ללילה">
-      <button class="mini add u-save">שמור</button>${u.email === CFG.admin ? "" : `<button class="mini del u-del">מחק</button>`}</span></div>`; }).join("");
+      <button class="mini add u-save">שמור</button>${u.email === ADMIN ? "" : `<button class="mini del u-del">מחק</button>`}</span></div>`; }).join("");
   box.querySelectorAll("[data-u]").forEach(row => {
     const email = row.dataset.u;
     row.querySelector(".u-save").onclick = async () => {
@@ -2277,12 +2280,12 @@ async function sendMonthlyReports(y, m, team, progress = () => {}){
   let n = 0, all = "";
   for (const mem of team) {
     const txt = summaryText(mem, y, m); all += txt + "\n------------------------------\n";
-    if (mem.u.email === CFG.admin) continue;
-    try { await emailjs.send(CFG.emailjs.service, CFG.emailjs.template, { from_name: CFG.senderName, reply_to: CFG.admin, to_email: mem.u.email, name: mem.u.name || mem.u.email, to_name: mem.u.email, subject: `סיכום שעות ושכר – ${MONTHS[m]} ${y}`, message: `שלום ${mem.u.name || ""},\n\n${txt}\nלצפייה בפרטים: ${location.origin}${location.pathname}` }); n++; progress(`נשלח ל-${n} עובדים...`); await wait(1200); }
+    if (mem.u.email === ADMIN) continue;
+    try { await emailjs.send(CFG.emailjs.service, CFG.emailjs.template, { from_name: CFG.senderName, reply_to: CFG.senderEmail, to_email: mem.u.email, name: mem.u.name || mem.u.email, to_name: mem.u.email, subject: `סיכום שעות ושכר – ${MONTHS[m]} ${y}`, message: `שלום ${mem.u.name || ""},\n\n${txt}\nלצפייה בפרטים: ${location.origin}${location.pathname}` }); n++; progress(`נשלח ל-${n} עובדים...`); await wait(1200); }
     catch (e) { console.warn(e); }
   }
   const tot = team.reduce((a, mem) => a + memberMonth(mem, y, m).total, 0);
-  await emailjs.send(CFG.emailjs.service, CFG.emailjs.template, { from_name: CFG.senderName, reply_to: CFG.admin, to_email: CFG.admin, name: "מערכת השעות", to_name: CFG.admin, subject: `סיכום חודשי לכל העובדים – ${MONTHS[m]} ${y}`, message: `סיכום כל העובדים לחודש ${MONTHS[m]} ${y}\nסה"כ לתשלום לכולם: ${money(tot)}\n\n${all}` });
+  await emailjs.send(CFG.emailjs.service, CFG.emailjs.template, { from_name: CFG.senderName, reply_to: CFG.senderEmail, to_email: ADMIN, name: "מערכת השעות", to_name: ADMIN, subject: `סיכום חודשי לכל העובדים – ${MONTHS[m]} ${y}`, message: `סיכום כל העובדים לחודש ${MONTHS[m]} ${y}\nסה"כ לתשלום לכולם: ${money(tot)}\n\n${all}` });
   progress(`הסיכום נשלח ל-${n} עובדים ואליך ✔`);
   return true;
 }
@@ -2500,7 +2503,7 @@ function tabBackup(body){
   body.innerHTML = `<p>הגיבוי כולל את <b>כל המערכת</b>: כל העובדים, כל המשמרות, ההגדרות והתעריפים.</p>
     <div class="frow"><button class="b-purple" id="bk-mail">📧 שלח גיבוי מלא למייל עכשיו</button><button class="b-blue" id="bk-down">💾 הורד גיבוי מלא למחשב</button></div>
     <div class="frow"><label style="min-width:auto"><input type="checkbox" id="bk-auto" ${B.auto ? "checked" : ""}> שלח לי גיבוי אוטומטי למייל פעם בשבוע</label></div>
-    <div class="muted" style="font-size:12.5px">גיבוי אחרון למייל: ${B.last ? new Date(B.last).toLocaleString("he-IL") : "עדיין לא נשלח"} · המייל נשלח אל ${esc(CFG.admin)}</div>
+    <div class="muted" style="font-size:12.5px">גיבוי אחרון למייל: ${B.last ? new Date(B.last).toLocaleString("he-IL") : "עדיין לא נשלח"} · המייל נשלח אל ${esc(ADMIN || "")}</div>
     <div id="bk-msg" class="msg"></div>
     <h4>📊 סיכום חודשי אוטומטי</h4>
     <div class="frow"><label style="min-width:auto"><input type="checkbox" id="mo-auto" ${globalCfg.monthly.auto ? "checked" : ""}> בתחילת כל חודש: לשלוח לכל עובד במייל את הסיכום של החודש שעבר, ולי סיכום של כולם</label></div>
@@ -2556,14 +2559,14 @@ async function doFullBackup({ email = true, download = false, silent = false } =
     const size = 40000, parts = Math.ceil(b64.length / size);
     emailjs.init(CFG.emailjs.key);
     for (let i = 0; i < parts; i++) {
-      await emailjs.send(CFG.emailjs.service, CFG.emailjs.template, { from_name: CFG.senderName, reply_to: CFG.admin,
-        to_email: CFG.admin, name: "מערכת השעות", to_name: CFG.admin,
+      await emailjs.send(CFG.emailjs.service, CFG.emailjs.template, { from_name: CFG.senderName, reply_to: CFG.senderEmail,
+        to_email: ADMIN, name: "מערכת השעות", to_name: ADMIN,
         subject: `גיבוי מלא – מערכת השעות – ${dmy(today)}${parts > 1 ? ` (חלק ${i + 1} מתוך ${parts})` : ""}`,
         message: `גיבוי מלא של מערכת השעות מתאריך ${dmy(today)}.\n${data.users.length} עובדים.\n\n${summary}\n\nלשחזור: היכנס להגדרות מנהל ← גיבוי, והדבק את כל הטקסט של ${parts > 1 ? "כל החלקים" : "המייל הזה"} בתיבת השחזור.\n\nMYHOURS-BACKUP ${i + 1}/${parts}:${b64.slice(i * size, (i + 1) * size)}:END`
       });
     }
     globalCfg.backup.last = Date.now(); await DB.putGlobal();
-    msg(`הגיבוי נשלח למייל ${CFG.admin} ✔${parts > 1 ? ` (${parts} מיילים)` : ""}`);
+    msg(`הגיבוי נשלח למייל ${ADMIN} ✔${parts > 1 ? ` (${parts} מיילים)` : ""}`);
   } catch (e) { const t = "הגיבוי נכשל: " + (e.text || e.code || e.message); if (silent) console.warn(t); else { const el = document.getElementById("bk-msg"); if (el) setMsg("bk-msg", t, false); else toast(t); } }
 }
 async function maybeAutoBackup(){
@@ -2690,10 +2693,11 @@ async function initFirebase(){
   a.onAuthStateChanged(fb.auth, onAuth);
 }
 async function onAuth(user){
-  if (!user) { me = null; $("modal-root").innerHTML = ""; show("login-screen"); return; }
+  if (!user) { me = null; ADMIN = null; isAdmin = false; $("modal-root").innerHTML = ""; show("login-screen"); return; }
   const { a, f } = fb, email = norm(user.email);
+  const adminUser = await isAdminEmail(email);
   try {
-    if (email === CFG.admin && !user.emailVerified) {
+    if (adminUser && !user.emailVerified) {
       await user.reload();
       if (!fb.auth.currentUser.emailVerified) {
         try { await a.sendEmailVerification(fb.auth.currentUser); } catch (e) {}
@@ -2702,9 +2706,9 @@ async function onAuth(user){
       }
     }
     let u = await f.getDoc(f.doc(fb.db, "users", email));
-    if (!u.exists() && email === CFG.admin) { await f.setDoc(f.doc(fb.db, "users", email), { email, role: "admin", name: "", createdAt: Date.now() }); u = await f.getDoc(f.doc(fb.db, "users", email)); }
+    if (!u.exists() && adminUser) { await f.setDoc(f.doc(fb.db, "users", email), { email, role: "admin", name: "", createdAt: Date.now() }); u = await f.getDoc(f.doc(fb.db, "users", email)); }
     if (!u.exists()) { await a.signOut(fb.auth); setMsg("login-msg", "אין לך הרשאת גישה למערכת. פנה למנהל.", false); return; }
-    me = email; isAdmin = email === CFG.admin;
+    me = email; isAdmin = adminUser; ADMIN = adminUser ? email : null;
     await openSystem(email, u.data().name);
   } catch (err) {
     console.error(err); await a.signOut(fb.auth); setMsg("login-msg", "שגיאה בטעינה: " + (err.code || err.message), false);
@@ -2754,7 +2758,7 @@ async function login(){
   $("login-btn").disabled = true; setMsg("login-msg", "", true);
   try { await fb.a.signInWithEmailAndPassword(fb.auth, email, pass); }
   catch (err) {
-    if (email === CFG.admin && ["auth/invalid-credential", "auth/user-not-found"].includes(err.code)) {
+    if ((await isAdminEmail(email)) && ["auth/invalid-credential", "auth/user-not-found"].includes(err.code)) {
       try { await fb.a.createUserWithEmailAndPassword(fb.auth, email, pass); }
       catch (e2) { setMsg("login-msg", e2.code === "auth/email-already-in-use" ? "שם משתמש או סיסמה שגויים." : errText(e2), false); }
     } else setMsg("login-msg", errText(err), false);
