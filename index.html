@@ -1706,7 +1706,7 @@ function renderTable(){
         <button class="mini delx" data-act="del" title="מחק משמרת">X</button>
       </div></td></tr>`;
     });
-    if (d.getDay() === 6 || day === last) {
+    if (d.getDay() === 6) {
       const ws = startOfWeek(d);
       html += `<tr class="weekrow ${ymd(ws) === ymd(weekStart) ? "active" : ""}" data-week="${ymd(ws)}"><td colspan="9" data-weeksum="${ymd(ws)}"></td></tr>`;
     }
@@ -2829,7 +2829,7 @@ function monthRows(){
   for (let day = 1; day <= last; day++) {
     const d = new Date(cur.y, cur.m, day), ds = ymd(d), list = shiftsOn(ds), notes = dayNotes(d).map(x => x.text);
     (list.length ? list : [null]).forEach((s, i) => out.push({ type: "shift", d, first: i === 0, s, notes, loc: s?.location || locationFor(ds), dayTotal: hoursOnDate(ds) }));
-    if (d.getDay() === 6 || day === last) { const ws = startOfWeek(d), we = addDays(ws, 6); out.push({ type: "week", ws, we, h: hoursInRange(ymd(ws), ymd(we)), pay: calcPay(shiftsInRange(ymd(ws), ymd(we))).total }); }
+    if (d.getDay() === 6) { const ws = startOfWeek(d), we = addDays(ws, 6); out.push({ type: "week", ws, we, h: hoursInRange(ymd(ws), ymd(we)), pay: calcPay(shiftsInRange(ymd(ws), ymd(we))).total }); }
   }
   return out;
 }
@@ -2973,6 +2973,13 @@ async function signup(){
   } catch (e) { setMsg("su-msg", e.code === "auth/email-already-in-use" ? "המייל הזה כבר רשום – חזור לכניסה (או \"שכחתי סיסמה\")." : errText(e), false); }
   finally { signupPending = false; $("su-btn").disabled = false; }
 }
+// אם האפליקציה נשארה פתוחה ועבר יום (למשל מ-30 ל-1 בחודש) – מרעננים כדי לפתוח את החודש החדש
+(function dayWatch(){
+  const loaded = ymd(today);
+  const chk = () => { if (ymd(new Date()) !== loaded && !$("modal-root").firstChild && !document.activeElement?.matches?.("input,textarea,select")) location.reload(); };
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") chk(); });
+  setInterval(chk, 5 * 60000);
+})();
 const RCP_MODE = document.documentElement.classList.contains("mode-rcp");
 async function openReceiptsPage(){
   await openReceipts();
