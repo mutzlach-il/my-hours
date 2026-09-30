@@ -1642,7 +1642,7 @@ function renderNotices(){
   box.querySelectorAll("[data-nact]").forEach(b => b.onclick = () => {
     const a = b.dataset.nact;
     if (a === "in") $("punch-in")?.click(); else if (a === "out") $("punch-out")?.click();
-    else if (a === "alerts") openSettings("board"); else if (a === "inbox") openSettings("inbox"); else if (a === "approve") openSettings("approve"); else if (a === "reports") openSettings("reports"); else if (a === "users") openSettings("users");
+    else if (a === "alerts") openSettings("board"); else if (a === "inbox") openSettings("inbox"); else if (a === "approve") openSettings("approve"); else if (a === "reports") openSettings("reports"); else if (a === "users") listUsers().then(l => { const n = l.find(u => (u.selfSignup && !u.seen) || u.pending); n ? openUserCard(n.email) : openSettings("users"); });
   });
 }
 function refreshMonthRow(){
@@ -2068,7 +2068,9 @@ async function tabUsers(body, m){
     <div class="muted" style="margin-bottom:8px">לכל עובד יש מערכת שעות משלו. 🏠 = הדירה שבה העובד עובד – המשמרות והקבלות שלו משויכות אליה אוטומטית. אפשר לקבוע לכל עובד תעריף אישי. אם משאירים ריק, העובד מקבל את התעריף הכללי (☀️ ${money(G.day)} לשעה · 🌙 ${money(G.nightFlat)} ללילה).</div>
     <div class="notice info" style="flex-direction:column;align-items:stretch;gap:6px"><label style="display:flex;gap:8px;align-items:center;font-weight:600"><input type="checkbox" id="su-open" style="width:auto"> 🔓 הרשמה עצמית פתוחה – כל אחד יכול להיכנס לבד (עם Google או מייל)</label>
       <span class="muted" style="font-weight:400">מי שנרשם לבד מופיע כאן עם 🆕, ומגיע אליך מייל. אפשר לשייך אותו לדירה, או ללחוץ ⛔ חסום (השעות שלו נשמרות, ואפשר לבטל את החסימה).</span></div>
+    <label style="display:flex;gap:8px;align-items:center;margin:6px 0"><input type="checkbox" id="su-approval" style="width:auto"> ⏳ נרשם חדש ממתין לאישור שלי לפני שהוא יכול להיכנס</label>
     <div id="su-blocked"></div>
+    <div class="frow"><input id="u-search" placeholder="🔎 חיפוש לפי שם, מייל, טלפון או דירה" style="flex:1"><select id="u-filter"><option value="">כולם</option><option value="new">🆕 רק חדשים / ממתינים</option><option value="noapt">🏠 בלי דירה</option></select></div>
     <div id="st-users">טוען...</div>
     <h4>＋ הוספת עובד</h4>
     <div class="frow"><input id="nu-name" placeholder="שם העובד" style="flex:1"><input id="nu-email" type="email" placeholder="מייל (שם משתמש)" style="flex:1.3"></div>
@@ -2081,6 +2083,12 @@ async function tabUsers(body, m){
   const so = body.querySelector("#su-open");
   if (DEMO) so.checked = true; else signupCfg().then(c => so.checked = c.open !== false);
   renderBlocked(body);
+  const sa = body.querySelector("#su-approval");
+  if (!DEMO) signupCfg().then(c => sa.checked = c.approval === true);
+  sa.onchange = async () => { if (DEMO) return toast("לא זמין במצב הדגמה"); try { await fb.f.setDoc(fb.f.doc(fb.db, "config", "signup"), { approval: sa.checked }, { merge: true }); toast(sa.checked ? "מעכשיו כל נרשם חדש ממתין לאישור שלך ⏳" : "נרשמים חדשים נכנסים מיד ✔"); } catch (e) { toast("שגיאה: " + (e.code || e.message)); sa.checked = !sa.checked; } };
+  const flt = () => { const q = body.querySelector("#u-search").value.trim().toLowerCase(), f = body.querySelector("#u-filter").value;
+    body.querySelectorAll("#st-users [data-u]").forEach(r => { const t = r.dataset.s || "", ok = (!q || t.includes(q)) && (!f || (f === "new" && r.dataset.new === "1") || (f === "noapt" && r.dataset.noapt === "1")); r.style.display = ok ? "" : "none"; }); };
+  body.querySelector("#u-search").oninput = flt; body.querySelector("#u-filter").onchange = flt;
   so.onchange = async () => { if (DEMO) return toast("לא זמין במצב הדגמה"); try { await fb.f.setDoc(fb.f.doc(fb.db, "config", "signup"), { open: so.checked }, { merge: true }); toast(so.checked ? "ההרשמה העצמית פתוחה ✔" : "ההרשמה העצמית נסגרה – רק מי שכבר רשום יכול להיכנס"); } catch (e) { toast("שגיאה: " + (e.code || e.message)); so.checked = !so.checked; } };
   renderUsers(body);
 }
@@ -2089,8 +2097,8 @@ async function renderUsers(body){
   const users = (await listUsers()).sort((a, b) => (b.selfSignup && !b.seen ? 1 : 0) - (a.selfSignup && !a.seen ? 1 : 0)), G = globalCfg.rates;
   const when = t => t ? new Date(t).toLocaleString("he-IL", { day: "numeric", month: "numeric", hour: "2-digit", minute: "2-digit" }) : "";
   box.innerHTML = users.map(u => { const r = u.rates || {};
-    const meta = `${u.selfSignup ? `<div class="muted" style="width:100%;font-size:12px">${!u.seen ? `<b class="up">🆕 חדש</b> · ` : ""}נרשם לבד ${u.provider === "google" ? "עם Google" : "עם מייל"} ב-${when(u.createdAt)}${u.lastLogin ? ` · נכנס לאחרונה ${when(u.lastLogin)}` : ""}${!u.seen ? ` <button class="mini add u-seen">✔ ראיתי</button>` : ""}</div>` : u.lastLogin ? `<div class="muted" style="width:100%;font-size:12px">נכנס לאחרונה ${when(u.lastLogin)}</div>` : ""}`;
-    return `<div class="list-item" style="flex-wrap:wrap" data-u="${esc(u.email)}">
+    const meta = `${u.selfSignup ? `<div class="muted" style="width:100%;font-size:12px">${u.pending ? `<b style="color:#b07800">⏳ ממתין לאישור</b> · ` : ""}${!u.seen ? `<b class="up">🆕 חדש</b> · ` : ""}נרשם לבד ${u.provider === "google" ? "עם Google" : "עם מייל"} ב-${when(u.createdAt)}${u.lastLogin ? ` · נכנס לאחרונה ${when(u.lastLogin)}` : ""}${!u.seen || u.pending ? ` <button class="mini add u-card">📝 פתח כרטיס ואשר</button>` : ""}</div>` : u.lastLogin ? `<div class="muted" style="width:100%;font-size:12px">נכנס לאחרונה ${when(u.lastLogin)}</div>` : ""}`;
+    return `<div class="list-item" style="flex-wrap:wrap${u.pending ? ";border-right:4px solid #e6a100" : ""}" data-u="${esc(u.email)}" data-s="${esc([u.name, u.email, u.phone, u.apt].join(" ").toLowerCase())}" data-new="${(u.selfSignup && !u.seen) || u.pending ? 1 : 0}" data-noapt="${u.apt ? 0 : 1}">
       <span style="min-width:200px"><input class="u-name" value="${esc(u.name || "")}" placeholder="שם" style="width:140px"> <span class="muted">${esc(u.email)}</span> ${u.email === ADMIN ? `<span class="up">· מנהל</span>` : ""}</span>
       <span class="rates">📞<input class="u-phone" value="${esc(u.phone || "")}" placeholder="טלפון" style="width:110px" inputmode="tel">🏠<select class="u-apt" title="הדירה שבה העובד עובד"><option value="">— דירה —</option>${(globalCfg.apartments || []).map(a => `<option ${a.name === (u.apt || "") ? "selected" : ""}>${esc(a.name)}</option>`).join("")}${u.apt && !(globalCfg.apartments || []).some(a => a.name === u.apt) ? `<option selected>${esc(u.apt)}</option>` : ""}</select>
       ☀️<input class="u-day" type="number" step="0.01" min="0" value="${esc(r.day || "")}" placeholder="${G.day}" title="תעריף שעת יום">🌙<input class="u-night" type="number" step="0.01" min="0" value="${esc(r.nightFlat || "")}" placeholder="${G.nightFlat}" title="סכום ללילה">
@@ -2117,7 +2125,8 @@ async function renderUsers(body){
     };
     const del = row.querySelector(".u-del"); if (del) del.onclick = () => deleteUser(email, body);
     const blk = row.querySelector(".u-block"); if (blk) blk.onclick = () => blockUser(email, body);
-    const sn = row.querySelector(".u-seen"); if (sn) sn.onclick = async () => { await DB.putUser(email, { seen: true }); renderUsers(body); adminScan(); };
+    const cb = row.querySelector(".u-card"); if (cb) cb.onclick = () => openUserCard(email);
+    const cb2 = document.createElement("button"); cb2.className = "mini fix"; cb2.textContent = "📝 כרטיס"; row.querySelector(".rates").appendChild(cb2); cb2.onclick = () => openUserCard(email);
     const nb = document.createElement("button"); nb.className = "mini fix"; nb.textContent = "🗒️ הערה פרטית"; row.querySelector(".rates").appendChild(nb);
     nb.onclick = async () => { const cur0 = await ANOTE.get(email).catch(() => ""); const t = prompt("הערה פרטית על העובד (רק אתה רואה):", cur0); if (t == null) return; await ANOTE.set(email, t.trim()); toast("ההערה נשמרה ✔"); };
   });
@@ -2191,7 +2200,7 @@ async function adminScan(){
       (globalCfg.apartments || []).filter(a => +a.budget > 0).forEach(a => { const sp = rc.filter(r => r.apt === a.name && r.month === mk).reduce((x, r) => x + (+r.amount || 0), 0);
         if (sp > +a.budget) alerts.push({ lvl: "red", text: `הדירה ${a.name} עברה את התקציב החודשי: ${money(sp)} מתוך ${money(+a.budget)}` }); });
     } catch (e) {}
-    let newUsers = 0; try { newUsers = (await listUsers()).filter(u => u.selfSignup && !u.seen).length; } catch (e) {}
+    let newUsers = 0; try { newUsers = (await listUsers()).filter(u => (u.selfSignup && !u.seen) || u.pending).length; } catch (e) {}
     adminAlerts = { alerts, pending, unread, reports, swaps, newUsers };
     const n = alerts.length + pending + unread + reports + swaps + newUsers;
     $("settings-btn").innerHTML = `<span class="ic">⚙️</span>הגדרות מנהל${n ? `<span class="badge-n">${n}</span>` : ""}`;
@@ -2734,6 +2743,7 @@ async function onAuth(user){
     let u = await f.getDoc(f.doc(fb.db, "users", email));
     if (!u.exists() && adminUser) { await f.setDoc(f.doc(fb.db, "users", email), { email, role: "admin", name: "", createdAt: Date.now() }); u = await f.getDoc(f.doc(fb.db, "users", email)); }
     if (!u.exists()) { if (!(await selfSignup(user, email))) return; u = await f.getDoc(f.doc(fb.db, "users", email)); }
+    else if (!adminUser && u.data().pending) { await a.signOut(fb.auth); setMsg("login-msg", "⏳ ההרשמה שלך ממתינה לאישור המנהל. נסה שוב אחרי שיאשר אותך.", true); return; }
     else if (!adminUser) f.setDoc(f.doc(fb.db, "users", email), { lastLogin: Date.now() }, { merge: true }).catch(() => {});
     me = email; isAdmin = adminUser; ADMIN = adminUser ? email : null;
     await openSystem(email, u.data().name);
@@ -2755,11 +2765,13 @@ async function selfSignup(user, email){
   }
   const name = (user.displayName || "").trim() || email.split("@")[0];
   const provider = (user.providerData || []).some(p => p.providerId === "google.com") ? "google" : "email";
-  await f.setDoc(f.doc(fb.db, "users", email), { email, name, role: "user", createdAt: Date.now(), selfSignup: true, provider });
+  const pend = cfg.approval === true;
+  await f.setDoc(f.doc(fb.db, "users", email), { email, name, role: "user", createdAt: Date.now(), selfSignup: true, provider, pending: pend });
   try { await f.setDoc(f.doc(fb.db, "settings", email), { name }, { merge: true }); } catch (e) {}
   f.addDoc(f.collection(fb.db, "log"), { at: Date.now(), by: email, byName: name, target: email, text: `נרשם בעצמו למערכת (${provider === "google" ? "Google" : "מייל"})` }).catch(() => {});
   // התראה למנהל – נשלחת דרך השרת, כך שהמייל של המנהל לא מופיע באתר
   resetCall({ action: "notifyNewUser", email, name }).catch(() => {});
+  if (pend) { await a.signOut(fb.auth); setMsg("login-msg", `✔ נרשמת, ${name}! המנהל צריך לאשר אותך. אחרי האישור תוכל להיכנס.`, true); return false; }
   setTimeout(() => toast(`ברוך הבא, ${name}! 👋`), 1500);
   return true;
 }
@@ -2907,6 +2919,58 @@ async function addUser(m){
   await f.setDoc(f.doc(fb.db, "settings", email), { ...defaultSettings(), name, locations: settings.locations || [] });
   m.querySelector("#nu-name").value = m.querySelector("#nu-email").value = m.querySelector("#nu-pass").value = "";
   setMsg("nu-msg", "המשתמש נוסף ✔" + note, true); renderUsers(m); fillUserSwitcher();
+}
+// ---- כרטיס משתמש: כל הפרטים והפעולות במקום אחד ----
+async function openUserCard(email){
+  const u = (await listUsers()).find(x => x.email === email) || { email }, r = u.rates || {}, G = globalCfg.rates;
+  const when = t => t ? new Date(t).toLocaleString("he-IL", { day: "numeric", month: "numeric", year: "2-digit", hour: "2-digit", minute: "2-digit" }) : "";
+  const note = await ANOTE.get(email).catch(() => "");
+  const apts = globalCfg.apartments || [];
+  const m = modal(`<h3>👤 ${esc(u.name || email)} ${closeX}</h3>
+    <div class="muted" style="margin-bottom:8px">${esc(email)}${u.selfSignup ? ` · נרשם לבד ${u.provider === "google" ? "עם Google" : "עם מייל"} ב-${when(u.createdAt)}` : ""}${u.lastLogin ? ` · נכנס לאחרונה ${when(u.lastLogin)}` : ""}${u.pending ? ` · <b style="color:#b07800">⏳ ממתין לאישור שלך</b>` : ""}</div>
+    <div class="frow"><input id="uc-name" value="${esc(u.name || "")}" placeholder="שם" style="flex:1"><input id="uc-phone" value="${esc(u.phone || "")}" placeholder="📞 טלפון" inputmode="tel" style="flex:1"></div>
+    <div class="frow"><select id="uc-apt" style="flex:1"><option value="">🏠 — בחר דירה —</option>${apts.map(a => `<option ${a.name === (u.apt || "") ? "selected" : ""}>${esc(a.name)}</option>`).join("")}${u.apt && !apts.some(a => a.name === u.apt) ? `<option selected>${esc(u.apt)}</option>` : ""}</select></div>
+    <div class="frow"><span>☀️</span><input id="uc-day" type="number" step="0.01" min="0" value="${esc(r.day || "")}" placeholder="תעריף יום (${G.day})" style="flex:1"><span>🌙</span><input id="uc-night" type="number" step="0.01" min="0" value="${esc(r.nightFlat || "")}" placeholder="סכום ללילה (${G.nightFlat})" style="flex:1"></div>
+    <div class="frow"><input id="uc-note" value="${esc(note || "")}" placeholder="🗒️ הערה פרטית (רק אתה רואה)" style="flex:1"></div>
+    <div class="frow"><button class="b-green" id="uc-save">✔ ${u.pending ? "אשר ושמור" : "שמור"}</button><button class="b-gray" id="uc-back">→ לרשימת העובדים</button></div>
+    <h4>📣 ברוך הבא</h4>
+    <div class="frow"><button class="btnlink b-wa" id="uc-wa">💬 שלח בוואטסאפ</button><button class="b-blue" id="uc-mail">📧 שלח במייל</button><button class="b-gray" id="uc-view">👁️ צפה בשעות שלו</button></div>
+    <h4>⚠️ פעולות</h4>
+    <div class="frow"><button class="b-red" id="uc-block">⛔ חסום</button><button class="b-gray" id="uc-del">🗑 מחק לגמרי</button></div>
+    <div id="nu-msg" class="msg"></div>`);
+  const val = id => m.querySelector(id).value.trim();
+  const welcome = () => { const apt = val("#uc-apt"); return `שלום ${val("#uc-name") || ""} 👋\nנרשמת למערכת "אברהם" לשעות עבודה וקבלות.${apt ? `\n🏠 הדירה שלך: ${apt}` : ""}\nכניסה: ${APP_URL}\nלהורדת האפליקציה לטלפון: ${DL_URL}`; };
+  const save = async (quiet) => {
+    const name = val("#uc-name"), phone = val("#uc-phone"), apt = val("#uc-apt"), rates = { day: +val("#uc-day") || 0, nightFlat: +val("#uc-night") || 0 };
+    if (DEMO) { toast("לא זמין במצב הדגמה"); return false; }
+    try {
+      const wasPending = u.pending;
+      await DB.putUser(email, { name, phone, apt, rates, seen: true, pending: false });
+      if (apt && apt !== (u.apt || "")) {
+        const entry = { address: apt, from: ymd(today) };
+        const st = await fb.f.getDoc(fb.f.doc(fb.db, "settings", email)); const locs = [...((st.exists() && st.data().locations) || []).filter(l => l.from !== entry.from), entry];
+        await fb.f.setDoc(fb.f.doc(fb.db, "settings", email), { locations: locs, name }, { merge: true });
+        LOG.add(email, `שייך לדירה ${apt} מ-${dmy(today)}`);
+      } else await fb.f.setDoc(fb.f.doc(fb.db, "settings", email), { name }, { merge: true });
+      if (val("#uc-note") !== (note || "")) await ANOTE.set(email, val("#uc-note"));
+      if (wasPending) LOG.add(email, "אישר את המשתמש");
+      Object.assign(u, { name, phone, apt, rates, seen: true, pending: false });
+      if (!quiet) toast(wasPending ? "המשתמש אושר ונשמר ✔" : "נשמר ✔");
+      fillUserSwitcher(); adminScan(); return true;
+    } catch (e) { toast("שגיאה בשמירה: " + (e.code || e.message)); return false; }
+  };
+  m.querySelector("#uc-save").onclick = () => save();
+  m.querySelector("#uc-back").onclick = () => openSettings("users");
+  m.querySelector("#uc-wa").onclick = async () => { const ph = val("#uc-phone"); if (!ph) return toast("קודם תכתוב מספר טלפון"); await save(true); window.open(`https://wa.me/${waNum(ph)}?text=${encodeURIComponent(welcome())}`, "_blank"); };
+  m.querySelector("#uc-mail").onclick = async () => {
+    if (DEMO) return toast("לא זמין במצב הדגמה");
+    await save(true);
+    try { emailjs.init(CFG.emailjs.key); await emailjs.send(CFG.emailjs.service, CFG.emailjs.template, { from_name: CFG.senderName, reply_to: CFG.senderEmail, to_email: email, name: val("#uc-name") || email, to_name: email, subject: "ברוך הבא למערכת אברהם 👋", message: welcome() }); toast("מייל ברוך הבא נשלח ✔"); }
+    catch (e) { toast("שליחת המייל נכשלה: " + (e.text || e.message)); }
+  };
+  m.querySelector("#uc-view").onclick = () => { closeModal(); const sel = $("view-user"); if (sel && [...sel.options].some(o => o.value === email)) { sel.value = email; sel.dispatchEvent(new Event("change")); } else toast("אפשר לבחור אותו ברשימה למעלה"); };
+  m.querySelector("#uc-block").onclick = async () => { await blockUser(email, m); if (!$("modal-root").firstChild || !(await listUsers()).some(x => x.email === email)) openSettings("users"); };
+  m.querySelector("#uc-del").onclick = async () => { await deleteUser(email, m); if (!(await listUsers()).some(x => x.email === email)) openSettings("users"); };
 }
 async function blockUser(email, m){
   if (DEMO) return toast("לא זמין במצב הדגמה");
