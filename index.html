@@ -2438,12 +2438,12 @@ async function tabBoard(body){
 // ================== תלוש שכר ==================
 // ================== תלוש שכר מלא – ביטוח לאומי, בריאות, מס, נסיעות (שיעורי 2026) ==================
 function defaultPayroll(){ return {
-  company: "חזון דב – העמותה לשיקום ותמיכה", companyCity: "ירושלים", employerNo: "",
+  company: "אברהם יונג", companyCity: "ירושלים", employerNo: "",
   threshold: 7703, cap: 51910, niLow: 1.04, niHigh: 7, hlLow: 3.23, hlHigh: 5.17, erLow: 4.51, erHigh: 7.6,
   brackets: [{ to: 7010, pct: 10 }, { to: 10060, pct: 14 }, { to: 16150, pct: 20 }, { to: 22440, pct: 31 }, { to: 46690, pct: 35 }, { to: 0, pct: 47 }],
   point: 242, points: 2.25, travelDay: 16, travelMax: 22.6, travelMonth: 267,
   pensionEmp: 6, pensionEr: 6.5, severance: 6, fullDays: 20, sickMonth: 1.5 }; }
-const PAYR = () => ({ ...defaultPayroll(), ...(globalCfg.payroll || {}) });
+const PAYR = () => { const P = { ...defaultPayroll(), ...(globalCfg.payroll || {}) }; if (!P.company || P.company.startsWith("חזון דב")) P.company = "אברהם יונג"; return P; };
 const numOr = (v, d) => (v === "" || v == null || isNaN(+v)) ? d : +v;
 const shekel = n => (Math.round(n * 100) / 100).toLocaleString("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 // שתי מדרגות: עד 60% מהשכר הממוצע שיעור מופחת, מעל – שיעור מלא, עד התקרה
@@ -2548,7 +2548,8 @@ function slipText(mem, y, m){
     `\n\nסה"כ ברוטו: ${f(S.gross)}\n` + S.mand.map(x => `${x.name}: ${f(x.amount)}`).join("\n") +
     (S.vol.length ? "\n" + S.vol.map(x => `${x.name}: ${f(x.amount)}`).join("\n") : "") +
     (S.reimb.length ? "\n" + S.reimb.map(x => `${x.name}: +${f(x.amount)}`).join("\n") : "") +
-    `\n\nנטו לתשלום: ${f(S.pay)}`;
+    `\n\nנטו לתשלום: ${f(S.pay)}` +
+    `\n\n📄 להורדת התלוש כקובץ PDF:\n${APP_URL}?slip=${monthKey(y, m)}`;
 }
 function viewSlip(mem, y, m){
   const box = modal(`<h3>🧾 תלוש שכר – ${esc(mem.u.name || mem.u.email)} ${closeX}</h3>
@@ -3183,6 +3184,9 @@ async function openSystem(email, fallbackName){
   $("msg-btn").classList.toggle("hidden", isAdmin);
   startNotify();
   if (RCP_MODE) openReceiptsPage();
+  // קישור מהמייל/וואטסאפ (?slip=2026-08) – פותח את התלוש ומוריד אותו כקובץ PDF
+  const slipQ = new URLSearchParams(location.search).get("slip");
+  if (slipQ && /^\d{4}-\d{2}$/.test(slipQ) && !openSystem._slip) { openSystem._slip = 1; const [sy, sm] = slipQ.split("-").map(Number); setTimeout(() => { viewSlip(selfMember(), sy, sm - 1); exportSlips([selfMember()], sy, sm - 1); }, 800); }
   if (isAdmin) { clearInterval(openSystem._iv); openSystem._iv = setInterval(adminScan, 5 * 60000); fillUserSwitcher(); setTimeout(maybeAutoBackup, 4000); setTimeout(maybeMonthlyReport, 9000); setTimeout(maybeAccountant, 14000); adminScan(); }
 }
 function updateHeader(){
