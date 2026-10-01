@@ -2528,7 +2528,7 @@ function slipHtml(mem, y, m){
       <div style="font-size:11px;color:#555;text-align:left">הופק ב-${dmy(new Date())}<br>${esc(hebDate(new Date()))}</div></div>
     <table style="width:100%;border-collapse:collapse;margin-top:6px"><tr>
       ${cell("שם עובד", esc(name))}${cell("תעודת זהות", esc(E.idNum || ""))}${cell("מחלקה / דירה", esc(mem.u.apt || ""))}${cell("תחילת עבודה", L ? dmy(parseYmd(L.start)) : "")}${cell("ותק (שנים)", L ? L.years.toFixed(2) : "")}</tr><tr>
-      ${cell("ימי עבודה", S.days)}${cell("שעות עבודה", fmtHM(S.hours))}${cell("תעריף שעה", shekel(r.R.day))}${cell("נקודות זיכוי", S.points)}${cell("בנק / סניף / חשבון", acct)}</tr></table>
+      ${cell("ימי עבודה", S.days)}${cell("שעות עבודה", fmtHM(S.hours))}${cell("תעריף שעה", shekel(r.R.day))}${cell("בנק / סניף / חשבון", acct)}</tr></table>
     <div style="display:flex;gap:8px;margin-top:8px;align-items:flex-start">
       <div style="flex:1.5"><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">תאור התשלום</th><th style="${th}">כמות</th><th style="${th}">תעריף</th><th style="${th}">סכום התשלום</th></tr></thead><tbody>${payRows}
         <tr><td colspan="3" style="${td};font-weight:bold;background:#f5f6f8">סה"כ תשלומים (ברוטו)</td><td style="${td};text-align:left;font-weight:bold;background:#f5f6f8">${shekel(S.gross)}</td></tr></tbody></table></div>
