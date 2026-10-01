@@ -2242,7 +2242,7 @@ async function tabUsers(body, m){
       <span class="muted" style="font-weight:400">מי שנרשם לבד מופיע כאן עם 🆕, ומגיע אליך מייל. אפשר לשייך אותו לדירה, או ללחוץ ⛔ חסום (השעות שלו נשמרות, ואפשר לבטל את החסימה).</span></div>
     <label style="display:flex;gap:8px;align-items:center;margin:6px 0"><input type="checkbox" id="su-approval" style="width:auto"> ⏳ נרשם חדש ממתין לאישור שלי לפני שהוא יכול להיכנס</label>
     <div id="su-blocked"></div>
-    <div class="frow"><input id="u-search" placeholder="🔎 חיפוש לפי שם, מייל, טלפון או דירה" style="flex:1"><select id="u-filter"><option value="">כולם</option><option value="new">🆕 רק חדשים / ממתינים</option><option value="noapt">🏠 בלי דירה</option></select></div>
+    <div class="frow"><input id="u-search" placeholder="🔎 חיפוש לפי שם, מייל, טלפון או דירה" style="flex:1"><select id="u-filter"><option value="">כולם</option><option value="new">🆕 רק חדשים / ממתינים</option><option value="noapt">🏠 בלי דירה</option></select></div><datalist id="u-apt-list">${(globalCfg.apartments || []).map(a => `<option value="${esc(a.name)}">`).join("")}</datalist>
     <div id="st-users">טוען...</div>
     <h4>＋ הוספת עובד</h4>
     <div class="frow"><input id="nu-name" placeholder="שם העובד" style="flex:1"><input id="nu-email" type="email" placeholder="מייל (שם משתמש)" style="flex:1.3"></div>
@@ -2272,7 +2272,7 @@ async function renderUsers(body){
     const meta = `${u.selfSignup ? `<div class="muted" style="width:100%;font-size:12px">${u.pending ? `<b style="color:#b07800">⏳ ממתין לאישור</b> · ` : ""}${!u.seen ? `<b class="up">🆕 חדש</b> · ` : ""}נרשם לבד ${u.provider === "google" ? "עם Google" : "עם מייל"} ב-${when(u.createdAt)}${u.lastLogin ? ` · נכנס לאחרונה ${when(u.lastLogin)}` : ""}${!u.seen || u.pending ? ` <button class="mini add u-card">📝 פתח כרטיס ואשר</button>` : ""}</div>` : u.lastLogin ? `<div class="muted" style="width:100%;font-size:12px">נכנס לאחרונה ${when(u.lastLogin)}</div>` : ""}`;
     return `<div class="list-item" style="flex-wrap:wrap${u.pending ? ";border-right:4px solid #e6a100" : ""}" data-u="${esc(u.email)}" data-s="${esc([u.name, u.email, u.phone, u.apt].join(" ").toLowerCase())}" data-new="${(u.selfSignup && !u.seen) || u.pending ? 1 : 0}" data-noapt="${u.apt ? 0 : 1}">
       <span style="min-width:200px"><input class="u-name" value="${esc(u.name || "")}" placeholder="שם" style="width:140px"> <span class="muted">${esc(u.email)}</span> ${u.email === ADMIN ? `<span class="up">· מנהל</span>` : ""}</span>
-      <span class="rates">📞<input class="u-phone" value="${esc(u.phone || "")}" placeholder="טלפון" style="width:110px" inputmode="tel">🏠<select class="u-apt" title="הדירה שבה העובד עובד"><option value="">— דירה —</option>${(globalCfg.apartments || []).map(a => `<option ${a.name === (u.apt || "") ? "selected" : ""}>${esc(a.name)}</option>`).join("")}${u.apt && !(globalCfg.apartments || []).some(a => a.name === u.apt) ? `<option selected>${esc(u.apt)}</option>` : ""}</select>
+      <span class="rates">📞<input class="u-phone" value="${esc(u.phone || "")}" placeholder="טלפון" style="width:110px" inputmode="tel">🏠<input class="u-apt" list="u-apt-list" value="${esc(u.apt || "")}" placeholder="דירה" title="הדירה שבה העובד עובד – אפשר לכתוב או לבחור" style="width:120px" autocomplete="off">
       ☀️<input class="u-day" type="number" step="0.01" min="0" value="${esc(r.day || "")}" placeholder="${G.day}" title="תעריף שעת יום">🌙<input class="u-night" type="number" step="0.01" min="0" value="${esc(r.nightFlat || "")}" placeholder="${G.nightFlat}" title="סכום ללילה">
       <button class="mini add u-save">שמור</button>${u.email === ADMIN ? "" : `<button class="mini del u-del">מחק</button><button class="mini del u-block" title="מחיקה + לא יוכל להירשם שוב">⛔ חסום</button>`}</span>${meta}</div>`; }).join("");
   box.querySelectorAll("[data-u]").forEach(row => {
@@ -2280,7 +2280,8 @@ async function renderUsers(body){
     row.querySelector(".u-save").onclick = async () => {
       const name = row.querySelector(".u-name").value.trim();
       const rates = { day: +row.querySelector(".u-day").value || 0, nightFlat: +row.querySelector(".u-night").value || 0 };
-      const apt = row.querySelector(".u-apt").value, phone = row.querySelector(".u-phone").value.trim();
+      const apt = row.querySelector(".u-apt").value.trim(), phone = row.querySelector(".u-phone").value.trim();
+      await ensureApt(apt);
       try {
         const prevApt = (users.find(x => x.email === email) || {}).apt || "";
         await DB.putUser(email, { name, rates, apt, phone });
@@ -3257,6 +3258,14 @@ async function addUser(m){
   m.querySelector("#nu-name").value = m.querySelector("#nu-email").value = m.querySelector("#nu-pass").value = "";
   setMsg("nu-msg", "המשתמש נוסף ✔" + note, true); renderUsers(m); fillUserSwitcher();
 }
+// דירה חדשה שנכתבה בכרטיס העובד – נוספת אוטומטית לרשימת הדירות
+async function ensureApt(name){
+  name = (name || "").trim(); if (!name) return;
+  const A = globalCfg.apartments || [];
+  if (A.some(a => norm(a.name) === norm(name))) return;
+  globalCfg.apartments = [...A, { id: newId(), name, address: "", instructions: "" }];
+  try { await DB.putGlobal(); } catch (e) {}
+}
 // ---- כרטיס משתמש: כל הפרטים והפעולות במקום אחד ----
 async function openUserCard(email){
   const u = (await listUsers()).find(x => x.email === email) || { email }, r = u.rates || {}, G = globalCfg.rates, PY = u.pay || {}, PP = PAYR();
@@ -3266,7 +3275,7 @@ async function openUserCard(email){
   const m = modal(`<h3>👤 ${esc(u.name || email)} ${closeX}</h3>
     <div class="muted" style="margin-bottom:8px">${esc(email)}${u.selfSignup ? ` · נרשם לבד ${u.provider === "google" ? "עם Google" : "עם מייל"} ב-${when(u.createdAt)}` : ""}${u.lastLogin ? ` · נכנס לאחרונה ${when(u.lastLogin)}` : ""}${u.pending ? ` · <b style="color:#b07800">⏳ ממתין לאישור שלך</b>` : ""}</div>
     <div class="frow"><input id="uc-name" value="${esc(u.name || "")}" placeholder="שם" style="flex:1"><input id="uc-phone" value="${esc(u.phone || "")}" placeholder="📞 טלפון" inputmode="tel" style="flex:1"></div>
-    <div class="frow"><select id="uc-apt" style="flex:1"><option value="">🏠 — בחר דירה —</option>${apts.map(a => `<option ${a.name === (u.apt || "") ? "selected" : ""}>${esc(a.name)}</option>`).join("")}${u.apt && !apts.some(a => a.name === u.apt) ? `<option selected>${esc(u.apt)}</option>` : ""}</select></div>
+    <div class="frow"><span>🏠</span><input id="uc-apt" list="uc-apt-list" value="${esc(u.apt || "")}" placeholder="דירה – תכתוב את שם הדירה או תבחר מהרשימה" style="flex:1" autocomplete="off"><datalist id="uc-apt-list">${apts.map(a => `<option value="${esc(a.name)}">`).join("")}</datalist></div>
     <div class="frow"><span>☀️</span><input id="uc-day" type="number" step="0.01" min="0" value="${esc(r.day || "")}" placeholder="תעריף יום (${G.day})" style="flex:1"><span>🌙</span><input id="uc-night" type="number" step="0.01" min="0" value="${esc(r.nightFlat || "")}" placeholder="סכום ללילה (${G.nightFlat})" style="flex:1"></div>
     <details style="margin:6px 0"${PY.idNum || PY.start ? "" : " open"}><summary style="cursor:pointer;font-weight:bold">🧾 פרטים לתלוש שכר</summary>
       <div class="frow"><input id="uc-id" value="${esc(PY.idNum || "")}" placeholder="תעודת זהות" inputmode="numeric" style="flex:1"><label style="min-width:auto">תחילת עבודה</label><input id="uc-start" type="date" value="${esc(PY.start || "")}"></div>
@@ -3286,7 +3295,7 @@ async function openUserCard(email){
   const val = id => m.querySelector(id).value.trim();
   const welcome = () => { const apt = val("#uc-apt"); return `שלום ${val("#uc-name") || ""} 👋\nנרשמת למערכת "אברהם" לשעות עבודה וקבלות.${apt ? `\n🏠 הדירה שלך: ${apt}` : ""}\nכניסה: ${APP_URL}\nלהורדת האפליקציה לטלפון: ${DL_URL}`; };
   const save = async (quiet) => {
-    const name = val("#uc-name"), phone = val("#uc-phone"), apt = val("#uc-apt"), rates = { day: +val("#uc-day") || 0, nightFlat: +val("#uc-night") || 0 };
+    const name = val("#uc-name"), phone = val("#uc-phone"), apt = val("#uc-apt"); await ensureApt(apt); const rates = { day: +val("#uc-day") || 0, nightFlat: +val("#uc-night") || 0 };
     const pay = { idNum: val("#uc-id"), start: val("#uc-start"), bank: val("#uc-bank"), branch: val("#uc-branch"), account: val("#uc-acc"), points: val("#uc-pts"), travelDay: val("#uc-td"), travelMonth: val("#uc-tm"), noTravel: m.querySelector("#uc-nt").checked, pension: m.querySelector("#uc-pen").checked };
     if (DEMO) { toast("לא זמין במצב הדגמה"); return false; }
     try {
