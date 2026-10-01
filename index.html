@@ -2539,14 +2539,48 @@ function slipHtml(mem, y, m){
     ${sig ? `<div style="margin-top:12px;font-size:12px">✍️ העובד אישר את השעות וחתם ב-${new Date(sig.at).toLocaleDateString("he-IL")}:<br><img src="${sig.img}" style="height:56px;border-bottom:1px solid #999"></div>` : ""}
   </div>`;
 }
+// התלוש כטקסט – למייל ולוואטסאפ
+function slipText(mem, y, m){
+  const S = payslip(mem, y, m), f = n => shekel(n) + " ₪";
+  return `תלוש שכר – ${MONTHS[m]} ${y}\n${S.P.company}\nעובד: ${mem.u.name || mem.u.email}\n\n` +
+    `ימי עבודה: ${S.days} · שעות: ${fmtHM(S.hours)}\n\n` +
+    S.lines.map(l => `${l.name}${l.qty !== "" ? ` (${(+l.qty).toFixed(2)} × ${(+l.rate).toFixed(2)})` : ""}: ${f(l.amount)}`).join("\n") +
+    `\n\nסה"כ ברוטו: ${f(S.gross)}\n` + S.mand.map(x => `${x.name}: ${f(x.amount)}`).join("\n") +
+    (S.vol.length ? "\n" + S.vol.map(x => `${x.name}: ${f(x.amount)}`).join("\n") : "") +
+    (S.reimb.length ? "\n" + S.reimb.map(x => `${x.name}: +${f(x.amount)}`).join("\n") : "") +
+    `\n\nנטו לתשלום: ${f(S.pay)}`;
+}
 function viewSlip(mem, y, m){
   const box = modal(`<h3>🧾 תלוש שכר – ${esc(mem.u.name || mem.u.email)} ${closeX}</h3>
-    <div class="frow"><input type="month" id="vs-m" value="${monthKey(y, m)}"><button class="b-blue" id="vs-pdf">⬇️ הורד PDF</button><button class="b-gray" id="vs-print">🖨️ הדפס</button></div>
+    <div class="frow"><input type="month" id="vs-m" value="${monthKey(y, m)}"><button class="b-blue" id="vs-pdf">⬇️ הורד PDF</button><button class="b-gray" id="vs-print">🖨️ הדפס</button>${isAdmin ? `<button class="b-blue" id="vs-mail">📧 שלח לעובד במייל</button><button class="btnlink b-wa" id="vs-wa">💬 שלח לעובד בוואטסאפ</button>` : ""}</div>
     <div style="overflow:auto;background:#fff;border-radius:8px"><div id="vs-body"></div></div>`);
   box.classList.add("wide");
   const draw = () => { const [yy, mm] = box.querySelector("#vs-m").value.split("-").map(Number); y = yy; m = mm - 1; box.querySelector("#vs-body").innerHTML = slipHtml(mem, y, m); };
   box.querySelector("#vs-m").onchange = draw; draw();
   box.querySelector("#vs-pdf").onclick = () => exportSlips([mem], y, m);
+  const mb = box.querySelector("#vs-mail"), wb = box.querySelector("#vs-wa");
+  if (mb) mb.onclick = async () => {
+    if (DEMO) return toast("לא זמין במצב הדגמה");
+    const to = mem.u.email; if (!to || !confirm(`לשלוח את התלוש של ${MONTHS[m]} ${y} אל ${to}?`)) return;
+    mb.disabled = true; toast("שולח את התלוש...");
+    try { emailjs.init(CFG.emailjs.key); await emailjs.send(CFG.emailjs.service, CFG.emailjs.template, { from_name: CFG.senderName, reply_to: CFG.senderEmail, to_email: to, name: mem.u.name || to, to_name: to, subject: `תלוש שכר – ${MONTHS[m]} ${y}`, message: slipText(mem, y, m) }); toast("התלוש נשלח במייל ✔"); LOG.add(to, `שלח תלוש ${MONTHS[m]} ${y} במייל`); }
+    catch (e) { toast("שליחת המייל נכשלה: " + (e.text || e.message)); } finally { mb.disabled = false; }
+  };
+  if (wb) wb.onclick = async () => {
+    const txt = slipText(mem, y, m), ph = mem.u.phone;
+    // בטלפון: שולח את קובץ ה-PDF של התלוש ישר לוואטסאפ. במחשב: הודעה עם כל פרטי התלוש
+    try {
+      if (navigator.canShare && /Android|iPhone|iPad/i.test(navigator.userAgent)) {
+        await loadScript("https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.2/dist/html2pdf.bundle.min.js");
+        const el = document.createElement("div"); el.innerHTML = slipHtml(mem, y, m);
+        const blob = await html2pdf().set({ margin: 8, image: { type: "jpeg", quality: 0.95 }, html2canvas: { scale: 2, backgroundColor: "#ffffff" }, jsPDF: { unit: "mm", format: "a4", orientation: "portrait" } }).from(el.firstElementChild).outputPdf("blob");
+        const file = new File([blob], `תלוש-${mem.u.name || "עובד"}-${MONTHS[m]}-${y}.pdf`, { type: "application/pdf" });
+        if (navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], text: `תלוש שכר – ${MONTHS[m]} ${y}` }); return; }
+      }
+    } catch (e) { if (e && e.name === "AbortError") return; }
+    if (!ph) return toast("לעובד אין מספר טלפון – תוסיף אותו בכרטיס העובד");
+    window.open(`https://wa.me/${waNum(ph)}?text=${encodeURIComponent(txt)}`, "_blank");
+  };
   box.querySelector("#vs-print").onclick = () => { const w = window.open("", "_blank"); if (!w) return toast("הדפדפן חסם חלון חדש"); w.document.write(`<!doctype html><html dir="rtl"><head><meta charset="utf-8"><title>תלוש ${esc(mem.u.name || "")} ${pad(m + 1)}/${y}</title></head><body style="margin:0">${slipHtml(mem, y, m)}</body></html>`); w.document.close(); setTimeout(() => w.print(), 400); };
 }
 function tabPayroll(body){
