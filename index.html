@@ -2568,7 +2568,9 @@ function viewSlip(mem, y, m){
     catch (e) { toast("שליחת המייל נכשלה: " + (e.text || e.message)); } finally { mb.disabled = false; }
   };
   if (wb) wb.onclick = async () => {
-    const txt = slipText(mem, y, m), ph = mem.u.phone;
+    const txt = slipText(mem, y, m);
+    // הטלפון נלקח תמיד מכרטיס העובד העדכני (גם כשהתלוש נפתח ממסך "שלי")
+    let ph = mem.u.phone; if (!ph && !DEMO) { try { ph = ((await listUsers()).find(x => x.email === mem.u.email) || {}).phone || ""; } catch (e) {} }
     // בטלפון: שולח את קובץ ה-PDF של התלוש ישר לוואטסאפ. במחשב: הודעה עם כל פרטי התלוש
     try {
       if (navigator.canShare && /Android|iPhone|iPad/i.test(navigator.userAgent)) {
