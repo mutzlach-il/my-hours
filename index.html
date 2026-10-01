@@ -2441,7 +2441,7 @@ function defaultPayroll(){ return {
   threshold: 7703, cap: 51910, niLow: 1.04, niHigh: 7, hlLow: 3.23, hlHigh: 5.17, erLow: 4.51, erHigh: 7.6,
   brackets: [{ to: 7010, pct: 10 }, { to: 10060, pct: 14 }, { to: 16150, pct: 20 }, { to: 22440, pct: 31 }, { to: 46690, pct: 35 }, { to: 0, pct: 47 }],
   point: 242, points: 2.25, travelDay: 16, travelMax: 22.6, travelMonth: 267,
-  otOn: true, otDay: 8.6, pensionEmp: 6, pensionEr: 6.5, severance: 6, fullDays: 20, sickMonth: 1.5 }; }
+  pensionEmp: 6, pensionEr: 6.5, severance: 6, fullDays: 20, sickMonth: 1.5 }; }
 const PAYR = () => ({ ...defaultPayroll(), ...(globalCfg.payroll || {}) });
 const numOr = (v, d) => (v === "" || v == null || isNaN(+v)) ? d : +v;
 const shekel = n => (Math.round(n * 100) / 100).toLocaleString("he-IL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -2453,14 +2453,10 @@ const slipOk = s => !s.rejected && !(s.approved === false && s.offPlan) && shift
 function payCalc(mem, y, m){
   const P = PAYR(), E = mem.u.pay || {}, r = memberMonth(mem, y, m), p = r.p, R = r.R;
   const work = r.list.filter(slipOk), lines = [], rnd = Math.round;
-  // שעות נוספות: מעל X שעות יום ביום אחד – השעתיים הראשונות 125%, ומעבר לזה 150%
-  let h125 = 0, h150 = 0;
-  if (P.otOn) { const perDay = {}; work.forEach(s => perDay[s.date] = (perDay[s.date] || 0) + calcPay([s], R).dayH);
-    for (const h of Object.values(perDay)) { const ex = Math.max(0, h - (+P.otDay || 8.6)); h125 += Math.min(2, ex); h150 += Math.max(0, ex - 2); } }
+  // בלי שעות נוספות בתלוש – כל שעות היום נכנסות לשכר יסוד
+  const h125 = 0, h150 = 0;
   const regH = Math.max(0, p.dayH - h125 - h150), rd = x => Math.round(x * 100) / 100;
   if (regH > 0) lines.push({ name: "שכר יסוד", qty: rd(regH), rate: R.day, amount: rnd(regH * R.day) });
-  if (h125 > 0) lines.push({ name: "שעות נוספות 125%", qty: rd(h125), rate: rd(R.day * 1.25), amount: rnd(h125 * R.day * 1.25) });
-  if (h150 > 0) lines.push({ name: "שעות נוספות 150%", qty: rd(h150), rate: rd(R.day * 1.5), amount: rnd(h150 * R.day * 1.5) });
   if (p.premH > 0) lines.push({ name: `תוספת שבת/חג ${p.pct - 100}%`, qty: rd(p.premH), rate: rd(R.day * (p.pct - 100) / 100), amount: rnd(p.premPay) });
   if (p.nights > 0) lines.push({ name: "משמרת לילה", qty: p.nights, rate: R.nightFlat, amount: rnd(p.nightPay) });
   // נסיעות: לפי ימי הגעה × תעריף יומי (עד התקרה), ואם חופשי חודשי זול יותר – משלמים חודשי. ימי שבת/חג תמיד לפי יום
@@ -2537,25 +2533,7 @@ function slipHtml(mem, y, m){
       <div style="flex:1.5"><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">תאור התשלום</th><th style="${th}">כמות</th><th style="${th}">תעריף</th><th style="${th}">סכום התשלום</th></tr></thead><tbody>${payRows}
         <tr><td colspan="3" style="${td};font-weight:bold;background:#f5f6f8">סה"כ תשלומים (ברוטו)</td><td style="${td};text-align:left;font-weight:bold;background:#f5f6f8">${shekel(S.gross)}</td></tr></tbody></table></div>
       <div style="flex:1"><table style="width:100%;border-collapse:collapse">
-        ${box("ברוטו למס הכנסה", S.gross)}${box("ברוטו לביטוח לאומי", S.gross)}${box('סה"כ תשלומים', S.gross)}${box('סה"כ ניכויים', S.mandSum + S.volSum)}${box("שכר נטו", S.net)}${box("נטו לתשלום", S.pay, true)}</table></div></div>
-    <div style="display:flex;gap:8px;margin-top:8px;align-items:flex-start">
-      <div style="flex:1"><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">ניכויי חובה</th><th style="${th}">הסכום</th></tr></thead><tbody>${dedRows(S.mand)}
-        <tr><td style="${td};font-weight:bold;background:#f5f6f8">סה"כ</td><td style="${td};text-align:left;font-weight:bold;background:#f5f6f8">${shekel(S.mandSum)}</td></tr></tbody></table></div>
-      <div style="flex:1"><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">ניכויי רשות / החזרים</th><th style="${th}">הסכום</th></tr></thead><tbody>${dedRows(S.vol) + S.reimb.map(x => `<tr><td style="${td}">${esc(x.name)} (לא חייב במס)</td><td style="${td};text-align:left">+${shekel(x.amount)}</td></tr>`).join("") || `<tr><td colspan="2" style="${td};text-align:center;color:#777">אין</td></tr>`}</tbody></table></div></div>
-    <div style="font-size:11px;color:#333;margin-top:6px;line-height:1.6;border:${bd};padding:6px 8px">
-      <b>איך חושב:</b> ביטוח לאומי ${P.niLow}% ודמי בריאות ${P.hlLow}% על השכר עד ${P.threshold.toLocaleString("he-IL")} ₪, ומעל זה ${P.niHigh}% ו-${P.hlHigh}% ·
-      מס הכנסה לפי מדרגות = ${shekel(S.taxRaw)}, פחות זיכוי ${S.points} נקודות × ${P.point} ₪${S.empP ? " וזיכוי פנסיה" : ""} = ${shekel(S.credit)}, ולכן המס ${shekel(S.tax)} ·
-      נסיעות: ${S.td ? (S.tm > 0 ? `${shekel(S.td)} ₪ ליום או חופשי חודשי ${shekel(S.tm)} ₪ – הזול מביניהם` : `${shekel(S.td)} ₪ ליום הגעה`) : "ללא"}${S.h125 || S.h150 ? ` · שעות נוספות: מעל ${P.otDay} שעות ביום` : ""}</div>
-    <div style="display:flex;gap:8px;margin-top:8px;align-items:flex-start">
-      <div style="flex:1"><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}" colspan="2">נתונים מצטברים ${y}</th></tr></thead><tbody>
-        ${[["ברוטו", S.ytd.gross], ["מס הכנסה", S.ytd.tax], ["ביטוח לאומי", S.ytd.ni], ["דמי בריאות", S.ytd.hl], ["נטו", S.ytd.net]].map(([a, b]) => `<tr><td style="${td}">${a}</td><td style="${td};text-align:left">${shekel(b)}</td></tr>`).join("")}</tbody></table></div>
-      <div style="flex:1"><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">היעדרויות</th><th style="${th}">צבירה החודש</th><th style="${th}">ניצול החודש</th><th style="${th}">יתרה</th></tr></thead><tbody>
-        ${L ? `<tr><td style="${td}">חופש</td><td style="${td};text-align:center">${L.vacM.toFixed(2)}</td><td style="${td};text-align:center">${L.usedVac}</td><td style="${td};text-align:center">${L.vac.toFixed(2)}</td></tr>
-        <tr><td style="${td}">מחלה</td><td style="${td};text-align:center">${L.sickM.toFixed(2)}</td><td style="${td};text-align:center">${L.usedSick}</td><td style="${td};text-align:center">${L.sick.toFixed(2)}</td></tr>` : `<tr><td colspan="4" style="${td}">אין נתונים</td></tr>`}</tbody></table>
-        <table style="width:100%;border-collapse:collapse;margin-top:6px"><tbody>
-          <tr><td style="${td}">ביטוח לאומי – חלק מעסיק</td><td style="${td};text-align:left">${shekel(S.erNi)}</td></tr>
-          ${S.erP ? `<tr><td style="${td}">פנסיה – מעסיק ${P.pensionEr}%</td><td style="${td};text-align:left">${shekel(S.erP)}</td></tr><tr><td style="${td}">פיצויים ${P.severance}%</td><td style="${td};text-align:left">${shekel(S.sev)}</td></tr>` : ""}
-          <tr><td style="${td};font-weight:bold">עלות מעסיק</td><td style="${td};text-align:left;font-weight:bold">${shekel(S.cost)}</td></tr></tbody></table></div></div>
+        ${box('סה"כ ברוטו', S.gross)}${S.mand.map(x => box(esc(x.name), x.amount)).join("")}${S.vol.map(x => box(esc(x.name), x.amount)).join("")}${S.reimb.map(x => box(esc(x.name) + " (+)", x.amount)).join("")}${box("נטו לתשלום", S.pay, true)}</table></div></div>
     ${shiftRows ? `<div style="font-size:12.5px;font-weight:bold;margin:10px 0 4px">פירוט משמרות</div><table style="width:100%;border-collapse:collapse"><thead><tr><th style="${th}">תאריך</th><th style="${th}">יום</th><th style="${th}">שעות</th><th style="${th}">סה"כ</th><th style="${th}">דירה</th></tr></thead><tbody>${shiftRows}</tbody></table>` : ""}
     ${sig ? `<div style="margin-top:12px;font-size:12px">✍️ העובד אישר את השעות וחתם ב-${new Date(sig.at).toLocaleDateString("he-IL")}:<br><img src="${sig.img}" style="height:56px;border-bottom:1px solid #999"></div>` : ""}
   </div>`;
@@ -2591,8 +2569,6 @@ function tabPayroll(body){
     ${f("py-td", "נסיעה ליום (ברירת מחדל)", P.travelDay, "0.01", 90, " ₪")}
     ${f("py-tx", "תקרה ליום לפי החוק", P.travelMax, "0.01", 90, " ₪")}
     ${f("py-tm", "מחיר חופשי חודשי", P.travelMonth, "0.01", 90, " ₪ <span class='muted'>(0 = לשלם תמיד לפי יום. אם יש מחיר – המערכת בודקת מה זול יותר)</span>")}
-    <h4>⏱️ שעות נוספות</h4>
-    <div class="frow"><label style="min-width:auto"><input type="checkbox" id="py-ot" ${P.otOn ? "checked" : ""}> לחשב שעות נוספות: מעל <input id="py-otd" type="number" step="0.1" value="${P.otDay}" style="width:60px"> שעות יום באותו יום – השעתיים הראשונות 125%, ומעבר לזה 150%</label></div>
     <h4>🏦 פנסיה (לעובדים שהפעלת להם בכרטיס)</h4>
     <div class="frow"><label>עובד</label><input id="py-pe" type="number" step="0.1" value="${P.pensionEmp}" style="width:70px">% <label style="min-width:auto">מעסיק</label><input id="py-pr" type="number" step="0.1" value="${P.pensionEr}" style="width:70px">% <label style="min-width:auto">פיצויים</label><input id="py-ps" type="number" step="0.01" value="${P.severance}" style="width:70px">%</div>
     <h4>🏖️ חופש ומחלה</h4>
@@ -2605,7 +2581,7 @@ function tabPayroll(body){
     globalCfg.payroll = { company: q("#py-co").value.trim(), companyCity: q("#py-city").value.trim(), employerNo: q("#py-emp").value.trim(),
       threshold: n("#py-thr"), cap: n("#py-cap"), niLow: n("#py-nl"), niHigh: n("#py-nh"), hlLow: n("#py-hl"), hlHigh: n("#py-hh"), erLow: n("#py-el"), erHigh: n("#py-eh"),
       brackets, point: n("#py-pt"), points: n("#py-pts"), travelDay: n("#py-td"), travelMax: n("#py-tx"), travelMonth: n("#py-tm"),
-      otOn: q("#py-ot").checked, otDay: n("#py-otd") || 8.6, pensionEmp: n("#py-pe"), pensionEr: n("#py-pr"), severance: n("#py-ps"), sickMonth: n("#py-sk"), fullDays: n("#py-fd") || 20 };
+      pensionEmp: n("#py-pe"), pensionEr: n("#py-pr"), severance: n("#py-ps"), sickMonth: n("#py-sk"), fullDays: n("#py-fd") || 20 };
     try { await DB.putGlobal(); toast("הגדרות התלוש נשמרו ✔"); } catch (e) { toast("שגיאה: " + (e.code || e.message)); }
   };
   q("#py-reset").onclick = async () => { if (!confirm("להחזיר את כל השיעורים לברירת המחדל של 2026? (שם החברה נשאר)")) return; const k = { company: P.company, companyCity: P.companyCity, employerNo: P.employerNo }; globalCfg.payroll = { ...defaultPayroll(), ...k }; await DB.putGlobal(); tabPayroll(body); toast("הוחזר ✔"); };
