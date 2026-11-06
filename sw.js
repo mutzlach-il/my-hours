@@ -1,5 +1,5 @@
 // שירות רקע קטן: מאפשר התקנה כאפליקציה ופתיחה מהירה. תמיד מנסה קודם את הרשת.
-const CACHE = "my-hours-v1";
+const CACHE = "my-hours-v2";
 self.addEventListener("install", e => { self.skipWaiting(); e.waitUntil(caches.open(CACHE).then(c => c.addAll(["./", "./index.html", "./icon.svg", "./manifest.webmanifest"]).catch(() => {}))); });
 self.addEventListener("activate", e => { e.waitUntil(self.clients.claim()); });
 self.addEventListener("fetch", e => {

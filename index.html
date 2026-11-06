@@ -3061,7 +3061,7 @@ async function netBlockReport(){
   const bad = [];
   await Promise.all(T.map(async ([d, u]) => { try { await fetch(u, { mode: "no-cors", cache: "no-store" }); } catch (e) { bad.push(d); } }));
   const el = $("login-msg"); el.className = "msg err";
-  el.innerHTML = bad.length ? `⛔ המערכת לא מצליחה להתחבר. נראה שסינון האינטרנט (למשל <b>נטפרי</b>) חוסם את הכתובות:<br><b dir="ltr">${bad.join("<br>")}</b><br>צריך לבקש מהסינון לפתוח אותן (יחד עם <b dir="ltr">mutzlach-il.github.io</b>).`
+  el.innerHTML = bad.length ? `⛔ המערכת לא מצליחה להתחבר. נראה שסינון האינטרנט (למשל <b>נטפרי</b>) חוסם את הכתובות:<br><b dir="ltr">${bad.join("<br>")}</b><br>צריך לבקש מהסינון לפתוח אותן (יחד עם <b dir="ltr">${location.hostname||"mutzlach-il.github.io"}</b>).`
     : "שגיאה בחיבור לשרת. בדוק את האינטרנט ורענן.";
 }
 async function initFirebase(){
@@ -3478,8 +3478,10 @@ function markWeek(){ document.querySelectorAll("tr.weekrow").forEach(r => r.clas
 let installEvt = null;
 window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); installEvt = e; });
 if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(() => {});
-const APP_URL = "https://mutzlach-il.github.io/my-hours/", RCP_URL = "https://mutzlach-il.github.io/my-hours/receipts/";
-const DL_URL = "https://mutzlach-il.github.io/my-hours/download/";
+/* הכתובת של המערכת – לפי המקום שבו היא פתוחה (מוכן למעבר לכתובת bonehsystems.co.il) */
+const MH_BASE = (/(^|\.)bonehsystems\.co\.il$/.test(location.hostname) ? location.origin : "https://mutzlach-il.github.io") + "/my-hours/";
+const APP_URL = MH_BASE, RCP_URL = MH_BASE + "receipts/";
+const DL_URL = MH_BASE + "download/";
 const IN_APP = (() => { try { if (/[?&]app=android/.test(location.search)) sessionStorage.setItem("inApp", "1"); return sessionStorage.getItem("inApp") === "1" || matchMedia("(display-mode: standalone)").matches || document.referrer.startsWith("android-app://"); } catch (e) { return false; } })();
 async function installApp(){
   const isAndroid = /android/i.test(navigator.userAgent), rcpM = document.documentElement.classList.contains("mode-rcp");
